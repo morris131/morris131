@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="R01DtrTblROr_C2SkIMI9BZFFw_1FH4bT5WNNVAkdm4">
+  <meta name="baidu-site-verification" content="ZORq9vnduv">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="lambda与集合首先回顾一下Java集合框架的接口继承结构：">
+<meta name="keywords" content="java8">
+<meta property="og:type" content="article">
+<meta property="og:title" content="lambda与集合">
+<meta property="og:url" content="https:&#x2F;&#x2F;morris131.github.io&#x2F;post&#x2F;4a10e949.html">
+<meta property="og:site_name" content="枪手的博客">
+<meta property="og:description" content="lambda与集合首先回顾一下Java集合框架的接口继承结构：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;java8&#x2F;images&#x2F;1574144689272.png">
+<meta property="og:updated_time" content="2019-11-07T16:00:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;java8&#x2F;images&#x2F;1574144689272.png">
+
+<link rel="canonical" href="https://morris131.github.io/post/4a10e949.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>lambda与集合 | 枪手的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="https://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">枪手的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">知识改变命运，编程照亮人生</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">13</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">6</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">55</span></a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/4a10e949.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          lambda与集合
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-08 00:00:00" itemprop="dateCreated datePublished" datetime="2019-11-08T00:00:00+08:00">2019-11-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java8/" itemprop="url" rel="index">
+                    <span itemprop="name">java8</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="lambda与集合"><a href="#lambda与集合" class="headerlink" title="lambda与集合"></a>lambda与集合</h1><p>首先回顾一下Java集合框架的接口继承结构：<br><img src="https://gitee.com/morris131/morris-book/raw/master/back/java/java8/images/1574144689272.png" alt></p><a id="more"></a>
+<p>上图中绿色标注的接口类，表示在Java8中加入了新的接口方法，当然由于继承关系，他们相应的子类也都会继承这些新方法。下表详细列举了这些方法。</p>
+<table>
+<thead>
+<tr>
+<th>接口名</th>
+<th>Java8新加入的方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Collection</td>
+<td>removeIf() spliterator() stream() parallelStream() forEach()</td>
+</tr>
+<tr>
+<td>List</td>
+<td>replaceAll() sort()</td>
+</tr>
+<tr>
+<td>Map</td>
+<td>getOrDefault() forEach() replaceAll() putIfAbsent() remove() replace() computeIfAbsent() computeIfPresent() compute() merge()</td>
+</tr>
+</tbody></table>
+<p>这些新加入的方法大部分要用到<code>java.util.function</code>包下的接口，这意味着这些方法大部分都跟Lambda表达式相关。我们将逐一学习这些方法。</p>
+<h2 id="Collection中的新方法"><a href="#Collection中的新方法" class="headerlink" title="Collection中的新方法"></a>Collection中的新方法</h2><p>接口<code>Collection</code>和<code>List</code>新加入了一些方法，我们以<code>List</code>的子类<code>ArrayList</code>为例来说明。</p>
+<h3 id="forEach"><a href="#forEach" class="headerlink" title="forEach()"></a>forEach()</h3><p>该方法的签名为：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">void for<span class="constructor">Each(Consumer&lt;? <span class="params">super</span> E&gt; <span class="params">action</span>)</span></span><br></pre></td></tr></table></figure>
+<p>作用是迭代容器中所有的元素执行<code>action</code>指定的动作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// java7以前需使用for增强实现迭代</span></span><br><span class="line"><span class="keyword">for</span> (Dish dish : dishes) &#123;</span><br><span class="line">    System.out.println(dish);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 遍历所有的元素</span></span><br><span class="line">dishes.forEach(System.out::println);</span><br></pre></td></tr></table></figure>
+
+<h3 id="removeIf"><a href="#removeIf" class="headerlink" title="removeIf()"></a>removeIf()</h3><p>该方法签名为</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">boolean</span> removeIf(Predicate&lt;? <span class="keyword">super</span> E&gt; <span class="built_in">filter</span>)</span><br></pre></td></tr></table></figure>
+<p>作用是删除容器中所有满足<code>filter</code>指定条件的元素</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 删除所有的蔬菜元素</span></span><br><span class="line">dishes.removeIf(Dish::isVegetarian);</span><br></pre></td></tr></table></figure>
+
+<h3 id="replaceAll"><a href="#replaceAll" class="headerlink" title="replaceAll()"></a>replaceAll()</h3><p>该方法签名为</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">replaceAll</span><span class="params">(UnaryOperator&lt;E&gt; <span class="keyword">operator</span>)</span></span></span><br></pre></td></tr></table></figure>
+<p>作用是对每个元素执行<code>operator</code>指定的操作，并用操作结果来替换原来的元素。UnaryOperator是函数式接口Function的子接口。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 将所有的元素的名字改为大写</span></span><br><span class="line">List&lt;String&gt; strings = <span class="module-access"><span class="module"><span class="identifier">Arrays</span>.</span></span><span class="keyword">as</span><span class="constructor">List(<span class="string">"I"</span>, <span class="string">"love"</span>, <span class="string">"you"</span>, <span class="string">"too"</span>)</span>;</span><br><span class="line">strings.replace<span class="constructor">All(String::<span class="params">toUpperCase</span>)</span>;</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(strings);</span><br></pre></td></tr></table></figure>
+
+<h3 id="sort"><a href="#sort" class="headerlink" title="sort()"></a>sort()</h3><p>该方法定义在<code>List</code>接口中，方法签名为</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> <span class="keyword">sort</span>(Comparator&lt;? <span class="keyword">super</span> E&gt; c)</span><br></pre></td></tr></table></figure>
+<p>该方法根据<code>c</code>指定的比较规则对容器元素进行排序。</p>
+<p><code>Comparator</code>接口我们并不陌生，其中有一个方法<code>int compare(T o1, T o2)</code>需要实现，显然该接口是个函数接口。</p>
+<p>java8为Comparator接口提供了许多静态工具类方法，下面会一一讲解。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 对整数列表升序排序</span></span><br><span class="line">List&lt;Integer&gt; list1 = <span class="module-access"><span class="module"><span class="identifier">Arrays</span>.</span></span><span class="keyword">as</span><span class="constructor">List(1, 11, 3, 9, 7)</span>;</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"before sort: "</span> + list1);</span><br><span class="line">list1.sort(<span class="module-access"><span class="module"><span class="identifier">Comparator</span>.</span></span>natural<span class="constructor">Order()</span>);</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"after natural order sort: "</span> + list1);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 对整数列表降序排序</span></span><br><span class="line">List&lt;Integer&gt; list2 = <span class="module-access"><span class="module"><span class="identifier">Arrays</span>.</span></span><span class="keyword">as</span><span class="constructor">List(1, 11, 3, 9, 7)</span>;</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"before sort: "</span> + list2);</span><br><span class="line">list2.sort(<span class="module-access"><span class="module"><span class="identifier">Comparator</span>.</span></span>reverse<span class="constructor">Order()</span>);</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"after reverse order sort: "</span> + list2);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 对对象的单个属性排序</span></span><br><span class="line">List&lt;Dish&gt; list3 = <span class="module-access"><span class="module"><span class="identifier">Dish</span>.</span></span>create<span class="constructor">List()</span>;</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"before sort: "</span> + list3);</span><br><span class="line">list3.sort(<span class="module-access"><span class="module"><span class="identifier">Comparator</span>.</span></span>comparing<span class="constructor">Int(Dish :: <span class="params">getCalories</span>)</span>);</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"after sort: "</span> + list3);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 对对象的多个属性排序</span></span><br><span class="line">List&lt;Dish&gt; list4 = <span class="module-access"><span class="module"><span class="identifier">Dish</span>.</span></span>create<span class="constructor">List()</span>;</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"before sort: "</span> + list4);</span><br><span class="line"><span class="comment">// 先以卡路里降序，后以名字升序</span></span><br><span class="line">list4.sort(<span class="module-access"><span class="module"><span class="identifier">Comparator</span>.</span></span>comparing<span class="constructor">Int(Dish::<span class="params">getCalories</span>)</span>.reversed<span class="literal">()</span>.<span class="keyword">then</span><span class="constructor">Comparing(Dish :: <span class="params">getName</span>)</span>);</span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"after sort: "</span> + list4);</span><br></pre></td></tr></table></figure>
+
+<h3 id="spliterator"><a href="#spliterator" class="headerlink" title="spliterator()"></a>spliterator()</h3><p>方法签名为<code>Spliterator&lt;E&gt; spliterator()</code>，该方法返回容器的可拆分迭代器。从名字来看该方法跟<code>iterator()</code>方法有点像，我们知道<code>Iterator</code>是用来迭代容器的，<code>Spliterator</code>也有类似作用，但二者有如下不同：</p>
+<ol>
+<li><code>Spliterator</code>既可以像<code>Iterator</code>那样逐个迭代，也可以批量迭代。批量迭代可以降低迭代的开销。</li>
+<li><code>Spliterator</code>是可拆分的，一个<code>Spliterator</code>可以通过调用<code>Spliterator&lt;T&gt; trySplit()</code>方法来尝试分成两个。一个是<code>this</code>，另一个是新返回的那个，这两个迭代器代表的元素没有重叠。</li>
+</ol>
+<p>可通过（多次）调用<code>Spliterator.trySplit()</code>方法来分解负载，以便多线程处理。</p>
+<h2 id="Map中的新方法"><a href="#Map中的新方法" class="headerlink" title="Map中的新方法"></a>Map中的新方法</h2><p>相比<code>Collection</code>，<code>Map</code>中加入了更多的方法，我们以<code>HashMap</code>为例来逐一探秘。</p>
+<h3 id="forEach-1"><a href="#forEach-1" class="headerlink" title="forEach()"></a>forEach()</h3><p>该方法签名为</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">void for<span class="constructor">Each(BiConsumer&lt;? <span class="params">super</span> K,? <span class="params">super</span> V&gt; <span class="params">action</span>)</span></span><br></pre></td></tr></table></figure>
+<p>作用是遍历<code>Map</code>中的每个映射执行<code>action</code>指定的操作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">HashMap&lt;Integer, String&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">map.put(<span class="number">1</span>, <span class="string">"one"</span>);</span><br><span class="line">map.put(<span class="number">2</span>, <span class="string">"two"</span>);</span><br><span class="line">map.put(<span class="number">3</span>, <span class="string">"three"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Java7以及之前迭代Map</span></span><br><span class="line"><span class="keyword">for</span>(Map.Entry&lt;Integer, String&gt; entry : map.entrySet())&#123;</span><br><span class="line">    System.out.println(entry.getKey() + <span class="string">"="</span> + entry.getValue());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用forEach()结合Lambda表达式迭代Map</span></span><br><span class="line">map.forEach((k, v) -&gt; System.out.println(k + <span class="string">"="</span> + v));</span><br></pre></td></tr></table></figure>
+
+<h3 id="getOrDefault"><a href="#getOrDefault" class="headerlink" title="getOrDefault()"></a>getOrDefault()</h3><p>该方法跟Lambda表达式没关系，但是很有用。方法签名为<code>V getOrDefault(Object key, V defaultValue)</code>，作用是按照给定的<code>key</code>查询<code>Map</code>中对应的<code>value</code>，如果没有找到则返回<code>defaultValue</code>。使用该方法程序员可以省去查询指定键值是否存在的麻烦。</p>
+<h3 id="putIfAbsent"><a href="#putIfAbsent" class="headerlink" title="putIfAbsent()"></a>putIfAbsent()</h3><p>该方法跟Lambda表达式没关系，但是很有用。方法签名为<code>V putIfAbsent(K key, V value)</code>，作用是只有在不存在<code>key</code>值的映射或映射值为<code>null</code>时，才将<code>value</code>指定的值放入到<code>Map</code>中，否则不对<code>Map</code>做更改．该方法将条件判断和赋值合二为一，使用起来更加方便．</p>
+<h3 id="remove"><a href="#remove" class="headerlink" title="remove()"></a>remove()</h3><p>我们都知道<code>Map</code>中有一个<code>remove(Object key)</code>方法，来根据指定<code>key</code>值删除<code>Map</code>中的映射关系；Java8新增了<code>remove(Object key, Object value)</code>方法，只有在当前<code>Map</code>中<code>key</code>正好映射到<code>value</code>时才删除该映射，否则什么也不做．</p>
+<h3 id="replace"><a href="#replace" class="headerlink" title="replace()"></a>replace()</h3><p>在Java7及以前，要想替换<code>Map</code>中的映射关系可通过<code>put(K key, V value)</code>方法实现，该方法总是会用新值替换原来的值．为了更精确的控制替换行为，Java8在<code>Map</code>中加入了两个<code>replace()</code>方法，分别如下：</p>
+<ul>
+<li><code>replace(K key, V value)</code>，只有在当前<code>Map</code>中<strong><code>key</code>的映射存在时</strong>才用<code>value</code>去替换原来的值，否则什么也不做．</li>
+<li><code>replace(K key, V oldValue, V newValue)</code>，只有在当前<code>Map</code>中<strong><code>key</code>的映射存在且等于<code>oldValue</code>时</strong>才用<code>newValue</code>去替换原来的值，否则什么也不做．</li>
+</ul>
+<h3 id="replaceAll-1"><a href="#replaceAll-1" class="headerlink" title="replaceAll()"></a>replaceAll()</h3><p>该方法签名为<code>replaceAll(BiFunction&lt;? super K,? super V,? extends V&gt; function)</code>，作用是对<code>Map</code>中的每个映射执行<code>function</code>指定的操作，并用<code>function</code>的执行结果替换原来的<code>value</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 将所有元素的值都转换成大写</span></span><br><span class="line">map.replaceAll((k,v) -&gt; v.toUpperCase());</span><br></pre></td></tr></table></figure>
+
+<h3 id="merge"><a href="#merge" class="headerlink" title="merge()"></a>merge()</h3><p>该方法签名为<code>merge(K key, V value, BiFunction&lt;? super V,? super V,? extends V&gt; remappingFunction)</code>，作用是：</p>
+<ol>
+<li>如果<code>Map</code>中<code>key</code>对应的映射不存在或者为<code>null</code>，则将<code>value</code>（不能是<code>null</code>）关联到<code>key</code>上；</li>
+<li>否则执行<code>remappingFunction</code>，如果执行结果非<code>null</code>则用该结果跟<code>key</code>关联，否则在<code>Map</code>中删除<code>key</code>的映射．</li>
+</ol>
+<p><code>merge()</code>方法虽然语义有些复杂，但该方法的用方式很明确，一个比较常见的场景是将新的错误信息拼接到原来的信息上，比如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">map.merge(key, newMsg, (v1, v2) -&gt; v1+v2);</span><br></pre></td></tr></table></figure>
+
+<h3 id="compute"><a href="#compute" class="headerlink" title="compute()"></a>compute()</h3><p>该方法签名为<code>compute(K key, BiFunction&lt;? super K,? super V,? extends V&gt; remappingFunction)</code>，作用是把<code>remappingFunction</code>的计算结果关联到<code>key</code>上，如果计算结果为<code>null</code>，则在<code>Map</code>中删除<code>key</code>的映射．</p>
+<p>要实现上述<code>merge()</code>方法中错误信息拼接的例子，使用<code>compute()</code>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">map.compute(key, (k,v) -&gt; v==<span class="keyword">null</span> ? newMsg : v.concat(newMsg));</span><br></pre></td></tr></table></figure>
+
+<h3 id="computeIfAbsent"><a href="#computeIfAbsent" class="headerlink" title="computeIfAbsent()"></a>computeIfAbsent()</h3><p>该方法签名为<code>V computeIfAbsent(K key, Function&lt;? super K,? extends V&gt; mappingFunction)</code>，作用是：只有在当前<code>Map</code>中不存在<code>key</code>值的映射或映射值为<code>null</code>时，才调用<code>mappingFunction</code>，并在<code>mappingFunction</code>执行结果非<code>null</code>时，将结果跟<code>key</code>关联．</p>
+<p><code>computeIfAbsent()</code>常用来对<code>Map</code>的某个<code>key</code>值建立初始化映射．比如我们要实现一个多值映射，<code>Map</code>的定义可能是<code>Map&lt;K,Set&lt;V&gt;&gt;</code>，要向<code>Map</code>中放入新值，可通过如下代码实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;Integer, Set&lt;String&gt;&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"><span class="comment">// Java7及以前的实现方式</span></span><br><span class="line"><span class="keyword">if</span>(map.containsKey(<span class="number">1</span>))&#123;</span><br><span class="line">    map.get(<span class="number">1</span>).add(<span class="string">"one"</span>);</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    Set&lt;String&gt; valueSet = <span class="keyword">new</span> HashSet&lt;String&gt;();</span><br><span class="line">    valueSet.add(<span class="string">"one"</span>);</span><br><span class="line">    map.put(<span class="number">1</span>, valueSet);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Java8的实现方式</span></span><br><span class="line">map.computeIfAbsent(<span class="number">1</span>, v -&gt; <span class="keyword">new</span> HashSet&lt;String&gt;()).add(<span class="string">"yi"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>computeIfAbsent()</code>将条件判断和添加操作合二为一，使代码更加简洁．</p>
+<h3 id="computeIfPresent"><a href="#computeIfPresent" class="headerlink" title="computeIfPresent()"></a>computeIfPresent()</h3><p>该方法签名为<code>V computeIfPresent(K key, BiFunction&lt;? super K,? super V,? extends V&gt; remappingFunction)</code>，作用跟<code>computeIfAbsent()</code>相反，即，只有在当前<code>Map</code>中<strong>存在<code>key</code>值的映射且非<code>null</code>时</strong>，才调用<code>remappingFunction</code>，如果<code>remappingFunction</code>执行结果为<code>null</code>，则删除<code>key</code>的映射，否则使用该结果替换<code>key</code>原来的映射．</p>
+<p>这个函数的功能跟如下代码是等效的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Java7及以前跟computeIfPresent()等效的代码</span></span><br><span class="line"><span class="keyword">if</span> (map.get(key) != <span class="keyword">null</span>) &#123;</span><br><span class="line">    V oldValue = map.get(key);</span><br><span class="line">    V newValue = remappingFunction.apply(key, oldValue);</span><br><span class="line">    <span class="keyword">if</span> (newValue != <span class="keyword">null</span>)</span><br><span class="line">        map.put(key, newValue);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        map.remove(key);</span><br><span class="line">    <span class="keyword">return</span> newValue;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> <span class="keyword">null</span>;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/java8/" rel="tag"><i class="fa fa-tag"></i> java8</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/post/6488f302.html" rel="next" title="Optional">
+                  <i class="fa fa-chevron-left"></i> Optional
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/post/6b148d3e.html" rel="prev" title="Collector的使用">
+                  Collector的使用 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#lambda与集合"><span class="nav-number">1.</span> <span class="nav-text">lambda与集合</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Collection中的新方法"><span class="nav-number">1.1.</span> <span class="nav-text">Collection中的新方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#forEach"><span class="nav-number">1.1.1.</span> <span class="nav-text">forEach()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#removeIf"><span class="nav-number">1.1.2.</span> <span class="nav-text">removeIf()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#replaceAll"><span class="nav-number">1.1.3.</span> <span class="nav-text">replaceAll()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sort"><span class="nav-number">1.1.4.</span> <span class="nav-text">sort()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#spliterator"><span class="nav-number">1.1.5.</span> <span class="nav-text">spliterator()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Map中的新方法"><span class="nav-number">1.2.</span> <span class="nav-text">Map中的新方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#forEach-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">forEach()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#getOrDefault"><span class="nav-number">1.2.2.</span> <span class="nav-text">getOrDefault()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#putIfAbsent"><span class="nav-number">1.2.3.</span> <span class="nav-text">putIfAbsent()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#remove"><span class="nav-number">1.2.4.</span> <span class="nav-text">remove()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#replace"><span class="nav-number">1.2.5.</span> <span class="nav-text">replace()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#replaceAll-1"><span class="nav-number">1.2.6.</span> <span class="nav-text">replaceAll()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#merge"><span class="nav-number">1.2.7.</span> <span class="nav-text">merge()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#compute"><span class="nav-number">1.2.8.</span> <span class="nav-text">compute()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#computeIfAbsent"><span class="nav-number">1.2.9.</span> <span class="nav-text">computeIfAbsent()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#computeIfPresent"><span class="nav-number">1.2.10.</span> <span class="nav-text">computeIfPresent()</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="https://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Morris"
+    src="/images/morris.png">
+  <p class="site-author-name" itemprop="name">Morris</p>
+  <div class="site-description" itemprop="description">你现在所得到的安逸将来要双倍偿还</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Morris</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

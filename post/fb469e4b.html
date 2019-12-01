@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="R01DtrTblROr_C2SkIMI9BZFFw_1FH4bT5WNNVAkdm4">
+  <meta name="baidu-site-verification" content="ZORq9vnduv">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="循环依赖循环依赖其实就是循环引用，也就是两个或则两个以上的bean互相持有对方，最终形成闭环。比如A依赖于B，B依赖于C，C又依赖于A。">
+<meta name="keywords" content="spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="循环依赖">
+<meta property="og:url" content="https:&#x2F;&#x2F;morris131.github.io&#x2F;post&#x2F;fb469e4b.html">
+<meta property="og:site_name" content="枪手的博客">
+<meta property="og:description" content="循环依赖循环依赖其实就是循环引用，也就是两个或则两个以上的bean互相持有对方，最终形成闭环。比如A依赖于B，B依赖于C，C又依赖于A。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-18T16:00:00.000Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://morris131.github.io/post/fb469e4b.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>循环依赖 | 枪手的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="https://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">枪手的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">知识改变命运，编程照亮人生</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">13</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">6</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">55</span></a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/fb469e4b.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          循环依赖
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-19 00:00:00" itemprop="dateCreated datePublished" datetime="2019-11-19T00:00:00+08:00">2019-11-19</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index">
+                    <span itemprop="name">spring</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="循环依赖"><a href="#循环依赖" class="headerlink" title="循环依赖"></a>循环依赖</h1><p>循环依赖其实就是循环引用，也就是两个或则两个以上的bean互相持有对方，最终形成闭环。比如A依赖于B，B依赖于C，C又依赖于A。</p><a id="more"></a>
+<h2 id="spring如何检测是否存在循环依赖"><a href="#spring如何检测是否存在循环依赖" class="headerlink" title="spring如何检测是否存在循环依赖"></a>spring如何检测是否存在循环依赖</h2><p>Spring容器会将每一个正在创建的Bean标识符放在一个“当前创建Bean池”中，Bean标识符在创建过程中将一直保持在这个池中，因此如果在创建Bean过程中发现自己已经在“当前创建Bean池”里时将抛出BeanCurrentlyInCreationException异常表示循环依赖；而对于创建完毕的Bean将从“当前创建Bean池”中清除掉。</p>
+<h2 id="构造器参数循环依赖"><a href="#构造器参数循环依赖" class="headerlink" title="构造器参数循环依赖"></a>构造器参数循环依赖</h2><p>通过构造器注入构成的循环依赖，此依赖是无法解决的，只能抛出BeanCurrentlyInCreationException异常表示循环依赖。</p>
+<p>下面是一个A依赖B，B依赖C，C依赖A的例子</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.cycle;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> B b;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">A</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	A(B b) &#123;</span><br><span class="line">		<span class="keyword">this</span>.b = b;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> B <span class="title">getB</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> b;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setB</span><span class="params">(B b)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.b = b;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">package com.morris.spring.cycle;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">B</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="type">C</span> <span class="built_in">c</span>;</span><br><span class="line"></span><br><span class="line">	<span class="type">B</span>() &#123;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="type">B</span>(<span class="type">C</span> <span class="built_in">c</span>) &#123;</span><br><span class="line">		this.<span class="built_in">c</span> = <span class="built_in">c</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="type">C</span> getC() &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">c</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> void setC(<span class="type">C</span> <span class="built_in">c</span>) &#123;</span><br><span class="line">		this.<span class="built_in">c</span> = <span class="built_in">c</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.cycle;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">C</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> A a;</span><br><span class="line"></span><br><span class="line">	C() &#123;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	C(A a) &#123;</span><br><span class="line">		<span class="keyword">this</span>.a = a;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> A <span class="title">getA</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> a;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setA</span><span class="params">(A a)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.a = a;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span> <span class="attr">xmlns:p</span>=<span class="string">"http://www.springframework.org/schema/p"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:aop</span>=<span class="string">"http://www.springframework.org/schema/aop"</span> <span class="attr">xmlns:tx</span>=<span class="string">"http://www.springframework.org/schema/tx"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xsi:schemaLocation</span>=<span class="string">"</span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/beans </span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/beans/spring-beans-4.3.xsd</span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/context</span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/context/spring-context-4.3.xsd"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"a"</span> <span class="attr">class</span>=<span class="string">"com.morris.spring.cycle.A"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">index</span>=<span class="string">"0"</span> <span class="attr">ref</span>=<span class="string">"b"</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">	</span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"b"</span> <span class="attr">class</span>=<span class="string">"com.morris.spring.cycle.B"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">index</span>=<span class="string">"0"</span> <span class="attr">ref</span>=<span class="string">"c"</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">	</span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"c"</span> <span class="attr">class</span>=<span class="string">"com.morris.spring.cycle.C"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">index</span>=<span class="string">"0"</span> <span class="attr">ref</span>=<span class="string">"a"</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.cycle;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.support.ClassPathXmlApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConstructCycleTest</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) &#123;</span><br><span class="line">		<span class="keyword">new</span> <span class="type">ClassPathXmlApplicationContext</span>(<span class="string">"classpath:spring-cycle-construct.xml"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">八月 <span class="number">21</span>, <span class="number">2018</span> <span class="number">6</span>:<span class="number">34</span>:<span class="number">25</span> 下午 org.springframework.context.support.AbstractApplicationContext prepareRefresh</span><br><span class="line">信息: Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@<span class="number">3</span>dd3bcd: startup date <span class="literal">[T<span class="identifier">ue</span> A<span class="identifier">ug</span> <span class="number">21</span> <span class="number">18</span>:<span class="number">34</span>:<span class="number">25</span> CST <span class="number">2018</span>]</span>; root <span class="keyword">of</span> context hierarchy</span><br><span class="line">八月 <span class="number">21</span>, <span class="number">2018</span> <span class="number">6</span>:<span class="number">34</span>:<span class="number">25</span> 下午 org.springframework.beans.factory.xml.XmlBeanDefinitionReader loadBeanDefinitions</span><br><span class="line">信息: Loading XML bean definitions from <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">construct</span>.<span class="identifier">xml</span>]</span></span><br><span class="line">八月 <span class="number">21</span>, <span class="number">2018</span> <span class="number">6</span>:<span class="number">34</span>:<span class="number">28</span> 下午 org.springframework.context.support.AbstractApplicationContext refresh</span><br><span class="line">警告: Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'a'</span> defined <span class="keyword">in</span> <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">construct</span>.<span class="identifier">xml</span>]</span>: Cannot resolve reference <span class="keyword">to</span> bean <span class="character">'b'</span> <span class="keyword">while</span> setting constructor argument; nested <span class="keyword">exception</span> is org.springframework.beans.factory.BeanCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'b'</span> defined <span class="keyword">in</span> <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">construct</span>.<span class="identifier">xml</span>]</span>: Cannot resolve reference <span class="keyword">to</span> bean <span class="character">'c'</span> <span class="keyword">while</span> setting constructor argument; nested <span class="keyword">exception</span> is org.springframework.beans.factory.BeanCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'c'</span> defined <span class="keyword">in</span> <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">construct</span>.<span class="identifier">xml</span>]</span>: Cannot resolve reference <span class="keyword">to</span> bean <span class="character">'a'</span> <span class="keyword">while</span> setting constructor argument; nested <span class="keyword">exception</span> is org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'a'</span>: Requested bean is currently <span class="keyword">in</span> creation: Is there an unresolvable circular reference?</span><br><span class="line">Exception <span class="keyword">in</span> thread <span class="string">"main"</span> org.springframework.beans.factory.BeanCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'a'</span> defined <span class="keyword">in</span> <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">construct</span>.<span class="identifier">xml</span>]</span>: Cannot resolve reference <span class="keyword">to</span> bean <span class="character">'b'</span> <span class="keyword">while</span> setting constructor argument; nested <span class="keyword">exception</span> is org.springframework.beans.factory.BeanCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'b'</span> defined <span class="keyword">in</span> <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">construct</span>.<span class="identifier">xml</span>]</span>: Cannot resolve reference <span class="keyword">to</span> bean <span class="character">'c'</span> <span class="keyword">while</span> setting constructor argument; nested <span class="keyword">exception</span> is org.springframework.beans.factory.BeanCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'c'</span> defined <span class="keyword">in</span> <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">construct</span>.<span class="identifier">xml</span>]</span>: Cannot resolve reference <span class="keyword">to</span> bean <span class="character">'a'</span> <span class="keyword">while</span> setting constructor argument; nested <span class="keyword">exception</span> is org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'a'</span>: Requested bean is currently <span class="keyword">in</span> creation: Is there an unresolvable circular reference?</span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">Reference(BeanDefinitionValueResolver.<span class="params">java</span>:378)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">ValueIfNecessary(BeanDefinitionValueResolver.<span class="params">java</span>:110)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">ConstructorResolver</span>.</span></span>resolve<span class="constructor">ConstructorArguments(ConstructorResolver.<span class="params">java</span>:625)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">ConstructorResolver</span>.</span></span>autowire<span class="constructor">Constructor(ConstructorResolver.<span class="params">java</span>:153)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>autowire<span class="constructor">Constructor(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:1267)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>create<span class="constructor">BeanInstance(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:1124)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span><span class="keyword">do</span><span class="constructor">CreateBean(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:535)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>create<span class="constructor">Bean(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:495)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span>lambda<span class="constructor">$doGetBean$0(AbstractBeanFactory.<span class="params">java</span>:317)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">DefaultSingletonBeanRegistry</span>.</span></span>get<span class="constructor">Singleton(DefaultSingletonBeanRegistry.<span class="params">java</span>:222)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span><span class="keyword">do</span><span class="constructor">GetBean(AbstractBeanFactory.<span class="params">java</span>:315)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span>get<span class="constructor">Bean(AbstractBeanFactory.<span class="params">java</span>:199)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">DefaultListableBeanFactory</span>.</span></span>pre<span class="constructor">InstantiateSingletons(DefaultListableBeanFactory.<span class="params">java</span>:759)</span></span><br><span class="line">	at org.springframework.context.support.<span class="module-access"><span class="module"><span class="identifier">AbstractApplicationContext</span>.</span></span>finish<span class="constructor">BeanFactoryInitialization(AbstractApplicationContext.<span class="params">java</span>:869)</span></span><br><span class="line">	at org.springframework.context.support.<span class="module-access"><span class="module"><span class="identifier">AbstractApplicationContext</span>.</span></span>refresh(<span class="module-access"><span class="module"><span class="identifier">AbstractApplicationContext</span>.</span></span>java:<span class="number">550</span>)</span><br><span class="line">	at org.springframework.context.support.ClassPathXmlApplicationContext.&lt;init&gt;(<span class="module-access"><span class="module"><span class="identifier">ClassPathXmlApplicationContext</span>.</span></span>java:<span class="number">144</span>)</span><br><span class="line">	at org.springframework.context.support.ClassPathXmlApplicationContext.&lt;init&gt;(<span class="module-access"><span class="module"><span class="identifier">ClassPathXmlApplicationContext</span>.</span></span>java:<span class="number">85</span>)</span><br><span class="line">	at com.morris.spring.cycle.<span class="module-access"><span class="module"><span class="identifier">ConstructCycleTest</span>.</span></span>main(<span class="module-access"><span class="module"><span class="identifier">ConstructCycleTest</span>.</span></span>java:<span class="number">8</span>)</span><br><span class="line">Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'b'</span> defined <span class="keyword">in</span> <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">construct</span>.<span class="identifier">xml</span>]</span>: Cannot resolve reference <span class="keyword">to</span> bean <span class="character">'c'</span> <span class="keyword">while</span> setting constructor argument; nested <span class="keyword">exception</span> is org.springframework.beans.factory.BeanCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'c'</span> defined <span class="keyword">in</span> <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">construct</span>.<span class="identifier">xml</span>]</span>: Cannot resolve reference <span class="keyword">to</span> bean <span class="character">'a'</span> <span class="keyword">while</span> setting constructor argument; nested <span class="keyword">exception</span> is org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'a'</span>: Requested bean is currently <span class="keyword">in</span> creation: Is there an unresolvable circular reference?</span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">Reference(BeanDefinitionValueResolver.<span class="params">java</span>:378)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">ValueIfNecessary(BeanDefinitionValueResolver.<span class="params">java</span>:110)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">ConstructorResolver</span>.</span></span>resolve<span class="constructor">ConstructorArguments(ConstructorResolver.<span class="params">java</span>:625)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">ConstructorResolver</span>.</span></span>autowire<span class="constructor">Constructor(ConstructorResolver.<span class="params">java</span>:153)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>autowire<span class="constructor">Constructor(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:1267)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>create<span class="constructor">BeanInstance(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:1124)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span><span class="keyword">do</span><span class="constructor">CreateBean(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:535)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>create<span class="constructor">Bean(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:495)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span>lambda<span class="constructor">$doGetBean$0(AbstractBeanFactory.<span class="params">java</span>:317)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">DefaultSingletonBeanRegistry</span>.</span></span>get<span class="constructor">Singleton(DefaultSingletonBeanRegistry.<span class="params">java</span>:222)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span><span class="keyword">do</span><span class="constructor">GetBean(AbstractBeanFactory.<span class="params">java</span>:315)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span>get<span class="constructor">Bean(AbstractBeanFactory.<span class="params">java</span>:199)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">Reference(BeanDefinitionValueResolver.<span class="params">java</span>:367)</span></span><br><span class="line"><span class="operator">	... </span><span class="number">17</span> more</span><br><span class="line">Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'c'</span> defined <span class="keyword">in</span> <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">construct</span>.<span class="identifier">xml</span>]</span>: Cannot resolve reference <span class="keyword">to</span> bean <span class="character">'a'</span> <span class="keyword">while</span> setting constructor argument; nested <span class="keyword">exception</span> is org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'a'</span>: Requested bean is currently <span class="keyword">in</span> creation: Is there an unresolvable circular reference?</span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">Reference(BeanDefinitionValueResolver.<span class="params">java</span>:378)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">ValueIfNecessary(BeanDefinitionValueResolver.<span class="params">java</span>:110)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">ConstructorResolver</span>.</span></span>resolve<span class="constructor">ConstructorArguments(ConstructorResolver.<span class="params">java</span>:625)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">ConstructorResolver</span>.</span></span>autowire<span class="constructor">Constructor(ConstructorResolver.<span class="params">java</span>:153)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>autowire<span class="constructor">Constructor(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:1267)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>create<span class="constructor">BeanInstance(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:1124)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span><span class="keyword">do</span><span class="constructor">CreateBean(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:535)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>create<span class="constructor">Bean(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:495)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span>lambda<span class="constructor">$doGetBean$0(AbstractBeanFactory.<span class="params">java</span>:317)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">DefaultSingletonBeanRegistry</span>.</span></span>get<span class="constructor">Singleton(DefaultSingletonBeanRegistry.<span class="params">java</span>:222)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span><span class="keyword">do</span><span class="constructor">GetBean(AbstractBeanFactory.<span class="params">java</span>:315)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span>get<span class="constructor">Bean(AbstractBeanFactory.<span class="params">java</span>:199)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">Reference(BeanDefinitionValueResolver.<span class="params">java</span>:367)</span></span><br><span class="line"><span class="operator">	... </span><span class="number">29</span> more</span><br><span class="line">Caused by: org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'a'</span>: Requested bean is currently <span class="keyword">in</span> creation: Is there an unresolvable circular reference?</span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">DefaultSingletonBeanRegistry</span>.</span></span>before<span class="constructor">SingletonCreation(DefaultSingletonBeanRegistry.<span class="params">java</span>:339)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">DefaultSingletonBeanRegistry</span>.</span></span>get<span class="constructor">Singleton(DefaultSingletonBeanRegistry.<span class="params">java</span>:215)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span><span class="keyword">do</span><span class="constructor">GetBean(AbstractBeanFactory.<span class="params">java</span>:315)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span>get<span class="constructor">Bean(AbstractBeanFactory.<span class="params">java</span>:199)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">Reference(BeanDefinitionValueResolver.<span class="params">java</span>:367)</span></span><br><span class="line"><span class="operator">	... </span><span class="number">41</span> more</span><br></pre></td></tr></table></figure>
+<p>过程分析：</p>
+<ol>
+<li>创建a，首先去”当前创建bean池”查找是否当前bean正在创建，如果没发现，则继续准备其需要的构造器参数”b”，并将”a”标识符放到”当前创建bean池”。</li>
+<li>创建b，首先去”当前创建bean池”查找是否当前bean正在创建，如果没发现，则继续准备其需要的构造器参数”c”，并将”b”标识符放到”当前创建bean池”。</li>
+<li>创建c，首先去”当前创建bean池”查找是否当前bean正在创建，如果没发现，则继续准备其需要的构造器参数”a”，并将”c”标识符放到”当前创建Bean池”。</li>
+<li>创建a，发现该bean标识符在”当前创建bean池”中，因为表示循环依赖，抛出BeanCurrentlyInCreationException</li>
+</ol>
+<h2 id="setter-singleton循环依赖"><a href="#setter-singleton循环依赖" class="headerlink" title="setter singleton循环依赖"></a>setter singleton循环依赖</h2><p>setter注入方式构成的循环依赖。对于setter注入造成的依赖是通过Spring容器提前暴露刚完成构造器注入但未完成其他步骤（如setter注入）的bean来完成的，而且只能解决单例作用域的bean循环依赖。通过提前暴露一个单例工厂方法，从而使其他bean能引用到该bean，关键源码如下所示：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="markdown">/**</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet"> * </span>Add </span>the<span class="markdown"> given singleton factory for building </span>the<span class="markdown"> specified singleton</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet"> * </span>if necessary.</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet"> * </span><span class="xml"><span class="tag">&lt;<span class="name">p</span>&gt;</span></span>To be called for eager registration of singletons, e.g. to be able to</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet"> * </span>resolve circular references.</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet"> * </span>@param beanName </span>the<span class="markdown"> name of </span>the<span class="markdown"> bean</span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet"> * </span>@param singletonFactory </span>the<span class="markdown"> factory for </span>the<span class="markdown"> singleton object</span></span></span><br><span class="line"><span class="comment"><span class="markdown"> */</span></span></span><br><span class="line">protected <span class="keyword">void</span> addSingletonFactory(<span class="built_in">String</span> beanName, ObjectFactory&lt;?&gt; singletonFactory) &#123;</span><br><span class="line">	Assert.notNull(singletonFactory, <span class="string">"Singleton factory must not be null"</span>);</span><br><span class="line">	synchronized (<span class="keyword">this</span>.singletonObjects) &#123;</span><br><span class="line">		<span class="keyword">if</span> (!<span class="keyword">this</span>.singletonObjects.containsKey(beanName)) &#123;</span><br><span class="line">			<span class="keyword">this</span>.singletonFactories.put(beanName, singletonFactory);</span><br><span class="line">			<span class="keyword">this</span>.earlySingletonObjects.remove(beanName);</span><br><span class="line">			<span class="keyword">this</span>.registeredSingletons.add(beanName);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>示例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span> <span class="attr">xmlns:p</span>=<span class="string">"http://www.springframework.org/schema/p"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:aop</span>=<span class="string">"http://www.springframework.org/schema/aop"</span> <span class="attr">xmlns:tx</span>=<span class="string">"http://www.springframework.org/schema/tx"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xsi:schemaLocation</span>=<span class="string">"</span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/beans </span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/beans/spring-beans-4.3.xsd</span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/context</span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/context/spring-context-4.3.xsd"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"a"</span> <span class="attr">class</span>=<span class="string">"com.morris.spring.cycle.A"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"b"</span> <span class="attr">ref</span>=<span class="string">"b"</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">	</span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"b"</span> <span class="attr">class</span>=<span class="string">"com.morris.spring.cycle.B"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"c"</span> <span class="attr">ref</span>=<span class="string">"c"</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">	</span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"c"</span> <span class="attr">class</span>=<span class="string">"com.morris.spring.cycle.C"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"a"</span> <span class="attr">ref</span>=<span class="string">"a"</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>过程分析：</p>
+<ol>
+<li>创建a，首先根据无参构造器创建bean，并暴露一个”ObjectFactory”用于返回一个提前暴露一个创建中的bean，并将”a”标识符放到”当前创建bean池”，然后进行setter注入”b”。</li>
+<li>创建b，首先根据无参构造器创建bean，并暴露一个”ObjectFactory”用于返回一个提前暴露一个创建中的bean，并将”b”标识符放到”当前创建bean池”，然后进行setter注入”c”。</li>
+<li>创建c，首先根据无参构造器创建bean，并暴露一个”ObjectFactory”用于返回一个提前暴露一个创建中的bean，并将”c”标识符放到”当前创建bean池”，然后进行setter注入”a”。进行注入”a”时由于提前暴露了”ObjectFactory”工厂，从而使用它返回提前暴露一个创建中的bean。</li>
+<li>最后在依赖注入”b”和”a”，完成setter注入。</li>
+</ol>
+<h2 id="setter-prototype循环依赖"><a href="#setter-prototype循环依赖" class="headerlink" title="setter prototype循环依赖"></a>setter prototype循环依赖</h2><p>对于prototype作用域bean，Spring容器无法完成依赖注入，因为Spring容器不进行缓存”prototype”作用域的bean，因此无法提前暴露一个创建中的bean。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span> <span class="attr">xmlns:p</span>=<span class="string">"http://www.springframework.org/schema/p"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:aop</span>=<span class="string">"http://www.springframework.org/schema/aop"</span> <span class="attr">xmlns:tx</span>=<span class="string">"http://www.springframework.org/schema/tx"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xsi:schemaLocation</span>=<span class="string">"</span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/beans </span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/beans/spring-beans-4.3.xsd</span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/context</span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/context/spring-context-4.3.xsd"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"a"</span> <span class="attr">class</span>=<span class="string">"com.morris.spring.cycle.A"</span> <span class="attr">scope</span>=<span class="string">"prototype"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"b"</span> <span class="attr">ref</span>=<span class="string">"b"</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">	</span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"b"</span> <span class="attr">class</span>=<span class="string">"com.morris.spring.cycle.B"</span> <span class="attr">scope</span>=<span class="string">"prototype"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"c"</span> <span class="attr">ref</span>=<span class="string">"c"</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">	</span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"c"</span> <span class="attr">class</span>=<span class="string">"com.morris.spring.cycle.C"</span> <span class="attr">scope</span>=<span class="string">"prototype"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"a"</span> <span class="attr">ref</span>=<span class="string">"a"</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">package</span> com.morris.spring.cycle;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.support.ClassPathXmlApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SettlePrototypeCycleTest</span> </span>&#123;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) &#123;</span><br><span class="line">		ClassPathXmlApplicationContext context = <span class="keyword">new</span> <span class="type">ClassPathXmlApplicationContext</span>(<span class="string">"classpath:spring-cycle-prototype.xml"</span>);</span><br><span class="line">		context.getBean(<span class="string">"a"</span>); <span class="comment">// //此时必须要获取Spring管理的实例，因为现在scope="prototype" 只有请求获取的时候才会实例化对象</span></span><br><span class="line">		context.close();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">八月 <span class="number">22</span>, <span class="number">2018</span> <span class="number">9</span>:<span class="number">56</span>:<span class="number">44</span> 上午 org.springframework.context.support.AbstractApplicationContext prepareRefresh</span><br><span class="line">信息: Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@<span class="number">3</span>dd3bcd: startup date <span class="literal">[W<span class="identifier">ed</span> A<span class="identifier">ug</span> <span class="number">22</span> <span class="number">09</span>:<span class="number">56</span>:<span class="number">44</span> CST <span class="number">2018</span>]</span>; root <span class="keyword">of</span> context hierarchy</span><br><span class="line">八月 <span class="number">22</span>, <span class="number">2018</span> <span class="number">9</span>:<span class="number">56</span>:<span class="number">44</span> 上午 org.springframework.beans.factory.xml.XmlBeanDefinitionReader loadBeanDefinitions</span><br><span class="line">信息: Loading XML bean definitions from <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">prototype</span>.<span class="identifier">xml</span>]</span></span><br><span class="line">Exception <span class="keyword">in</span> thread <span class="string">"main"</span> org.springframework.beans.factory.BeanCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'a'</span> defined <span class="keyword">in</span> <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">prototype</span>.<span class="identifier">xml</span>]</span>: Cannot resolve reference <span class="keyword">to</span> bean <span class="character">'b'</span> <span class="keyword">while</span> setting bean property <span class="character">'b'</span>; nested <span class="keyword">exception</span> is org.springframework.beans.factory.BeanCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'b'</span> defined <span class="keyword">in</span> <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">prototype</span>.<span class="identifier">xml</span>]</span>: Cannot resolve reference <span class="keyword">to</span> bean <span class="character">'c'</span> <span class="keyword">while</span> setting bean property <span class="character">'c'</span>; nested <span class="keyword">exception</span> is org.springframework.beans.factory.BeanCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'c'</span> defined <span class="keyword">in</span> <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">prototype</span>.<span class="identifier">xml</span>]</span>: Cannot resolve reference <span class="keyword">to</span> bean <span class="character">'a'</span> <span class="keyword">while</span> setting bean property <span class="character">'a'</span>; nested <span class="keyword">exception</span> is org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'a'</span>: Requested bean is currently <span class="keyword">in</span> creation: Is there an unresolvable circular reference?</span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">Reference(BeanDefinitionValueResolver.<span class="params">java</span>:378)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">ValueIfNecessary(BeanDefinitionValueResolver.<span class="params">java</span>:110)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>apply<span class="constructor">PropertyValues(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:1602)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>populate<span class="constructor">Bean(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:1354)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span><span class="keyword">do</span><span class="constructor">CreateBean(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:572)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>create<span class="constructor">Bean(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:495)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span><span class="keyword">do</span><span class="constructor">GetBean(AbstractBeanFactory.<span class="params">java</span>:335)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span>get<span class="constructor">Bean(AbstractBeanFactory.<span class="params">java</span>:199)</span></span><br><span class="line">	at org.springframework.context.support.<span class="module-access"><span class="module"><span class="identifier">AbstractApplicationContext</span>.</span></span>get<span class="constructor">Bean(AbstractApplicationContext.<span class="params">java</span>:1089)</span></span><br><span class="line">	at com.morris.spring.cycle.<span class="module-access"><span class="module"><span class="identifier">SettlePrototypeCycleTest</span>.</span></span>main(<span class="module-access"><span class="module"><span class="identifier">SettlePrototypeCycleTest</span>.</span></span>java:<span class="number">9</span>)</span><br><span class="line">Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'b'</span> defined <span class="keyword">in</span> <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">prototype</span>.<span class="identifier">xml</span>]</span>: Cannot resolve reference <span class="keyword">to</span> bean <span class="character">'c'</span> <span class="keyword">while</span> setting bean property <span class="character">'c'</span>; nested <span class="keyword">exception</span> is org.springframework.beans.factory.BeanCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'c'</span> defined <span class="keyword">in</span> <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">prototype</span>.<span class="identifier">xml</span>]</span>: Cannot resolve reference <span class="keyword">to</span> bean <span class="character">'a'</span> <span class="keyword">while</span> setting bean property <span class="character">'a'</span>; nested <span class="keyword">exception</span> is org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'a'</span>: Requested bean is currently <span class="keyword">in</span> creation: Is there an unresolvable circular reference?</span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">Reference(BeanDefinitionValueResolver.<span class="params">java</span>:378)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">ValueIfNecessary(BeanDefinitionValueResolver.<span class="params">java</span>:110)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>apply<span class="constructor">PropertyValues(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:1602)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>populate<span class="constructor">Bean(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:1354)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span><span class="keyword">do</span><span class="constructor">CreateBean(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:572)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>create<span class="constructor">Bean(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:495)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span><span class="keyword">do</span><span class="constructor">GetBean(AbstractBeanFactory.<span class="params">java</span>:335)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span>get<span class="constructor">Bean(AbstractBeanFactory.<span class="params">java</span>:199)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">Reference(BeanDefinitionValueResolver.<span class="params">java</span>:367)</span></span><br><span class="line"><span class="operator">	... </span><span class="number">9</span> more</span><br><span class="line">Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'c'</span> defined <span class="keyword">in</span> <span class="keyword">class</span> path resource <span class="literal">[<span class="identifier">spring</span>-<span class="identifier">cycle</span>-<span class="identifier">prototype</span>.<span class="identifier">xml</span>]</span>: Cannot resolve reference <span class="keyword">to</span> bean <span class="character">'a'</span> <span class="keyword">while</span> setting bean property <span class="character">'a'</span>; nested <span class="keyword">exception</span> is org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'a'</span>: Requested bean is currently <span class="keyword">in</span> creation: Is there an unresolvable circular reference?</span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">Reference(BeanDefinitionValueResolver.<span class="params">java</span>:378)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">ValueIfNecessary(BeanDefinitionValueResolver.<span class="params">java</span>:110)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>apply<span class="constructor">PropertyValues(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:1602)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>populate<span class="constructor">Bean(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:1354)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span><span class="keyword">do</span><span class="constructor">CreateBean(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:572)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractAutowireCapableBeanFactory</span>.</span></span>create<span class="constructor">Bean(AbstractAutowireCapableBeanFactory.<span class="params">java</span>:495)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span><span class="keyword">do</span><span class="constructor">GetBean(AbstractBeanFactory.<span class="params">java</span>:335)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span>get<span class="constructor">Bean(AbstractBeanFactory.<span class="params">java</span>:199)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">Reference(BeanDefinitionValueResolver.<span class="params">java</span>:367)</span></span><br><span class="line"><span class="operator">	... </span><span class="number">17</span> more</span><br><span class="line">Caused by: org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creating bean <span class="keyword">with</span> name <span class="character">'a'</span>: Requested bean is currently <span class="keyword">in</span> creation: Is there an unresolvable circular reference?</span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span><span class="keyword">do</span><span class="constructor">GetBean(AbstractBeanFactory.<span class="params">java</span>:264)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">AbstractBeanFactory</span>.</span></span>get<span class="constructor">Bean(AbstractBeanFactory.<span class="params">java</span>:199)</span></span><br><span class="line">	at org.springframework.beans.factory.support.<span class="module-access"><span class="module"><span class="identifier">BeanDefinitionValueResolver</span>.</span></span>resolve<span class="constructor">Reference(BeanDefinitionValueResolver.<span class="params">java</span>:367)</span></span><br><span class="line"><span class="operator">	... </span><span class="number">25</span> more</span><br></pre></td></tr></table></figure>
+
+<h3 id="setAllowCircularReferences循环依赖开关"><a href="#setAllowCircularReferences循环依赖开关" class="headerlink" title="setAllowCircularReferences循环依赖开关"></a>setAllowCircularReferences循环依赖开关</h3><figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.cycle;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.support.ClassPathXmlApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DisableSetterSingletonCycleTest</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) &#123;</span><br><span class="line">		ClassPathXmlApplicationContext context = <span class="keyword">new</span> <span class="type">ClassPathXmlApplicationContext</span>(<span class="string">"classpath:spring-cycle-setter.xml"</span>);</span><br><span class="line">		context.setAllowCircularReferences(<span class="literal">false</span>); <span class="comment">// 禁止循环依赖</span></span><br><span class="line">		context.refresh(); <span class="comment">// 不refresh不生效，原因是之前bean factory已经refresh了</span></span><br><span class="line">		context.close();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/spring/" rel="tag"><i class="fa fa-tag"></i> spring</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/post/37fd9ed5.html" rel="next" title="双向链表">
+                  <i class="fa fa-chevron-left"></i> 双向链表
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/post/43c816cd.html" rel="prev" title="依赖注入详解">
+                  依赖注入详解 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#循环依赖"><span class="nav-number">1.</span> <span class="nav-text">循环依赖</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#spring如何检测是否存在循环依赖"><span class="nav-number">1.1.</span> <span class="nav-text">spring如何检测是否存在循环依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构造器参数循环依赖"><span class="nav-number">1.2.</span> <span class="nav-text">构造器参数循环依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#setter-singleton循环依赖"><span class="nav-number">1.3.</span> <span class="nav-text">setter singleton循环依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#setter-prototype循环依赖"><span class="nav-number">1.4.</span> <span class="nav-text">setter prototype循环依赖</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#setAllowCircularReferences循环依赖开关"><span class="nav-number">1.4.1.</span> <span class="nav-text">setAllowCircularReferences循环依赖开关</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="https://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Morris"
+    src="/images/morris.png">
+  <p class="site-author-name" itemprop="name">Morris</p>
+  <div class="site-description" itemprop="description">你现在所得到的安逸将来要双倍偿还</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Morris</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

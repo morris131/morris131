@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="R01DtrTblROr_C2SkIMI9BZFFw_1FH4bT5WNNVAkdm4">
+  <meta name="baidu-site-verification" content="ZORq9vnduv">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Bean的生命周期POJO PO（Persistent Object）：持久对象，与数据库中的表相映射的Java对象，对应数据库中某个表中的一条记录。PO不包含业务逻辑和数据逻辑，就是一个Entity。 VO（Value Object）：值对象,通常用于业务层之间的数据传递，和PO一样也是仅仅包含数据而已。但应是抽象出的业务对象，可以和表对应，也可以不，这根据业务的需要。 BO（Business">
+<meta name="keywords" content="spring,生命周期">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Bean的生命周期">
+<meta property="og:url" content="https:&#x2F;&#x2F;morris131.github.io&#x2F;post&#x2F;48c92662.html">
+<meta property="og:site_name" content="枪手的博客">
+<meta property="og:description" content="Bean的生命周期POJO PO（Persistent Object）：持久对象，与数据库中的表相映射的Java对象，对应数据库中某个表中的一条记录。PO不包含业务逻辑和数据逻辑，就是一个Entity。 VO（Value Object）：值对象,通常用于业务层之间的数据传递，和PO一样也是仅仅包含数据而已。但应是抽象出的业务对象，可以和表对应，也可以不，这根据业务的需要。 BO（Business">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;morris131&#x2F;morris-bookwiki&#x2F;raw&#x2F;master&#x2F;%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91&#x2F;Java&#x2F;spring&#x2F;https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;spring&#x2F;images&#x2F;Spring%20bean%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png">
+<meta property="og:updated_time" content="2019-12-01T09:49:35.929Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;morris131&#x2F;morris-bookwiki&#x2F;raw&#x2F;master&#x2F;%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91&#x2F;Java&#x2F;spring&#x2F;https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;spring&#x2F;images&#x2F;Spring%20bean%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png">
+
+<link rel="canonical" href="https://morris131.github.io/post/48c92662.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Bean的生命周期 | 枪手的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="https://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">枪手的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">知识改变命运，编程照亮人生</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">13</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">6</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">55</span></a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/48c92662.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Bean的生命周期
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-09-12 14:29:22" itemprop="dateCreated datePublished" datetime="2018-09-12T14:29:22+08:00">2018-09-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-12-01 17:49:35" itemprop="dateModified" datetime="2019-12-01T17:49:35+08:00">2019-12-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index">
+                    <span itemprop="name">spring</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Bean的生命周期"><a href="#Bean的生命周期" class="headerlink" title="Bean的生命周期"></a>Bean的生命周期</h1><h2 id="POJO"><a href="#POJO" class="headerlink" title="POJO"></a>POJO</h2><ul>
+<li>PO（Persistent Object）：持久对象，与数据库中的表相映射的Java对象，对应数据库中某个表中的一条记录。PO不包含业务逻辑和数据逻辑，就是一个Entity。</li>
+<li>VO（Value Object）：值对象,通常用于业务层之间的数据传递，和PO一样也是仅仅包含数据而已。但应是抽象出的业务对象，可以和表对应，也可以不，这根据业务的需要。</li>
+<li>BO（Business Object）：业务对象层，封装业务逻辑的java对象，通过调用DAO方法，结合PO,VO进行业务操作。它就是一个对PO的组合，也可以就是PO，只是出发点是满足业务的传输对象。</li>
+<li>DTO（Data Transfer Object）：数据传输对象，单纯用来数据传输的对象。</li>
+<li>POJO（Plain Ordinary Java Object）：简单的Java对象，实际就是普通JavaBeans。包含DTO、VO 、BO、PO等。</li>
+</ul><a id="more"></a>
+<h2 id="Bean的作用域"><a href="#Bean的作用域" class="headerlink" title="Bean的作用域"></a>Bean的作用域</h2><p>在Spring中，那些组成应用程序的主体及由Spring IoC容器所管理的对象，被称之为Bean。简单地讲，bean就是由IoC容器初始化、装配及管理的对象，除此之外，bean就与应用程序中的其他对象没有什么区别了。而bean的定义以及bean相互间的依赖关系将通过配置元数据来描述。</p>
+<p>下面就是Spring直接支持的五种作用域了，当然开发者也可以自己定制作用域。</p>
+<ul>
+<li>singleton：容器中仅存在一个对象，默认值</li>
+<li>prototype：每调用一次getBean()，都返回一个新的对象</li>
+<li>request：每一个HTTP请求会产生一个Bean对象</li>
+<li>session：同一个Http Session共用一个Bean    </li>
+<li>global session：类似于seesion作用域，仅在portletweb应用中有意义</li>
+</ul>
+<p>说明：request,session以及global session这三个作用域都是只有在基于web的SpringApplicationContext实现的（比如XmlWebApplicationContext）中才能使用。 如果开发者仅仅在常规的Spring IoC容器中比如ClassPathXmlApplicationContext中使用这些作用域，那么将会抛出一个IllegalStateException来说明使用了未知的作用域。</p>
+<h2 id="Bean的生命周期-1"><a href="#Bean的生命周期-1" class="headerlink" title="Bean的生命周期"></a>Bean的生命周期</h2><p>下面是Spring中Bean的完整生命周期：<br><img src="https://github.com/morris131/morris-bookwiki/raw/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/spring/https://gitee.com/morris131/morris-book/raw/master/back/java/spring/images/Spring%20bean%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png" alt="Alt text"></p>
+<p>Bean实例生命周期的执行过程如下：</p>
+<ol>
+<li>Spring对bean进行实例化；</li>
+<li>Spring将值和bean的引用注入到bean对应的属性中；</li>
+<li>如果bean实现了BeanNameAware接口，Spring将bean的ID传递给setBean-Name()方法；</li>
+<li>如果bean实现了BeanFactoryAware接口，Spring将调用setBeanFactory()方法，将BeanFactory容器实例传入；</li>
+<li>如果bean实现了ApplicationContextAware接口，Spring将调用setApplicationContext()方法，将bean所在的应用上下文的引用传入进来；</li>
+<li>如果有BeanPostProcessors和Bean关联，那么其postProcessBeforeInitialization()方法将被调用。</li>
+<li>如果bean实现了InitializingBean接口，Spring将调用它们的after-PropertiesSet()方法。</li>
+<li>如果bean使用init-method声明了初始化方法，该方法也会被调用；</li>
+<li>如果有BeanPostProcessors与Bean关联，那么其postProcessAfterInitialization()方法将被调用。</li>
+<li>此时，bean已经准备就绪，可以被应用程序使用了，它们将一直驻留在应用上下文中，直到该应用上下文被销毁；</li>
+<li>如果bean实现了DisposableBean接口，Spring将调用它的destroy()接口方法。</li>
+<li>如果bean使用destroy-method声明了销毁方法，该方法也会被调用。</li>
+</ol>
+<p>说明：Spring是不会完全管理原型Bean的生命周期的：Spring容器只会初始化，配置以及装载这些Bean，传递给Client。但是之后就不会再去管原型Bean之后的动作了。<br>也就是说，初始化生命周期回调方法在所有作用域的Bean是都会调用的，但是销毁生命周期回调方法在原型Bean是不会调用的。所以，客户端代码必须注意清理原型Bean以及释放原型Bean所持有的一些资源。可以通过使用自定义的bean post-processor来让Spring释放掉原型Bean所持有的资源。</p>
+<h2 id="演示代码"><a href="#演示代码" class="headerlink" title="演示代码"></a>演示代码</h2><p>Person.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.bean;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.BeansException;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.BeanFactory;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.BeanFactoryAware;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.BeanNameAware;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.DisposableBean;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.InitializingBean;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationContext;	</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationContextAware;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> <span class="keyword">implements</span> <span class="title">BeanNameAware</span>, <span class="title">BeanFactoryAware</span>, <span class="title">ApplicationContextAware</span>	, <span class="title">InitializingBean</span>, <span class="title">DisposableBean</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> name;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.name = name;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"invoke Person init()"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">myDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"invoke Person myDestroy()"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"invoke DisposableBean destroy()"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterPropertiesSet</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"invoke InitializingBean afterPropertiesSet()"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setApplicationContext</span><span class="params">(ApplicationContext arg0)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"invoke ApplicationContextAware setApplicationContext(): "</span> + arg0);		</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBeanFactory</span><span class="params">(BeanFactory arg0)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"invoke BeanFactoryAware setBeanFactory(): "</span> + arg0);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBeanName</span><span class="params">(String arg0)</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"invoke BeanNameAware setBeanName(): "</span> + arg0);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>MyBeanPostProcessor.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.bean;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.BeansException;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.config.BeanPostProcessor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyBeanPostProcessor</span> <span class="keyword">implements</span> <span class="title">BeanPostProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">postProcessBeforeInitialization</span><span class="params">(Object bean,</span></span></span><br><span class="line"><span class="function"><span class="params">            String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;       </span><br><span class="line">        System.out.println(<span class="string">"invoke MyBeanPostProcessor postProcessBeforeInitialization,bean:"</span> + bean+<span class="string">",beanName:"</span>+beanName);</span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">postProcessAfterInitialization</span><span class="params">(Object bean,</span></span></span><br><span class="line"><span class="function"><span class="params">            String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"invoke MyBeanPostProcessor postProcessAfterInitialization,bean:"</span> + bean+<span class="string">",beanName:"</span>+beanName);</span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>spring-lifecycle.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span> <span class="attr">xmlns:p</span>=<span class="string">"http://www.springframework.org/schema/p"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:aop</span>=<span class="string">"http://www.springframework.org/schema/aop"</span> <span class="attr">xmlns:tx</span>=<span class="string">"http://www.springframework.org/schema/tx"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xsi:schemaLocation</span>=<span class="string">"</span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/beans </span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/beans/spring-beans-4.3.xsd</span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/context</span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/context/spring-context-4.3.xsd"</span>&gt;</span></span><br><span class="line">                    </span><br><span class="line">     <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"person"</span> <span class="attr">destroy-method</span>=<span class="string">"myDestroy"</span> <span class="attr">init-method</span>=<span class="string">"init"</span> <span class="attr">class</span>=<span class="string">"com.morris.spring.bean.Person"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"name"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>jack<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">&lt;!-- 配置自定义的后置处理器 --&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"postProcessor"</span> <span class="attr">class</span>=<span class="string">"com.morris.spring.bean.MyBeanPostProcessor"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>BeanLifeCycleTest.java</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.bean;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.support.ClassPathXmlApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanLifeCycleTest</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) &#123;</span><br><span class="line">		ClassPathXmlApplicationContext context = <span class="keyword">new</span> <span class="type">ClassPathXmlApplicationContext</span>(<span class="string">"spring-lifecycle.xml"</span>);</span><br><span class="line">		</span><br><span class="line">		Person person = (Person) context.getBean(<span class="string">"person"</span>);</span><br><span class="line">		</span><br><span class="line">		System.out.println(person.getName());</span><br><span class="line">		</span><br><span class="line">		context.close();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight taggerscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">"D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\b</span>in<span class="symbol">\j</span>ava.exe" "-javaagent:D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>etBrains<span class="symbol">\I</span>ntelliJ IDEA 2018.1.4<span class="symbol">\l</span>ib<span class="symbol">\i</span>dea_rt.jar=61410:D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>etBrains<span class="symbol">\I</span>ntelliJ IDEA 2018.1.4<span class="symbol">\b</span>in" -Dfile.encoding=UTF-8 -classpath "D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\c</span>harsets.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\d</span>eploy.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\e</span>xt<span class="symbol">\a</span>ccess-bridge-64.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\e</span>xt<span class="symbol">\c</span>ldrdata.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\e</span>xt<span class="symbol">\d</span>nsns.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\e</span>xt<span class="symbol">\j</span>access.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\e</span>xt<span class="symbol">\j</span>fxrt.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\e</span>xt<span class="symbol">\l</span>ocaledata.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\e</span>xt<span class="symbol">\n</span>ashorn.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\e</span>xt<span class="symbol">\s</span>unec.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\e</span>xt<span class="symbol">\s</span>unjce_provider.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\e</span>xt<span class="symbol">\s</span>unmscapi.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\e</span>xt<span class="symbol">\s</span>unpkcs11.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\e</span>xt<span class="symbol">\z</span>ipfs.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\j</span>avaws.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\j</span>ce.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\j</span>fr.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\j</span>fxswt.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\j</span>sse.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\m</span>anagement-agent.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\p</span>lugin.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\r</span>esources.jar;D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>dk1.8.0_172<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\r</span>t.jar;D:<span class="symbol">\g</span>itPrj<span class="symbol">\m</span>orris-book<span class="symbol">\后</span>端开发<span class="symbol">\J</span>ava<span class="symbol">\s</span>pring<span class="symbol">\s</span>pringDemo<span class="symbol">\t</span>arget<span class="symbol">\c</span>lasses;C:<span class="symbol">\U</span>sers<span class="symbol">\w</span>j65651<span class="symbol">\.</span>m2<span class="symbol">\r</span>epository<span class="symbol">\o</span>rg<span class="symbol">\s</span>pringframework<span class="symbol">\s</span>pring-context<span class="symbol">\5</span>.0.8.RELEASE<span class="symbol">\s</span>pring-context-5.0.8.RELEASE.jar;C:<span class="symbol">\U</span>sers<span class="symbol">\w</span>j65651<span class="symbol">\.</span>m2<span class="symbol">\r</span>epository<span class="symbol">\o</span>rg<span class="symbol">\s</span>pringframework<span class="symbol">\s</span>pring-aop<span class="symbol">\5</span>.0.8.RELEASE<span class="symbol">\s</span>pring-aop-5.0.8.RELEASE.jar;C:<span class="symbol">\U</span>sers<span class="symbol">\w</span>j65651<span class="symbol">\.</span>m2<span class="symbol">\r</span>epository<span class="symbol">\o</span>rg<span class="symbol">\s</span>pringframework<span class="symbol">\s</span>pring-beans<span class="symbol">\5</span>.0.8.RELEASE<span class="symbol">\s</span>pring-beans-5.0.8.RELEASE.jar;C:<span class="symbol">\U</span>sers<span class="symbol">\w</span>j65651<span class="symbol">\.</span>m2<span class="symbol">\r</span>epository<span class="symbol">\o</span>rg<span class="symbol">\s</span>pringframework<span class="symbol">\s</span>pring-core<span class="symbol">\5</span>.0.8.RELEASE<span class="symbol">\s</span>pring-core-5.0.8.RELEASE.jar;C:<span class="symbol">\U</span>sers<span class="symbol">\w</span>j65651<span class="symbol">\.</span>m2<span class="symbol">\r</span>epository<span class="symbol">\o</span>rg<span class="symbol">\s</span>pringframework<span class="symbol">\s</span>pring-jcl<span class="symbol">\5</span>.0.8.RELEASE<span class="symbol">\s</span>pring-jcl-5.0.8.RELEASE.jar;C:<span class="symbol">\U</span>sers<span class="symbol">\w</span>j65651<span class="symbol">\.</span>m2<span class="symbol">\r</span>epository<span class="symbol">\o</span>rg<span class="symbol">\s</span>pringframework<span class="symbol">\s</span>pring-expression<span class="symbol">\5</span>.0.8.RELEASE<span class="symbol">\s</span>pring-expression-5.0.8.RELEASE.jar;C:<span class="symbol">\U</span>sers<span class="symbol">\w</span>j65651<span class="symbol">\.</span>m2<span class="symbol">\r</span>epository<span class="symbol">\j</span>unit<span class="symbol">\j</span>unit<span class="symbol">\4</span>.11<span class="symbol">\j</span>unit-4.11.jar;C:<span class="symbol">\U</span>sers<span class="symbol">\w</span>j65651<span class="symbol">\.</span>m2<span class="symbol">\r</span>epository<span class="symbol">\o</span>rg<span class="symbol">\h</span>amcrest<span class="symbol">\h</span>amcrest-core<span class="symbol">\1</span>.3<span class="symbol">\h</span>amcrest-core-1.3.jar;C:<span class="symbol">\U</span>sers<span class="symbol">\w</span>j65651<span class="symbol">\.</span>m2<span class="symbol">\r</span>epository<span class="symbol">\o</span>rg<span class="symbol">\a</span>spectj<span class="symbol">\a</span>spectjrt<span class="symbol">\1</span>.9.1<span class="symbol">\a</span>spectjrt-1.9.1.jar;C:<span class="symbol">\U</span>sers<span class="symbol">\w</span>j65651<span class="symbol">\.</span>m2<span class="symbol">\r</span>epository<span class="symbol">\o</span>rg<span class="symbol">\a</span>spectj<span class="symbol">\a</span>spectjweaver<span class="symbol">\1</span>.9.1<span class="symbol">\a</span>spectjweaver-1.9.1.jar" com.morris.spring.bean.BeanLifeCycleTest</span><br><span class="line">九月 12, 2018 4:32:13 下午 org.springframework.context.support.AbstractApplicationContext prepareRefresh</span><br><span class="line">信息: Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@7ab2bfe1: startup date [Wed Sep 12 16:32:13 CST 2018]; root of context hierarchy</span><br><span class="line">九月 12, 2018 4:32:13 下午 org.springframework.beans.factory.xml.XmlBeanDefinitionReader loadBeanDefinitions</span><br><span class="line">信息: Loading XML bean definitions from class path resource [spring-lifecycle.xml]</span><br><span class="line">invoke BeanNameAware setBeanName(): person</span><br><span class="line">invoke BeanFactoryAware setBeanFactory(): org.springframework.beans.factory.support.DefaultListableBeanFactory@6b2fad11: defining beans [person,postProcessor]; root of factory hierarchy</span><br><span class="line">invoke ApplicationContextAware setApplicationContext(): org.springframework.context.support.ClassPathXmlApplicationContext@7ab2bfe1: startup date [Wed Sep 12 16:32:13 CST 2018]; root of context hierarchy</span><br><span class="line">invoke MyBeanPostProcessor postProcessBeforeInitialization,bean:com.morris.spring.bean.Person@7085bdee,beanName:person</span><br><span class="line">invoke InitializingBean afterPropertiesSet()</span><br><span class="line">invoke Person init()</span><br><span class="line">invoke MyBeanPostProcessor postProcessAfterInitialization,bean:com.morris.spring.bean.Person@7085bdee,beanName:person</span><br><span class="line">jack</span><br><span class="line">九月 12, 2018 4:32:13 下午 org.springframework.context.support.AbstractApplicationContext doClose</span><br><span class="line">invoke DisposableBean destroy()</span><br><span class="line">invoke Person myDestroy()</span><br><span class="line">信息: Closing org.springframework.context.support.ClassPathXmlApplicationContext@7ab2bfe1: startup date [Wed Sep 12 16:32:13 CST 2018]; root of context hierarchy</span><br><span class="line"></span><br><span class="line">Process finished with exit code 0</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/spring/" rel="tag"><i class="fa fa-tag"></i> spring</a>
+              <a href="/tags/%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/" rel="tag"><i class="fa fa-tag"></i> 生命周期</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/post/a155b976.html" rel="prev" title="MVC工作原理">
+                  MVC工作原理 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Bean的生命周期"><span class="nav-number">1.</span> <span class="nav-text">Bean的生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#POJO"><span class="nav-number">1.1.</span> <span class="nav-text">POJO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bean的作用域"><span class="nav-number">1.2.</span> <span class="nav-text">Bean的作用域</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bean的生命周期-1"><span class="nav-number">1.3.</span> <span class="nav-text">Bean的生命周期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#演示代码"><span class="nav-number">1.4.</span> <span class="nav-text">演示代码</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="https://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Morris"
+    src="/images/morris.png">
+  <p class="site-author-name" itemprop="name">Morris</p>
+  <div class="site-description" itemprop="description">你现在所得到的安逸将来要双倍偿还</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Morris</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="R01DtrTblROr_C2SkIMI9BZFFw_1FH4bT5WNNVAkdm4">
+  <meta name="baidu-site-verification" content="ZORq9vnduv">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="AOP通知Advice(通知)：通知定义了切面的位置，应用在某个方法被调用之前？之后？还是抛出异常时？等等。">
+<meta name="keywords" content="spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AOP通知">
+<meta property="og:url" content="https:&#x2F;&#x2F;morris131.github.io&#x2F;post&#x2F;5210c693.html">
+<meta property="og:site_name" content="枪手的博客">
+<meta property="og:description" content="AOP通知Advice(通知)：通知定义了切面的位置，应用在某个方法被调用之前？之后？还是抛出异常时？等等。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-21T16:00:00.000Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://morris131.github.io/post/5210c693.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>AOP通知 | 枪手的博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="https://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">枪手的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">知识改变命运，编程照亮人生</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">13</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">6</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">55</span></a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/5210c693.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          AOP通知
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-22 00:00:00" itemprop="dateCreated datePublished" datetime="2019-11-22T00:00:00+08:00">2019-11-22</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index">
+                    <span itemprop="name">spring</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="AOP通知"><a href="#AOP通知" class="headerlink" title="AOP通知"></a>AOP通知</h1><p>Advice(通知)：通知定义了切面的位置，应用在某个方法被调用之前？之后？还是抛出异常时？等等。</p><a id="more"></a>
+<h2 id="通知的类型"><a href="#通知的类型" class="headerlink" title="通知的类型"></a>通知的类型</h2><ul>
+<li>前置通知（before）: 在方法执行之前执行通知。</li>
+<li>返回后通知（afterreturning）:    在一个方法执行之后，只有在方法成功完成时，才能执行通知。</li>
+<li>抛出异常后通知（afterthrowing）:在一个方法执行之后，只有在方法退出抛出异常时，才能执行通知。</li>
+<li>后置通知（after）: 在方法执行之后，不考虑其结果，执行通知，相当于afterreturning+afterthrowing。</li>
+<li>环绕通知（around）:在方法调用之前和之后，执行通知。</li>
+</ul>
+<h2 id="前置通知before"><a href="#前置通知before" class="headerlink" title="前置通知before"></a>前置通知before</h2><p>目标类</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.before;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String hello(String name) &#123;</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"hello "</span> + name);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"hello "</span> + name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>切面类</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.before;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.Aspect;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.Before;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.Pointcut;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 切面</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyAspect</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 切点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Pointcut(<span class="meta-string">"execution(* com.morris.spring.aop.annotation.before..*.*(..))"</span>)</span></span><br><span class="line">    <span class="keyword">public</span> void beforePointCut() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 前置通知</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Before(<span class="meta-string">"beforePointCut()"</span>)</span></span><br><span class="line">    <span class="keyword">public</span> void before() &#123;</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"before"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>切面类也可以简写如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.before;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.Aspect;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.Before;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 切面</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyAspect</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 前置通知</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Before(<span class="meta-string">"execution(* com.morris.spring.aop.annotation.before..*.*(..))"</span>)</span></span><br><span class="line">    <span class="keyword">public</span> void before() &#123;</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"before"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试类</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.before;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.AnnotationConfigApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.ComponentScan;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.EnableAspectJAutoProxy;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableAspectJAutoProxy</span></span><br><span class="line"><span class="meta">@ComponentScan(basePackages = <span class="meta-string">"com.morris.spring.aop.annotation.before"</span>)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AspectTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> static void main(String[] args) &#123;</span><br><span class="line">        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(AspectTest.<span class="keyword">class</span>);</span><br><span class="line">        UserService userService = (UserService)annotationConfigApplicationContext.getBean(<span class="string">"userService"</span>);</span><br><span class="line"></span><br><span class="line">        userService.hello(<span class="string">"morris"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">before</span></span><br><span class="line">hello morris</span><br></pre></td></tr></table></figure>
+
+<h2 id="返回后通知afterreturning"><a href="#返回后通知afterreturning" class="headerlink" title="返回后通知afterreturning"></a>返回后通知afterreturning</h2><p>目标类</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.afterreturning;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String hello(String name) &#123;</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"hello "</span> + name);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"hello "</span> + name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>切面类</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">package</span> <span class="selector-tag">com</span><span class="selector-class">.morris</span><span class="selector-class">.spring</span><span class="selector-class">.aop</span><span class="selector-class">.annotation</span><span class="selector-class">.afterreturning</span>;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">org</span><span class="selector-class">.aspectj</span><span class="selector-class">.lang</span><span class="selector-class">.annotation</span>.*;</span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">org</span><span class="selector-class">.springframework</span><span class="selector-class">.stereotype</span><span class="selector-class">.Component</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 切面</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">@<span class="keyword">Component</span></span><br><span class="line">@<span class="keyword">Aspect</span></span><br><span class="line"><span class="keyword">public</span> class MyAspect &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 返回后通知</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    @<span class="keyword">AfterReturning</span>(<span class="keyword">value</span> = <span class="string">"execution(* com.morris.spring.aop.annotation.afterreturning..*.*(..))"</span>, returning = <span class="string">"returnValue"</span>)</span><br><span class="line">    public void afterReturning(String returnValue) &#123;</span><br><span class="line">        <span class="selector-tag">System</span><span class="selector-class">.out</span><span class="selector-class">.println</span>("<span class="selector-tag">returnValue</span><span class="selector-pseudo">:"</span> + <span class="selector-tag">returnValue</span>);</span><br><span class="line">        <span class="selector-tag">System</span><span class="selector-class">.out</span><span class="selector-class">.println</span>("<span class="selector-tag">after</span> <span class="selector-tag">returning</span>");</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试类</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.afterreturning;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.AnnotationConfigApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.ComponentScan;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.EnableAspectJAutoProxy;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableAspectJAutoProxy</span></span><br><span class="line"><span class="meta">@ComponentScan(basePackages = <span class="meta-string">"com.morris.spring.aop.annotation.afterreturning"</span>)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AspectTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> static void main(String[] args) &#123;</span><br><span class="line">        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(AspectTest.<span class="keyword">class</span>);</span><br><span class="line">        UserService userService = (UserService) annotationConfigApplicationContext.getBean(<span class="string">"userService"</span>);</span><br><span class="line"></span><br><span class="line">        userService.hello(<span class="string">"morris"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">hello</span> <span class="string">morris</span></span><br><span class="line"><span class="attr">returnValue</span>:<span class="string">hello morris</span></span><br><span class="line"><span class="attr">after</span> <span class="string">returning</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="抛出异常后通知afterthrowing"><a href="#抛出异常后通知afterthrowing" class="headerlink" title="抛出异常后通知afterthrowing"></a>抛出异常后通知afterthrowing</h2><p>目标类</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.annotation.afterthrowing;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line">@Service</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">String</span> hello(<span class="keyword">String</span> name) &#123;</span><br><span class="line">        System.out.println(<span class="string">"hello "</span> + name);</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="type">RuntimeException</span>(<span class="string">"system error"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>切面类</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">package</span> <span class="selector-tag">com</span><span class="selector-class">.morris</span><span class="selector-class">.spring</span><span class="selector-class">.aop</span><span class="selector-class">.annotation</span><span class="selector-class">.afterthrowing</span>;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">org</span><span class="selector-class">.aspectj</span><span class="selector-class">.lang</span><span class="selector-class">.annotation</span><span class="selector-class">.AfterThrowing</span>;</span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">org</span><span class="selector-class">.aspectj</span><span class="selector-class">.lang</span><span class="selector-class">.annotation</span><span class="selector-class">.Aspect</span>;</span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">org</span><span class="selector-class">.springframework</span><span class="selector-class">.stereotype</span><span class="selector-class">.Component</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 切面</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">@<span class="keyword">Component</span></span><br><span class="line">@<span class="keyword">Aspect</span></span><br><span class="line"><span class="keyword">public</span> class MyAspect &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 抛出异常后通知</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    @<span class="keyword">AfterThrowing</span>(<span class="keyword">value</span> = <span class="string">"execution(* com.morris.spring.aop.annotation.afterthrowing..*.*(..))"</span>, throwing = <span class="string">"ex"</span>)</span><br><span class="line">    public void afterThrowing(Throwable ex) &#123;</span><br><span class="line">        <span class="selector-tag">System</span><span class="selector-class">.out</span><span class="selector-class">.println</span>("<span class="selector-tag">afterThrowing</span>");</span><br><span class="line">        <span class="selector-tag">ex</span><span class="selector-class">.printStackTrace</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试类</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.afterthrowing;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.AnnotationConfigApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.ComponentScan;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.EnableAspectJAutoProxy;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableAspectJAutoProxy</span></span><br><span class="line"><span class="meta">@ComponentScan(basePackages = <span class="meta-string">"com.morris.spring.aop.annotation.afterthrowing"</span>)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AspectTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> static void main(String[] args) &#123;</span><br><span class="line">        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(AspectTest.<span class="keyword">class</span>);</span><br><span class="line">        UserService userService = (UserService) annotationConfigApplicationContext.getBean(<span class="string">"userService"</span>);</span><br><span class="line"></span><br><span class="line">        userService.hello(<span class="string">"morris"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">hello morris</span><br><span class="line">afterThrowing</span><br><span class="line">java<span class="selector-class">.lang</span><span class="selector-class">.RuntimeException</span>: system error</span><br><span class="line">	at com<span class="selector-class">.morris</span><span class="selector-class">.spring</span><span class="selector-class">.aop</span><span class="selector-class">.annotation</span><span class="selector-class">.afterthrowing</span><span class="selector-class">.UserService</span><span class="selector-class">.hello</span>(UserService<span class="selector-class">.java</span>:<span class="number">10</span>)</span><br><span class="line">	at com<span class="selector-class">.morris</span><span class="selector-class">.spring</span><span class="selector-class">.aop</span><span class="selector-class">.annotation</span><span class="selector-class">.afterthrowing</span><span class="selector-class">.UserService</span>$<span class="variable">$FastClassBySpringCGLIB</span>$<span class="variable">$a8aadecd</span>.invoke(&lt;generated&gt;)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.cglib</span><span class="selector-class">.proxy</span><span class="selector-class">.MethodProxy</span><span class="selector-class">.invoke</span>(MethodProxy<span class="selector-class">.java</span>:<span class="number">218</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.framework</span><span class="selector-class">.CglibAopProxy</span><span class="variable">$CglibMethodInvocation</span>.invokeJoinpoint(CglibAopProxy<span class="selector-class">.java</span>:<span class="number">769</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.framework</span><span class="selector-class">.ReflectiveMethodInvocation</span><span class="selector-class">.proceed</span>(ReflectiveMethodInvocation<span class="selector-class">.java</span>:<span class="number">163</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.framework</span><span class="selector-class">.CglibAopProxy</span><span class="variable">$CglibMethodInvocation</span>.proceed(CglibAopProxy<span class="selector-class">.java</span>:<span class="number">747</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.aspectj</span><span class="selector-class">.AspectJAfterThrowingAdvice</span><span class="selector-class">.invoke</span>(AspectJAfterThrowingAdvice<span class="selector-class">.java</span>:<span class="number">62</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.framework</span><span class="selector-class">.ReflectiveMethodInvocation</span><span class="selector-class">.proceed</span>(ReflectiveMethodInvocation<span class="selector-class">.java</span>:<span class="number">186</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.framework</span><span class="selector-class">.CglibAopProxy</span><span class="variable">$CglibMethodInvocation</span>.proceed(CglibAopProxy<span class="selector-class">.java</span>:<span class="number">747</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.interceptor</span><span class="selector-class">.ExposeInvocationInterceptor</span><span class="selector-class">.invoke</span>(ExposeInvocationInterceptor<span class="selector-class">.java</span>:<span class="number">93</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.framework</span><span class="selector-class">.ReflectiveMethodInvocation</span><span class="selector-class">.proceed</span>(ReflectiveMethodInvocation<span class="selector-class">.java</span>:<span class="number">186</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.framework</span><span class="selector-class">.CglibAopProxy</span><span class="variable">$CglibMethodInvocation</span>.proceed(CglibAopProxy<span class="selector-class">.java</span>:<span class="number">747</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.framework</span><span class="selector-class">.CglibAopProxy</span><span class="variable">$DynamicAdvisedInterceptor</span>.intercept(CglibAopProxy<span class="selector-class">.java</span>:<span class="number">689</span>)</span><br><span class="line">	at com<span class="selector-class">.morris</span><span class="selector-class">.spring</span><span class="selector-class">.aop</span><span class="selector-class">.annotation</span><span class="selector-class">.afterthrowing</span><span class="selector-class">.UserService</span>$<span class="variable">$EnhancerBySpringCGLIB</span>$$<span class="number">105</span>a62a2.hello(&lt;generated&gt;)</span><br><span class="line">	at com<span class="selector-class">.morris</span><span class="selector-class">.spring</span><span class="selector-class">.aop</span><span class="selector-class">.annotation</span><span class="selector-class">.afterthrowing</span><span class="selector-class">.AspectTest</span><span class="selector-class">.main</span>(AspectTest<span class="selector-class">.java</span>:<span class="number">17</span>)</span><br><span class="line">Exception <span class="keyword">in</span> thread <span class="string">"main"</span> java<span class="selector-class">.lang</span><span class="selector-class">.RuntimeException</span>: system error</span><br><span class="line">	at com<span class="selector-class">.morris</span><span class="selector-class">.spring</span><span class="selector-class">.aop</span><span class="selector-class">.annotation</span><span class="selector-class">.afterthrowing</span><span class="selector-class">.UserService</span><span class="selector-class">.hello</span>(UserService<span class="selector-class">.java</span>:<span class="number">10</span>)</span><br><span class="line">	at com<span class="selector-class">.morris</span><span class="selector-class">.spring</span><span class="selector-class">.aop</span><span class="selector-class">.annotation</span><span class="selector-class">.afterthrowing</span><span class="selector-class">.UserService</span>$<span class="variable">$FastClassBySpringCGLIB</span>$<span class="variable">$a8aadecd</span>.invoke(&lt;generated&gt;)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.cglib</span><span class="selector-class">.proxy</span><span class="selector-class">.MethodProxy</span><span class="selector-class">.invoke</span>(MethodProxy<span class="selector-class">.java</span>:<span class="number">218</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.framework</span><span class="selector-class">.CglibAopProxy</span><span class="variable">$CglibMethodInvocation</span>.invokeJoinpoint(CglibAopProxy<span class="selector-class">.java</span>:<span class="number">769</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.framework</span><span class="selector-class">.ReflectiveMethodInvocation</span><span class="selector-class">.proceed</span>(ReflectiveMethodInvocation<span class="selector-class">.java</span>:<span class="number">163</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.framework</span><span class="selector-class">.CglibAopProxy</span><span class="variable">$CglibMethodInvocation</span>.proceed(CglibAopProxy<span class="selector-class">.java</span>:<span class="number">747</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.aspectj</span><span class="selector-class">.AspectJAfterThrowingAdvice</span><span class="selector-class">.invoke</span>(AspectJAfterThrowingAdvice<span class="selector-class">.java</span>:<span class="number">62</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.framework</span><span class="selector-class">.ReflectiveMethodInvocation</span><span class="selector-class">.proceed</span>(ReflectiveMethodInvocation<span class="selector-class">.java</span>:<span class="number">186</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.framework</span><span class="selector-class">.CglibAopProxy</span><span class="variable">$CglibMethodInvocation</span>.proceed(CglibAopProxy<span class="selector-class">.java</span>:<span class="number">747</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.interceptor</span><span class="selector-class">.ExposeInvocationInterceptor</span><span class="selector-class">.invoke</span>(ExposeInvocationInterceptor<span class="selector-class">.java</span>:<span class="number">93</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.framework</span><span class="selector-class">.ReflectiveMethodInvocation</span><span class="selector-class">.proceed</span>(ReflectiveMethodInvocation<span class="selector-class">.java</span>:<span class="number">186</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.framework</span><span class="selector-class">.CglibAopProxy</span><span class="variable">$CglibMethodInvocation</span>.proceed(CglibAopProxy<span class="selector-class">.java</span>:<span class="number">747</span>)</span><br><span class="line">	at org<span class="selector-class">.springframework</span><span class="selector-class">.aop</span><span class="selector-class">.framework</span><span class="selector-class">.CglibAopProxy</span><span class="variable">$DynamicAdvisedInterceptor</span>.intercept(CglibAopProxy<span class="selector-class">.java</span>:<span class="number">689</span>)</span><br><span class="line">	at com<span class="selector-class">.morris</span><span class="selector-class">.spring</span><span class="selector-class">.aop</span><span class="selector-class">.annotation</span><span class="selector-class">.afterthrowing</span><span class="selector-class">.UserService</span>$<span class="variable">$EnhancerBySpringCGLIB</span>$$<span class="number">105</span>a62a2.hello(&lt;generated&gt;)</span><br><span class="line">	at com<span class="selector-class">.morris</span><span class="selector-class">.spring</span><span class="selector-class">.aop</span><span class="selector-class">.annotation</span><span class="selector-class">.afterthrowing</span><span class="selector-class">.AspectTest</span><span class="selector-class">.main</span>(AspectTest<span class="selector-class">.java</span>:<span class="number">17</span>)</span><br></pre></td></tr></table></figure>
+<p>如果方法抛出的异常与通知方法参数的异常不匹配，将不会执行切面。</p>
+<h2 id="后置通知after"><a href="#后置通知after" class="headerlink" title="后置通知after"></a>后置通知after</h2><p>目标类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.annotation.afterfinally;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">hello</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"hello "</span> + name);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"hello "</span> + name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">error</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"system error"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>切面类</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.afterfinally;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.After;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.AfterReturning;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.Aspect;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 切面</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyAspect</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 通知+切点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@After(<span class="meta-string">"execution(* com.morris.spring.aop.annotation.afterfinally..*.*(..))"</span>)</span></span><br><span class="line">    <span class="keyword">public</span> void after() &#123;</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"after"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试类</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.afterfinally;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.AnnotationConfigApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.ComponentScan;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.EnableAspectJAutoProxy;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableAspectJAutoProxy</span></span><br><span class="line"><span class="meta">@ComponentScan(basePackages = <span class="meta-string">"com.morris.spring.aop.annotation.afterfinally"</span>)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AspectTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> static void main(String[] args) &#123;</span><br><span class="line">        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(AspectTest.<span class="keyword">class</span>);</span><br><span class="line">        UserService userService = (UserService)annotationConfigApplicationContext.getBean(<span class="string">"userService"</span>);</span><br><span class="line"></span><br><span class="line">        userService.hello(<span class="string">"morris"</span>);</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"----------------"</span>);</span><br><span class="line">        userService.error();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="环绕通知around"><a href="#环绕通知around" class="headerlink" title="环绕通知around"></a>环绕通知around</h2><p>目标类</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.around;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String hello(String name) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"hello "</span> + name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>切面类</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.around;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.ProceedingJoinPoint;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.Around;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.Aspect;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 切面</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyAspect</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 环绕通知</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Around(<span class="meta-string">"execution(* com.morris.spring.aop.annotation.around..*.*(..))"</span>)</span></span><br><span class="line">    <span class="keyword">public</span> void around(ProceedingJoinPoint joinPoint) &#123;</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"before"</span>);</span><br><span class="line">        Arrays.asList(joinPoint.getArgs()).forEach(System.<span class="keyword">out</span>::println);</span><br><span class="line">        Object returnValue = <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            returnValue = joinPoint.proceed();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable throwable) &#123;</span><br><span class="line">            throwable.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"returnValue:"</span> + returnValue);</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"after"</span>);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试类</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.around;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.AnnotationConfigApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.ComponentScan;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.EnableAspectJAutoProxy;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableAspectJAutoProxy</span></span><br><span class="line"><span class="meta">@ComponentScan(basePackages = <span class="meta-string">"com.morris.spring.aop.annotation.around"</span>)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AspectTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> static void main(String[] args) &#123;</span><br><span class="line">        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(AspectTest.<span class="keyword">class</span>);</span><br><span class="line">        UserService userService = (UserService)annotationConfigApplicationContext.getBean(<span class="string">"userService"</span>);</span><br><span class="line"></span><br><span class="line">        userService.hello(<span class="string">"morris"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">before</span></span><br><span class="line">morris</span><br><span class="line">returnValue:hello morris</span><br><span class="line"><span class="keyword">after</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="多个AOP之间的执行顺序"><a href="#多个AOP之间的执行顺序" class="headerlink" title="多个AOP之间的执行顺序"></a>多个AOP之间的执行顺序</h2><p>目标类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.annotation.afterfinally;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">hello</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"hello "</span> + name);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"hello "</span> + name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">error</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"system error"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>切面类</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.afterfinally;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.After;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.AfterReturning;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.Aspect;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 切面</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyAspect</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 通知+切点</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@After(<span class="meta-string">"execution(* com.morris.spring.aop.annotation.afterfinally..*.*(..))"</span>)</span></span><br><span class="line">    <span class="keyword">public</span> void after() &#123;</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"after"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试类</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.afterfinally;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.AnnotationConfigApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.ComponentScan;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.EnableAspectJAutoProxy;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableAspectJAutoProxy</span></span><br><span class="line"><span class="meta">@ComponentScan(basePackages = <span class="meta-string">"com.morris.spring.aop.annotation.afterfinally"</span>)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AspectTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> static void main(String[] args) &#123;</span><br><span class="line">        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(AspectTest.<span class="keyword">class</span>);</span><br><span class="line">        UserService userService = (UserService)annotationConfigApplicationContext.getBean(<span class="string">"userService"</span>);</span><br><span class="line"></span><br><span class="line">        userService.hello(<span class="string">"morris"</span>);</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"----------------"</span>);</span><br><span class="line">        userService.error();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="环绕通知around-1"><a href="#环绕通知around-1" class="headerlink" title="环绕通知around"></a>环绕通知around</h2><p>目标类</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.advice;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String hello(String name) &#123;</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"hello "</span> + name);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"hello "</span> + name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>切面类1</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.advice;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.ProceedingJoinPoint;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.*;</span><br><span class="line"><span class="keyword">import</span> org.springframework.core.<span class="keyword">annotation</span>.Order;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 切面</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="meta">@Order(2)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyAspect</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Pointcut(<span class="meta-string">"execution(* com.morris.spring.aop.annotation.advice..*.*(..))"</span>)</span></span><br><span class="line">    <span class="keyword">public</span> void beforePointCut() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 环绕通知</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Around(<span class="meta-string">"beforePointCut()"</span>)</span></span><br><span class="line">    <span class="keyword">public</span> void around(ProceedingJoinPoint joinPoint) throws Throwable &#123;</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"around begin"</span>);</span><br><span class="line">        joinPoint.proceed();</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"around end"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>切面类1</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.advice;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.ProceedingJoinPoint;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.Around;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.Aspect;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.<span class="keyword">annotation</span>.Pointcut;</span><br><span class="line"><span class="keyword">import</span> org.springframework.core.<span class="keyword">annotation</span>.Order;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 切面</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="meta">@Order(1)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyAspect1</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Pointcut(<span class="meta-string">"execution(* com.morris.spring.aop.annotation.advice..*.*(..))"</span>)</span></span><br><span class="line">    <span class="keyword">public</span> void beforePointCut() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 环绕通知</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Around(<span class="meta-string">"beforePointCut()"</span>)</span></span><br><span class="line">    <span class="keyword">public</span> void around2(ProceedingJoinPoint joinPoint) throws Throwable &#123;</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"around2 begin"</span>);</span><br><span class="line">        joinPoint.proceed();</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"around2 end"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试类</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.spring.aop.<span class="keyword">annotation</span>.advice;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.AnnotationConfigApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.ComponentScan;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.<span class="keyword">annotation</span>.EnableAspectJAutoProxy;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableAspectJAutoProxy</span></span><br><span class="line"><span class="meta">@ComponentScan(basePackages = <span class="meta-string">"com.morris.spring.aop.annotation.advice"</span>)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AspectTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> static void main(String[] args) &#123;</span><br><span class="line">        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(AspectTest.<span class="keyword">class</span>);</span><br><span class="line">        UserService userService = (UserService)annotationConfigApplicationContext.getBean(<span class="string">"userService"</span>);</span><br><span class="line"></span><br><span class="line">        userService.hello(<span class="string">"morris"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">around2</span> <span class="string">begin</span></span><br><span class="line"><span class="attr">around</span> <span class="string">begin</span></span><br><span class="line"><span class="attr">hello</span> <span class="string">morris</span></span><br><span class="line"><span class="attr">around</span> <span class="string">end</span></span><br><span class="line"><span class="attr">around2</span> <span class="string">end</span></span><br></pre></td></tr></table></figure>
+<p>结论：order越小越是最先执行，但更重要的是最先执行的最后结束,Spring AOP就是一个同心圆，要执行的方法为圆心，最外层的order最小。</p>
+<p>@Order注解只能作用于类上，标记在方法上无效，同一个切面中，两个通知作用于同一个目标方法是无序的。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/spring/" rel="tag"><i class="fa fa-tag"></i> spring</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/post/3c271a1b.html" rel="next" title="代理模式之静态代理">
+                  <i class="fa fa-chevron-left"></i> 代理模式之静态代理
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/post/aac96d8c.html" rel="prev" title="AOP引入">
+                  AOP引入 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AOP通知"><span class="nav-number">1.</span> <span class="nav-text">AOP通知</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#通知的类型"><span class="nav-number">1.1.</span> <span class="nav-text">通知的类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前置通知before"><span class="nav-number">1.2.</span> <span class="nav-text">前置通知before</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#返回后通知afterreturning"><span class="nav-number">1.3.</span> <span class="nav-text">返回后通知afterreturning</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抛出异常后通知afterthrowing"><span class="nav-number">1.4.</span> <span class="nav-text">抛出异常后通知afterthrowing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后置通知after"><span class="nav-number">1.5.</span> <span class="nav-text">后置通知after</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环绕通知around"><span class="nav-number">1.6.</span> <span class="nav-text">环绕通知around</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多个AOP之间的执行顺序"><span class="nav-number">1.7.</span> <span class="nav-text">多个AOP之间的执行顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环绕通知around-1"><span class="nav-number">1.8.</span> <span class="nav-text">环绕通知around</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="https://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Morris"
+    src="/images/morris.png">
+  <p class="site-author-name" itemprop="name">Morris</p>
+  <div class="site-description" itemprop="description">你现在所得到的安逸将来要双倍偿还</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Morris</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,255' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
