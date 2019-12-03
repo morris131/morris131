@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="R01DtrTblROr_C2SkIMI9BZFFw_1FH4bT5WNNVAkdm4">
+  <meta name="baidu-site-verification" content="ZORq9vnduv">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="git的使用创建仓库仓库又叫版本库（repository），可以简单理解成一个目录，这个目录里面的所有文件都可以被Git管理起来，每个文件的修改、删除，Git都能跟踪，以便任何时刻都可以追踪历史，或者在将来某个时刻可以“还原”。">
+<meta name="keywords" content="git">
+<meta property="og:type" content="article">
+<meta property="og:title" content="git的使用">
+<meta property="og:url" content="https:&#x2F;&#x2F;morris131.github.io&#x2F;post&#x2F;2e742d51.html">
+<meta property="og:site_name" content="枪手的博客">
+<meta property="og:description" content="git的使用创建仓库仓库又叫版本库（repository），可以简单理解成一个目录，这个目录里面的所有文件都可以被Git管理起来，每个文件的修改、删除，Git都能跟踪，以便任何时刻都可以追踪历史，或者在将来某个时刻可以“还原”。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;tools&#x2F;git&#x2F;images&#x2F;1574244591375.png">
+<meta property="og:updated_time" content="2019-10-28T16:00:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;tools&#x2F;git&#x2F;images&#x2F;1574244591375.png">
+
+<link rel="canonical" href="https://morris131.github.io/post/2e742d51.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>git的使用 | 枪手的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?2c9b55a761d135ab6f0695a694c71065";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="https://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">枪手的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">知识改变命运，编程照亮人生</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">13</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">6</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">55</span></a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/2e742d51.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          git的使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-29 00:00:00" itemprop="dateCreated datePublished" datetime="2019-10-29T00:00:00+08:00">2019-10-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/git/" itemprop="url" rel="index">
+                    <span itemprop="name">git</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="git的使用"><a href="#git的使用" class="headerlink" title="git的使用"></a>git的使用</h1><h2 id="创建仓库"><a href="#创建仓库" class="headerlink" title="创建仓库"></a>创建仓库</h2><p>仓库又叫版本库（repository），可以简单理解成一个目录，这个目录里面的所有文件都可以被Git管理起来，每个文件的修改、删除，Git都能跟踪，以便任何时刻都可以追踪历史，或者在将来某个时刻可以“还原”。</p><a id="more"></a>
+<h3 id="创建目录"><a href="#创建目录" class="headerlink" title="创建目录"></a>创建目录</h3><p>找一个合适的地方，创建一个空目录。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> d:</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> mkdir gittest</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> gittest</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">pwd</span></span></span><br><span class="line">/d/gittest</span><br></pre></td></tr></table></figure>
+
+<h3 id="初始化仓库"><a href="#初始化仓库" class="headerlink" title="初始化仓库"></a>初始化仓库</h3><figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git init</span><br><span class="line">Initialized empty Git repository in D:<span class="string">/gittest/.git/</span></span><br><span class="line">$ <span class="keyword">ls</span> -a</span><br><span class="line"><span class="string">./</span>  <span class="string">../</span>  <span class="string">.git/</span></span><br></pre></td></tr></table></figure>
+<p>打开gittest目录下会发现多了一个.git的目录，这个目录是Git来跟踪管理版本库的，不要手动修改这个目录里面的文件，不然改乱了，就把Git仓库给破坏了。</p>
+<h2 id="工作区和暂存区"><a href="#工作区和暂存区" class="headerlink" title="工作区和暂存区"></a>工作区和暂存区</h2><p>工作区（Working Directory）就是仓库所在目录，比如上面gittest文件夹就是一个工作区。</p>
+<p>工作区有一个隐藏目录.git，这个不算工作区，而是Git的版本库。</p>
+<p>Git的版本库里存了很多东西，其中最重要的就是称为stage（或者叫index）的暂存区，还有Git为我们自动创建的第一个分支master，以及指向master的一个指针叫HEAD。</p>
+<p><img src="https://gitee.com/morris131/morris-book/raw/master/tools/git/images/1574244591375.png" alt></p>
+<p>把文件往Git版本库里添加的时候，是分两步执行的：</p>
+<ol>
+<li>用<code>git add</code>把文件添加进去，实际上就是把文件修改添加到暂存区；</li>
+<li>是用<code>git commit</code>提交更改，实际上就是把暂存区的所有内容提交到当前分支。</li>
+</ol>
+<p>因为我们创建Git版本库时，Git自动为我们创建了唯一一个master分支，所以，现在，<code>git commit</code>就是往master分支上提交更改。</p>
+<h3 id="添加文件到暂存区"><a href="#添加文件到暂存区" class="headerlink" title="添加文件到暂存区"></a>添加文件到暂存区</h3><p>用文本工具如Notepad++编写一个readme.txt文件，内容如下</p>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">versio<span class="symbol">n1</span></span><br></pre></td></tr></table></figure>
+<p>将readme.txt添加到暂存区。</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="keyword">add</span><span class="bash"> readme.txt</span></span><br></pre></td></tr></table></figure>
+<p>上面的写法只能添加一个，下面的命令更常用：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="keyword">add</span><span class="bash"> .</span></span><br></pre></td></tr></table></figure>
+<p>.代表当前目录，命令意思为将当前目录的修改添加到暂存区。</p>
+<h3 id="提交到版本库"><a href="#提交到版本库" class="headerlink" title="提交到版本库"></a>提交到版本库</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="keyword">commit</span> -m <span class="string">'add version1'</span></span><br><span class="line">[<span class="keyword">master</span> (root-<span class="keyword">commit</span>) e52c7b8] <span class="keyword">add</span> version1</span><br><span class="line"> <span class="number">1</span> <span class="keyword">file</span> <span class="keyword">changed</span>, <span class="number">1</span> insertion(+)</span><br><span class="line"> <span class="keyword">create</span> <span class="keyword">mode</span> <span class="number">100644</span> readme.txt</span><br></pre></td></tr></table></figure>
+
+<h2 id="版本回退"><a href="#版本回退" class="headerlink" title="版本回退"></a>版本回退</h2><h3 id="git-status"><a href="#git-status" class="headerlink" title="git status"></a>git status</h3><p>修改readme.txt的内容如下：</p>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">versio<span class="symbol">n1</span></span><br><span class="line">versio<span class="symbol">n2</span></span><br></pre></td></tr></table></figure>
+<p>使用<code>git status</code>命令可以查看仓库当前的状态。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ git status</span><br><span class="line">On branch master</span><br><span class="line">Changes not staged for <span class="keyword">commit</span>:</span><br><span class="line">  (<span class="keyword">use</span> <span class="string">"git add &lt;file&gt;..."</span> <span class="keyword">to</span> <span class="keyword">update</span> what will be committed)</span><br><span class="line">  (<span class="keyword">use</span> <span class="string">"git checkout -- &lt;file&gt;..."</span> <span class="keyword">to</span> discard changes <span class="keyword">in</span> working <span class="keyword">directory</span>)</span><br><span class="line"></span><br><span class="line">        modified:   readme.txt</span><br><span class="line"></span><br><span class="line"><span class="keyword">no</span> changes added <span class="keyword">to</span> <span class="keyword">commit</span> (<span class="keyword">use</span> <span class="string">"git add"</span> <span class="keyword">and</span>/<span class="keyword">or</span> <span class="string">"git commit -a"</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="git-diff"><a href="#git-diff" class="headerlink" title="git diff"></a>git diff</h3><p>使用<code>git diff</code>命令可以查看文件具体修改了什么内容。</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ git diff readme.txt</span><br><span class="line">diff --git a/readme<span class="selector-class">.txt</span> b/readme.txt</span><br><span class="line">index <span class="number">5</span>bdcfc1..<span class="number">60211</span>be <span class="number">100644</span></span><br><span class="line">--- a/readme.txt</span><br><span class="line">+++ b/readme.txt</span><br><span class="line">@@ -<span class="number">1</span> +<span class="number">1</span>,<span class="number">2</span> @@</span><br><span class="line"> version1</span><br><span class="line">+version2</span><br></pre></td></tr></table></figure>
+
+<h3 id="git-log"><a href="#git-log" class="headerlink" title="git log"></a>git log</h3><p>先将上面对readme.txt的修改添加到暂存区，然后提交到版本库。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="keyword">commit</span> -m <span class="string">'add version2'</span></span><br><span class="line">[<span class="keyword">master</span> <span class="number">5e16</span>c39] <span class="keyword">add</span> version2</span><br><span class="line"> <span class="number">1</span> <span class="keyword">file</span> <span class="keyword">changed</span>, <span class="number">1</span> insertion(+)</span><br></pre></td></tr></table></figure>
+<p>使用<code>git log</code>命令显示从最近到最远的提交日志。</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ git log</span><br><span class="line">commit <span class="number">5e16</span>c39863fb9af5b7be61fcfda0b89d3247dcdb (HEAD -&gt; master)</span><br><span class="line">Author: morris &lt;<span class="symbol">morris131@</span><span class="number">126.</span>com&gt;</span><br><span class="line">Date:   Tue Oct <span class="number">29</span> <span class="number">17</span>:<span class="number">26</span>:<span class="number">24</span> <span class="number">2019</span> +<span class="number">0800</span></span><br><span class="line"></span><br><span class="line">    add version2</span><br><span class="line"></span><br><span class="line">commit e52c7b8b6063a3046ae73e9c44cbd6b90ab1e532</span><br><span class="line">Author: morris &lt;<span class="symbol">morris131@</span><span class="number">126.</span>com&gt;</span><br><span class="line">Date:   Tue Oct <span class="number">29</span> <span class="number">17</span>:<span class="number">23</span>:<span class="number">50</span> <span class="number">2019</span> +<span class="number">0800</span></span><br><span class="line"></span><br><span class="line">    add version1</span><br></pre></td></tr></table></figure>
+<p>如果嫌输出信息太多，看得眼花缭乱的，可以试试加上<code>--pretty=oneline</code>参数：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git log <span class="attribute">--pretty</span>=oneline</span><br><span class="line">5e16c39863fb9af5b7be61fcfda0b89d3247dcdb (HEAD -&gt; master) <span class="builtin-name">add</span> version2</span><br><span class="line">e52c7b8b6063a3046ae73e9c44cbd6b90ab1e532 <span class="builtin-name">add</span> version1</span><br></pre></td></tr></table></figure>
+<p>a563c242949eae94e8bb2bee6aa2396c918c4d4f类似这样一长串是每次commit的commit_id，后面如果要回滚的话，这个commit_id就能派上用场了。</p>
+<h3 id="git-reset"><a href="#git-reset" class="headerlink" title="git reset"></a>git reset</h3><p>为了方便测试再提交点内容。<br>修改readme.txt内容如下：</p>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">versio<span class="symbol">n1</span></span><br><span class="line">versio<span class="symbol">n2</span></span><br><span class="line">versio<span class="symbol">n3</span></span><br></pre></td></tr></table></figure>
+<p>将readme.txt的修改添加到暂存区，然后提交到版本库。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git add .</span><br><span class="line">$ git <span class="keyword">commit</span> -m <span class="string">'add version3'</span></span><br><span class="line">[<span class="keyword">master</span> a7b4ddc] <span class="keyword">add</span> version3</span><br><span class="line"> <span class="number">1</span> <span class="keyword">file</span> <span class="keyword">changed</span>, <span class="number">1</span> insertion(+)</span><br></pre></td></tr></table></figure>
+<p>现在准备把readme.txt回退到上一个版本，也就是version2的那个版本，怎么做呢？</p>
+<p>首先，Git必须知道当前版本是哪个版本，在Git中，用HEAD表示当前版本，上一个版本就是HEAD^，上上一个版本就是HEAD^^，当然往上100个版本写100个^比较容易数不过来，可以写成HEAD~100。</p>
+<p>现在，我们要把当前版本version3回退到上一个版本version2，就可以使用<code>git reset</code>命令：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="keyword">reset</span> <span class="comment">--hard HEAD^</span></span><br><span class="line"><span class="keyword">HEAD</span> <span class="keyword">is</span> <span class="keyword">now</span> <span class="keyword">at</span> <span class="number">5e16</span>c39 <span class="keyword">add</span> version2</span><br></pre></td></tr></table></figure>
+
+<p>看看readme.txt的内容是不是version2</p>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ cat readme.txt</span><br><span class="line">versio<span class="symbol">n1</span></span><br><span class="line">versio<span class="symbol">n2</span></span><br></pre></td></tr></table></figure>
+<p>果然被还原了。</p>
+<p>还可以继续回退到上一个版本version1，不过且慢，然我们用git log再看看现在版本库的状态：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">commit <span class="number">5e16</span>c39863fb9af5b7be61fcfda0b89d3247dcdb (HEAD -&gt; master)</span><br><span class="line">Author: morris &lt;<span class="symbol">morris131@</span><span class="number">126.</span>com&gt;</span><br><span class="line">Date:   Tue Oct <span class="number">29</span> <span class="number">17</span>:<span class="number">26</span>:<span class="number">24</span> <span class="number">2019</span> +<span class="number">0800</span></span><br><span class="line"></span><br><span class="line">    add version2</span><br><span class="line"></span><br><span class="line">commit e52c7b8b6063a3046ae73e9c44cbd6b90ab1e532</span><br><span class="line">Author: morris &lt;<span class="symbol">morris131@</span><span class="number">126.</span>com&gt;</span><br><span class="line">Date:   Tue Oct <span class="number">29</span> <span class="number">17</span>:<span class="number">23</span>:<span class="number">50</span> <span class="number">2019</span> +<span class="number">0800</span></span><br><span class="line"></span><br><span class="line">    add version1</span><br></pre></td></tr></table></figure>
+
+<p>最新的那个版本version3已经看不到了！现在想回到version3，肿么办？</p>
+<p>办法其实还是有的，只要上面的命令行窗口还没有被关掉，你就可以顺着往上找啊找啊，找到那个version3的commit id是a7b4ddc，于是就可以指定回到未来的某个版本：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="keyword">reset</span> <span class="comment">--hard a7b4ddc</span></span><br><span class="line"><span class="keyword">HEAD</span> <span class="keyword">is</span> <span class="keyword">now</span> <span class="keyword">at</span> a7b4ddc <span class="keyword">add</span> version3</span><br></pre></td></tr></table></figure>
+<p>再看看readme.txt的内容：</p>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ cat readme.txt</span><br><span class="line">versio<span class="symbol">n1</span></span><br><span class="line">versio<span class="symbol">n2</span></span><br><span class="line">versio<span class="symbol">n3</span></span><br></pre></td></tr></table></figure>
+<p>果然，又回到version3了。</p>
+<p>Git的版本回退速度非常快，因为Git在内部有个指向当前版本的HEAD指针，当你回退版本的时候，Git仅仅是把HEAD从指向version3</p>
+<p>现在，你回退到了某个版本，关掉了电脑，第二天早上就后悔了，想恢复到新版本怎么办？找不到新版本的commit id怎么办？</p>
+<p>Git提供了一个命令git reflog用来记录你的每一次命令：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">ref</span>log</span><br><span class="line">a7b4ddc (HEAD -&gt; master) <span class="symbol">HEAD@</span>&#123;<span class="number">0</span>&#125;: reset: moving to a7b4ddc</span><br><span class="line"><span class="number">5e16</span>c39 <span class="symbol">HEAD@</span>&#123;<span class="number">1</span>&#125;: reset: moving to HEAD^</span><br><span class="line">a7b4ddc (HEAD -&gt; master) <span class="symbol">HEAD@</span>&#123;<span class="number">2</span>&#125;: commit: add version3</span><br><span class="line"><span class="number">5e16</span>c39 <span class="symbol">HEAD@</span>&#123;<span class="number">3</span>&#125;: commit: add version2</span><br><span class="line">e52c7b8 <span class="symbol">HEAD@</span>&#123;<span class="number">4</span>&#125;: commit (initial): add version1</span><br></pre></td></tr></table></figure>
+<p>终于命令的输出可知，version3的commit id是a7b4ddc，现在，你又可以使用<code>git reset</code>回到version3了。</p>
+<h2 id="撤销修改"><a href="#撤销修改" class="headerlink" title="撤销修改"></a>撤销修改</h2><h3 id="丢弃工作区的修改"><a href="#丢弃工作区的修改" class="headerlink" title="丢弃工作区的修改"></a>丢弃工作区的修改</h3><p>修改readme.txt的内容如下：</p>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">versio<span class="symbol">n1</span></span><br><span class="line">versio<span class="symbol">n2</span></span><br><span class="line">versio<span class="symbol">n3</span></span><br><span class="line">versio<span class="symbol">n4</span></span><br></pre></td></tr></table></figure>
+<p>想放弃刚刚对readme.txt的修改，怎么办？</p>
+<p>用git status查看一下当前的状态：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ git status</span><br><span class="line">On branch master</span><br><span class="line">Changes not staged for <span class="keyword">commit</span>:</span><br><span class="line">  (<span class="keyword">use</span> <span class="string">"git add &lt;file&gt;..."</span> <span class="keyword">to</span> <span class="keyword">update</span> what will be committed)</span><br><span class="line">  (<span class="keyword">use</span> <span class="string">"git checkout -- &lt;file&gt;..."</span> <span class="keyword">to</span> discard changes <span class="keyword">in</span> working <span class="keyword">directory</span>)</span><br><span class="line"></span><br><span class="line">        modified:   readme.txt</span><br><span class="line"></span><br><span class="line"><span class="keyword">no</span> changes added <span class="keyword">to</span> <span class="keyword">commit</span> (<span class="keyword">use</span> <span class="string">"git add"</span> <span class="keyword">and</span>/<span class="keyword">or</span> <span class="string">"git commit -a"</span>)</span><br></pre></td></tr></table></figure>
+
+<p>Git会告诉你，<code>git checkout -- file</code>可以丢弃工作区的修改：</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout <span class="comment">-- readme.txt</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="丢弃对暂存区的修改"><a href="#丢弃对暂存区的修改" class="headerlink" title="丢弃对暂存区的修改"></a>丢弃对暂存区的修改</h3><p>如果上面的修改已经通过<code>git add</code>添加到暂存区了，想放弃对readme.txt的修改，怎么办？</p>
+<p>用<code>git status</code>查看一下，修改只是添加到了暂存区，还没有提交：</p>
+<figure class="highlight vhdl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ git status</span><br><span class="line"><span class="keyword">On</span> branch master</span><br><span class="line">Changes <span class="keyword">to</span> be committed:</span><br><span class="line">  (<span class="keyword">use</span> <span class="string">"git reset HEAD &lt;file&gt;..."</span> <span class="keyword">to</span> unstage)</span><br><span class="line"></span><br><span class="line">        modified:   readme.txt</span><br></pre></td></tr></table></figure>
+<p>Git同样告诉我们，用命令<code>git reset HEAD &lt;file&gt;</code>可以把暂存区的修改撤销掉（unstage），重新放回工作区：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="keyword">reset</span> <span class="keyword">HEAD</span> readme.txt</span><br><span class="line">Unstaged changes <span class="keyword">after</span> <span class="keyword">reset</span>:</span><br><span class="line">M       readme.txt</span><br></pre></td></tr></table></figure>
+
+<p>git reset命令既可以回退版本，也可以把暂存区的修改回退到工作区。当我们用HEAD时，表示最新的版本。</p>
+<p>再用git status查看一下，现在暂存区是干净的，工作区有修改：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ git status</span><br><span class="line">On branch master</span><br><span class="line">Changes not staged for <span class="keyword">commit</span>:</span><br><span class="line">  (<span class="keyword">use</span> <span class="string">"git add &lt;file&gt;..."</span> <span class="keyword">to</span> <span class="keyword">update</span> what will be committed)</span><br><span class="line">  (<span class="keyword">use</span> <span class="string">"git checkout -- &lt;file&gt;..."</span> <span class="keyword">to</span> discard changes <span class="keyword">in</span> working <span class="keyword">directory</span>)</span><br><span class="line"></span><br><span class="line">        modified:   readme.txt</span><br><span class="line"></span><br><span class="line"><span class="keyword">no</span> changes added <span class="keyword">to</span> <span class="keyword">commit</span> (<span class="keyword">use</span> <span class="string">"git add"</span> <span class="keyword">and</span>/<span class="keyword">or</span> <span class="string">"git commit -a"</span>)</span><br></pre></td></tr></table></figure>
+<p>还记得如何丢弃工作区的修改吗？</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout <span class="comment">-- readme.txt</span></span><br><span class="line">$ git status</span><br><span class="line"><span class="keyword">On</span> branch master</span><br><span class="line"><span class="keyword">nothing</span> <span class="keyword">to</span> <span class="keyword">commit</span>, working tree clean</span><br></pre></td></tr></table></figure>
+<p>整个世界终于清静了！</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/git/" rel="tag"><i class="fa fa-tag"></i> git</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/post/9362e2f9.html" rel="next" title="git简介及安装">
+                  <i class="fa fa-chevron-left"></i> git简介及安装
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/post/bc04b79d.html" rel="prev" title="git分支的使用">
+                  git分支的使用 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#git的使用"><span class="nav-number">1.</span> <span class="nav-text">git的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建仓库"><span class="nav-number">1.1.</span> <span class="nav-text">创建仓库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建目录"><span class="nav-number">1.1.1.</span> <span class="nav-text">创建目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化仓库"><span class="nav-number">1.1.2.</span> <span class="nav-text">初始化仓库</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#工作区和暂存区"><span class="nav-number">1.2.</span> <span class="nav-text">工作区和暂存区</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#添加文件到暂存区"><span class="nav-number">1.2.1.</span> <span class="nav-text">添加文件到暂存区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提交到版本库"><span class="nav-number">1.2.2.</span> <span class="nav-text">提交到版本库</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#版本回退"><span class="nav-number">1.3.</span> <span class="nav-text">版本回退</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#git-status"><span class="nav-number">1.3.1.</span> <span class="nav-text">git status</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#git-diff"><span class="nav-number">1.3.2.</span> <span class="nav-text">git diff</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#git-log"><span class="nav-number">1.3.3.</span> <span class="nav-text">git log</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#git-reset"><span class="nav-number">1.3.4.</span> <span class="nav-text">git reset</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#撤销修改"><span class="nav-number">1.4.</span> <span class="nav-text">撤销修改</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#丢弃工作区的修改"><span class="nav-number">1.4.1.</span> <span class="nav-text">丢弃工作区的修改</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#丢弃对暂存区的修改"><span class="nav-number">1.4.2.</span> <span class="nav-text">丢弃对暂存区的修改</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="https://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Morris"
+    src="/images/morris.png">
+  <p class="site-author-name" itemprop="name">Morris</p>
+  <div class="site-description" itemprop="description">你现在所得到的安逸将来要双倍偿还</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Morris</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: 'Iv1.0719a89e9daaa171',
+      clientSecret: '1be0a26202610ddbd49d231a941981c6649c2aff',
+      repo: 'gitalk',
+      owner: 'morris131',
+      admin: ['morris131'],
+      id: 'd78b67bffc34d806fed315f6dfc17e3b',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>

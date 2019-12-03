@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="R01DtrTblROr_C2SkIMI9BZFFw_1FH4bT5WNNVAkdm4">
+  <meta name="baidu-site-verification" content="ZORq9vnduv">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="git分支的使用使用分支意味着你可以把你的工作从开发主线上分离开来，以免影响开发主线。 在很多版本控制系统中，这是一个略微低效的过程——常常需要完全创建一个源代码目录的副本。对于大项目来说，这样的过程会耗费很多时间。而Git 处理分支的方式可谓是难以置信的轻量，创建新分支这一操作几乎能在瞬间完成，并且在不同分支之间的切换操作也是一样便捷。">
+<meta name="keywords" content="git">
+<meta property="og:type" content="article">
+<meta property="og:title" content="git分支的使用">
+<meta property="og:url" content="https:&#x2F;&#x2F;morris131.github.io&#x2F;post&#x2F;bc04b79d.html">
+<meta property="og:site_name" content="枪手的博客">
+<meta property="og:description" content="git分支的使用使用分支意味着你可以把你的工作从开发主线上分离开来，以免影响开发主线。 在很多版本控制系统中，这是一个略微低效的过程——常常需要完全创建一个源代码目录的副本。对于大项目来说，这样的过程会耗费很多时间。而Git 处理分支的方式可谓是难以置信的轻量，创建新分支这一操作几乎能在瞬间完成，并且在不同分支之间的切换操作也是一样便捷。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;tools&#x2F;git&#x2F;images&#x2F;20191031140137225_23247.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;tools&#x2F;git&#x2F;images&#x2F;20191031140201341_30972.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;tools&#x2F;git&#x2F;images&#x2F;20191031140233271_8186.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;tools&#x2F;git&#x2F;images&#x2F;20191031140252696_28700.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;tools&#x2F;git&#x2F;images&#x2F;20191031140324842_4948.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;tools&#x2F;git&#x2F;images&#x2F;20191031145137775_6796.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;tools&#x2F;git&#x2F;images&#x2F;20191031145837188_16640.png">
+<meta property="og:updated_time" content="2019-10-30T16:00:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;tools&#x2F;git&#x2F;images&#x2F;20191031140137225_23247.png">
+
+<link rel="canonical" href="https://morris131.github.io/post/bc04b79d.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>git分支的使用 | 枪手的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?2c9b55a761d135ab6f0695a694c71065";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="https://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">枪手的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">知识改变命运，编程照亮人生</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">13</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">6</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">55</span></a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/bc04b79d.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          git分支的使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-31 00:00:00" itemprop="dateCreated datePublished" datetime="2019-10-31T00:00:00+08:00">2019-10-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/git/" itemprop="url" rel="index">
+                    <span itemprop="name">git</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="git分支的使用"><a href="#git分支的使用" class="headerlink" title="git分支的使用"></a>git分支的使用</h1><p>使用分支意味着你可以把你的工作从开发主线上分离开来，以免影响开发主线。 在很多版本控制系统中，这是一个略微低效的过程——常常需要完全创建一个源代码目录的副本。对于大项目来说，这样的过程会耗费很多时间。而Git 处理分支的方式可谓是难以置信的轻量，创建新分支这一操作几乎能在瞬间完成，并且在不同分支之间的切换操作也是一样便捷。</p><a id="more"></a>
+<h2 id="git分支图解"><a href="#git分支图解" class="headerlink" title="git分支图解"></a>git分支图解</h2><p>在版本回退里，每次提交，Git都把它们串成一条时间线，这条时间线就是一个分支。截止到目前，只有一条时间线，在Git里，这个分支叫主分支，即master分支。HEAD严格来说不是指向提交，而是指向master，master才是指向提交的，所以，HEAD指向的就是当前分支。<br>一开始的时候，master分支是一条线，Git用master指向最新的提交，再用HEAD指向master，就能确定当前分支，以及当前分支的提交点：</p>
+<p><img src="https://gitee.com/morris131/morris-book/raw/master/tools/git/images/20191031140137225_23247.png" alt="master"></p>
+<p>每次提交，master分支都会向前移动一步，这样，随着你不断提交，master分支的线也越来越长：<br>当我们创建新的分支，例如dev时，Git新建了一个指针叫dev，指向master相同的提交，再把HEAD指向dev，就表示当前分支在dev上：</p>
+<p><img src="https://gitee.com/morris131/morris-book/raw/master/tools/git/images/20191031140201341_30972.png" alt="dev"></p>
+<p>你看，Git创建一个分支很快，因为除了增加一个dev指针，改改HEAD的指向，工作区的文件都没有任何变化！<br>不过，从现在开始，对工作区的修改和提交就是针对dev分支了，比如新提交一次后，dev指针往前移动一步，而master指针不变：</p>
+<p><img src="https://gitee.com/morris131/morris-book/raw/master/tools/git/images/20191031140233271_8186.png" alt="dev"></p>
+<p>假如我们在dev上的工作完成了，就可以把dev合并到master上。Git怎么合并呢？最简单的方法，就是直接把master指向dev的当前提交，就完成了合并：</p>
+<p><img src="https://gitee.com/morris131/morris-book/raw/master/tools/git/images/20191031140252696_28700.png" alt="master-dev"></p>
+<p>所以Git合并分支也很快！就改改指针，工作区内容也不变！<br>合并完分支后，甚至可以删除dev分支。删除dev分支就是把dev指针给删掉，删掉后，我们就剩下了一条master分支：</p>
+<p><img src="https://gitee.com/morris131/morris-book/raw/master/tools/git/images/20191031140324842_4948.png" alt="master"></p>
+<h2 id="分支的使用"><a href="#分支的使用" class="headerlink" title="分支的使用"></a>分支的使用</h2><h3 id="创建并切换分支"><a href="#创建并切换分支" class="headerlink" title="创建并切换分支"></a>创建并切换分支</h3><p>首先，我们创建dev分支，然后切换到dev分支：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout -<span class="selector-tag">b</span> dev</span><br><span class="line">Switched to <span class="selector-tag">a</span> new branch <span class="string">'dev'</span></span><br></pre></td></tr></table></figure>
+<p><code>git checkout</code>命令加上-b参数表示创建并切换，相当于以下两条命令：</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="keyword">branch </span>dev</span><br><span class="line">$ git checkout dev</span><br><span class="line"><span class="keyword">Switched </span>to <span class="keyword">branch </span><span class="string">'dev'</span></span><br></pre></td></tr></table></figure>
+<p><code>git branch</code>命令会列出所有分支，当前分支前面会标一个*号。</p>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">$</span> git branch</span><br><span class="line"><span class="comment">* dev</span></span><br><span class="line">  master</span><br></pre></td></tr></table></figure>
+
+<h3 id="合并分支"><a href="#合并分支" class="headerlink" title="合并分支"></a>合并分支</h3><p>修改readme.txt的内容并提交：</p>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">$</span> cat readme.txt</span><br><span class="line">version1</span><br><span class="line"><span class="symbol">$</span> git add .</span><br><span class="line"><span class="symbol">$</span> git commit -m <span class="string">'add version2'</span></span><br><span class="line">[dev b74906a] add version2</span><br><span class="line"> <span class="number">1</span> <span class="keyword">file</span> changed, <span class="number">2</span> insertions(+), <span class="number">1</span> deletion(-)</span><br><span class="line"></span><br><span class="line"><span class="symbol">$</span> cat readme.txt</span><br><span class="line">version1</span><br><span class="line">version2</span><br></pre></td></tr></table></figure>
+<p>现在要将dev的代码合并到master分支上，首先切换回master分支：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout master</span><br><span class="line">Switched <span class="keyword">to</span> branch <span class="string">'master'</span></span><br><span class="line">Your branch <span class="keyword">is</span> up <span class="keyword">to</span> <span class="type">date</span> <span class="keyword">with</span> <span class="string">'origin/master'</span>.</span><br></pre></td></tr></table></figure>
+<p>然后把dev分支的代码合并到master分支上：</p>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">$</span> cat readme.txt</span><br><span class="line">version1</span><br><span class="line"><span class="symbol">$</span> git merge dev</span><br><span class="line"><span class="function"><span class="title">Updating</span></span> <span class="number">19</span>ea396..b74906a</span><br><span class="line">Fast-forward</span><br><span class="line"> readme.txt | <span class="number">3</span> ++-</span><br><span class="line"> <span class="number">1</span> <span class="keyword">file</span> changed, <span class="number">2</span> insertions(+), <span class="number">1</span> deletion(-)</span><br><span class="line"></span><br><span class="line"><span class="symbol">$</span> cat readme.txt</span><br><span class="line">version1</span><br><span class="line">version2</span><br></pre></td></tr></table></figure>
+<p>如果dev和master分支的代码没有冲突，就会快速合并（Fast-forward），有冲突需手动解决冲突后才能合并。</p>
+<h3 id="删除分支"><a href="#删除分支" class="headerlink" title="删除分支"></a>删除分支</h3><p>dev的代码合并到master完成后，就可以放心地删除dev分支了：</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="keyword">branch </span>-d dev</span><br><span class="line"><span class="symbol">Deleted</span> <span class="keyword">branch </span>dev (was <span class="keyword">b74906a).</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="keyword">$ </span>git <span class="keyword">branch</span></span><br><span class="line"><span class="keyword">* </span>master</span><br></pre></td></tr></table></figure>
+<p>如果dev的代码没有合并到master，直接删除会提示一个错误</p>
+<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git branch -d dev</span><br><span class="line"><span class="keyword">error: </span>The branch 'dev' is not fully merged.</span><br><span class="line">If you are sure you want to delete it, run 'git branch -D dev'.</span><br></pre></td></tr></table></figure>
+<p>这时可以使用<code>git branch -D dev</code>强制删除。</p>
+<h3 id="解决冲突"><a href="#解决冲突" class="headerlink" title="解决冲突"></a>解决冲突</h3><p>开一个新的分支来演示冲突的出现与解决办法。<br>在readme.txt文件中加了一行内容并提交。</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="keyword">cat</span> readme.txt</span><br><span class="line">version1</span><br><span class="line">version2</span><br><span class="line"></span><br><span class="line">$ git checkout -<span class="keyword">b</span> feature1</span><br><span class="line">Switched <span class="keyword">to</span> <span class="keyword">a</span> <span class="keyword">new</span> branch <span class="string">'feature1'</span></span><br><span class="line"></span><br><span class="line">$ git <span class="built_in">add</span> .</span><br><span class="line">$ git commit -<span class="keyword">m</span> <span class="string">'add version-feature'</span></span><br><span class="line">[feature1 c133411] <span class="built_in">add</span> <span class="keyword">version</span>-feature</span><br><span class="line"> <span class="number">1</span> <span class="keyword">file</span> changed, <span class="number">2</span> insertions(+), <span class="number">1</span> deletion(-)</span><br><span class="line"></span><br><span class="line">$ <span class="keyword">cat</span> readme.txt</span><br><span class="line">version1</span><br><span class="line">version2</span><br><span class="line"><span class="keyword">version</span>-feature</span><br></pre></td></tr></table></figure>
+<p>切换回master分支，然后在readme.txt文件中加了一行内容并提交。</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ cat readme.txt</span><br><span class="line">version1</span><br><span class="line">version2</span><br><span class="line">$ git add .</span><br><span class="line"></span><br><span class="line">$ git commit -m 'add <span class="keyword">version</span>-<span class="literal">master</span>'</span><br><span class="line">[<span class="keyword">master</span> <span class="title">4e1781a</span>] add <span class="keyword">version</span>-<span class="literal">master</span></span><br><span class="line"> <span class="number">1</span> file changed, <span class="number">2</span> insertions(+), <span class="number">1</span> deletion(-)</span><br><span class="line"></span><br><span class="line">$ cat readme.txt</span><br><span class="line">version1</span><br><span class="line">version2</span><br><span class="line"><span class="keyword">version</span>-<span class="literal">master</span></span><br></pre></td></tr></table></figure>
+<p>现在，master分支和feature1分支各自都分别有新的提交，变成了这样：</p>
+<p><img src="https://gitee.com/morris131/morris-book/raw/master/tools/git/images/20191031145137775_6796.png" alt="解决冲突"></p>
+<p>这种情况下，Git无法执行“快速合并”，只能试图把各自的修改合并起来，但这种合并就可能会有冲突，我们试试看：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git merge feature1</span><br><span class="line">Auto-merging readme.txt</span><br><span class="line"><span class="keyword">CONFLICT</span> (content): Merge <span class="keyword">conflict</span> <span class="keyword">in</span> readme.txt</span><br><span class="line">Automatic merge failed; fix conflicts <span class="keyword">and</span> <span class="keyword">then</span> <span class="keyword">commit</span> the result.</span><br></pre></td></tr></table></figure>
+<p>果然冲突了！Git告诉我们，readme.txt文件存在冲突，必须手动解决冲突后再提交。git status也可以告诉我们冲突的文件：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ git status</span><br><span class="line">On branch master</span><br><span class="line">Your branch is ahead of 'origin/master' by 2 commits.</span><br><span class="line">  (<span class="keyword">use</span> <span class="string">"git push"</span> <span class="keyword">to</span> publish your <span class="keyword">local</span> commits)</span><br><span class="line"></span><br><span class="line">You have unmerged paths.</span><br><span class="line">  (fix conflicts <span class="keyword">and</span> run <span class="string">"git commit"</span>)</span><br><span class="line">  (<span class="keyword">use</span> <span class="string">"git merge --abort"</span> <span class="keyword">to</span> <span class="keyword">abort</span> the <span class="keyword">merge</span>)</span><br><span class="line"></span><br><span class="line">Unmerged paths:</span><br><span class="line">  (<span class="keyword">use</span> <span class="string">"git add &lt;file&gt;..."</span> <span class="keyword">to</span> mark resolution)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">both</span> modified:   readme.txt</span><br><span class="line"></span><br><span class="line"><span class="keyword">no</span> changes added <span class="keyword">to</span> <span class="keyword">commit</span> (<span class="keyword">use</span> <span class="string">"git add"</span> <span class="keyword">and</span>/<span class="keyword">or</span> <span class="string">"git commit -a"</span>)</span><br></pre></td></tr></table></figure>
+<p>git提示我们可以用<code>git merge --abort</code>撤销本次合并。也可以手动解决冲突后提交。</p>
+<p>我们可以直接查看readme.txt的内容：</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ cat readme.txt</span><br><span class="line">version1</span><br><span class="line">version2</span><br><span class="line">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</span><br><span class="line">version-master</span><br><span class="line">=======</span><br><span class="line">version-feature</span><br><span class="line">&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature1</span><br></pre></td></tr></table></figure>
+<p>Git用&lt;&lt;&lt;&lt;&lt;&lt;&lt;，=======，&gt;&gt;&gt;&gt;&gt;&gt;&gt;标记出不同分支的内容，我们修改如下后保存：</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">version</span>-<span class="literal">master</span></span><br></pre></td></tr></table></figure>
+<p>再提交：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git add readme.txt</span><br><span class="line"></span><br><span class="line">$ git <span class="keyword">commit</span> -m <span class="string">'merge from feature1'</span></span><br><span class="line">[<span class="keyword">master</span> e763995] <span class="keyword">merge</span> <span class="keyword">from</span> feature1</span><br></pre></td></tr></table></figure>
+<p>现在，master分支和feature1分支变成了下图所示：</p>
+<p><img src="https://gitee.com/morris131/morris-book/raw/master/tools/git/images/20191031145837188_16640.png" alt="解决冲突后"></p>
+<p>用带参数的git log也可以看到分支的合并情况：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">log</span> <span class="comment">--graph --pretty=oneline --abbrev-commit</span></span><br><span class="line">*   e763995 (HEAD -&gt; master) <span class="built_in">merge</span> <span class="built_in">from</span> feature1</span><br><span class="line">|\</span><br><span class="line">| * c133411 (feature1) <span class="built_in">add</span> <span class="built_in">version</span>-feature</span><br><span class="line">* | <span class="number">4e1781</span><span class="keyword">a</span> <span class="built_in">add</span> <span class="built_in">version</span>-master</span><br><span class="line">|/</span><br><span class="line">* b74906a (origin/dev) <span class="built_in">add</span> version2</span><br><span class="line">* <span class="number">19</span>ea396 (origin/master) <span class="built_in">add</span> version1</span><br></pre></td></tr></table></figure>
+
+<p>最后，删除feature1分支：</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="keyword">branch </span>-d feature1</span><br><span class="line"><span class="symbol">Deleted</span> <span class="keyword">branch </span>feature1 (was c133411).</span><br></pre></td></tr></table></figure>
+<p>工作完成。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/git/" rel="tag"><i class="fa fa-tag"></i> git</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/post/2e742d51.html" rel="next" title="git的使用">
+                  <i class="fa fa-chevron-left"></i> git的使用
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/post/128488bd.html" rel="prev" title="lambda简介">
+                  lambda简介 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#git分支的使用"><span class="nav-number">1.</span> <span class="nav-text">git分支的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#git分支图解"><span class="nav-number">1.1.</span> <span class="nav-text">git分支图解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分支的使用"><span class="nav-number">1.2.</span> <span class="nav-text">分支的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建并切换分支"><span class="nav-number">1.2.1.</span> <span class="nav-text">创建并切换分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#合并分支"><span class="nav-number">1.2.2.</span> <span class="nav-text">合并分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除分支"><span class="nav-number">1.2.3.</span> <span class="nav-text">删除分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决冲突"><span class="nav-number">1.2.4.</span> <span class="nav-text">解决冲突</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="https://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Morris"
+    src="/images/morris.png">
+  <p class="site-author-name" itemprop="name">Morris</p>
+  <div class="site-description" itemprop="description">你现在所得到的安逸将来要双倍偿还</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Morris</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: 'Iv1.0719a89e9daaa171',
+      clientSecret: '1be0a26202610ddbd49d231a941981c6649c2aff',
+      repo: 'gitalk',
+      owner: 'morris131',
+      admin: ['morris131'],
+      id: 'b5419f52223cb48bcbacaeb9d4e75887',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>

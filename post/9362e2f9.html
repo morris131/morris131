@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="R01DtrTblROr_C2SkIMI9BZFFw_1FH4bT5WNNVAkdm4">
+  <meta name="baidu-site-verification" content="ZORq9vnduv">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="git简介及安装Git是什么？Git是一款免费、开源的分布式版本控制系统，用于敏捷高效地处理任何大小的项目。">
+<meta name="keywords" content="git">
+<meta property="og:type" content="article">
+<meta property="og:title" content="git简介及安装">
+<meta property="og:url" content="https:&#x2F;&#x2F;morris131.github.io&#x2F;post&#x2F;9362e2f9.html">
+<meta property="og:site_name" content="枪手的博客">
+<meta property="og:description" content="git简介及安装Git是什么？Git是一款免费、开源的分布式版本控制系统，用于敏捷高效地处理任何大小的项目。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;tools&#x2F;git&#x2F;images&#x2F;1574244516052.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;tools&#x2F;git&#x2F;images&#x2F;1574244525310.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;tools&#x2F;git&#x2F;images&#x2F;1574244546193.gif">
+<meta property="og:updated_time" content="2019-10-28T16:00:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;tools&#x2F;git&#x2F;images&#x2F;1574244516052.png">
+
+<link rel="canonical" href="https://morris131.github.io/post/9362e2f9.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>git简介及安装 | 枪手的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?2c9b55a761d135ab6f0695a694c71065";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="https://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">枪手的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">知识改变命运，编程照亮人生</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">13</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">6</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">55</span></a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/9362e2f9.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          git简介及安装
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-29 00:00:00" itemprop="dateCreated datePublished" datetime="2019-10-29T00:00:00+08:00">2019-10-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/git/" itemprop="url" rel="index">
+                    <span itemprop="name">git</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="git简介及安装"><a href="#git简介及安装" class="headerlink" title="git简介及安装"></a>git简介及安装</h1><h2 id="Git是什么？"><a href="#Git是什么？" class="headerlink" title="Git是什么？"></a>Git是什么？</h2><p>Git是一款免费、开源的<strong>分布式</strong>版本控制系统，用于敏捷高效地处理任何大小的项目。</p><a id="more"></a>
+<h2 id="集中式-VS-分布式"><a href="#集中式-VS-分布式" class="headerlink" title="集中式 VS 分布式"></a>集中式 VS 分布式</h2><p>集中式版本控制系统中版本库是集中存放在中央服务器的，而干活的时候，用的都是自己的电脑，所以要先从中央服务器取得最新的版本，然后开始干活，干完活了，再把自己的活推送给中央服务器。</p>
+<p><img src="https://gitee.com/morris131/morris-book/raw/master/tools/git/images/1574244516052.png" alt></p>
+<p>分布式版本控制系统根本没有“中央服务器”，每个人的电脑上都是一个完整的版本库，这样，你工作的时候，就不需要联网了，因为版本库就在你自己的电脑上。既然每个人电脑上都有一个完整的版本库，那多个人如何协作呢？比方说你在自己电脑上改了文件A，你的同事也在他的电脑上改了文件A，这时，你们俩之间只需把各自的修改推送给对方，就可以互相看到对方的修改了。</p>
+<p><img src="https://gitee.com/morris131/morris-book/raw/master/tools/git/images/1574244525310.png" alt></p>
+<p>和集中式版本控制系统相比，分布式版本控制系统的安全性要高很多，因为每个人电脑里都有完整的版本库，某一个人的电脑坏掉了不要紧，从其他人那里复制一个就可以了。而集中式版本控制系统的中央服务器要是出了问题，所有人都没法干活了。</p>
+<p>在实际使用分布式版本控制系统的时候，其实很少在两人之间的电脑上推送版本库的修改，因为可能你们俩不在一个局域网内，两台电脑互相访问不了，也可能今天你的同事病了，他的电脑压根没有开机。因此，分布式版本控制系统通常也有一台充当“中央服务器”的电脑，但这个服务器的作用仅仅是用来方便“交换”大家的修改，没有它大家也一样干活，只是交换修改不方便而已。</p>
+<h2 id="git的安装"><a href="#git的安装" class="headerlink" title="git的安装"></a>git的安装</h2><ol>
+<li>前往<a href="https://git-scm.com" target="_blank" rel="noopener">git官网</a>下载与系统对应的版本进行安装。</li>
+<li>查看是否安装成功<br>双击桌面Git Bash图标，弹出一个类似命令行的窗口，就说明Git安装成功！<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git --version</span><br><span class="line">git version <span class="number">2.17</span><span class="number">.0</span>.windows<span class="number">.1</span></span><br></pre></td></tr></table></figure></li>
+<li>配置用户名与邮箱<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git<span class="built_in"> config </span>--global user.name <span class="string">"morris"</span></span><br><span class="line">$ git<span class="built_in"> config </span>--global user.email <span class="string">"morris131@126.com"</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>配置完之后会在用户目录下生成一个.gitconfig文件，文件内容如下：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[user]</span><br><span class="line">	name = morris</span><br><span class="line">	eamil = <span class="symbol">morris131@</span><span class="number">126.</span>com</span><br></pre></td></tr></table></figure>
+<p>也可以直接修改此文件，无需命令配置。</p>
+<p>如果不配置用户名和邮箱，在提交到版本库时会报错。</p>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ git commit -m 'test'</span><br><span class="line"></span><br><span class="line">*** Please tell me who you are.</span><br><span class="line"></span><br><span class="line">Run</span><br><span class="line"></span><br><span class="line">  git config --global <span class="keyword">user</span>.email <span class="string">"you@example.com"</span></span><br><span class="line">  git config --global <span class="keyword">user</span>.name <span class="string">"Your Name"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">to</span> <span class="built_in">set</span> your account's <span class="keyword">default</span> identity.</span><br><span class="line">Omit --global <span class="keyword">to</span> <span class="built_in">set</span> the identity only <span class="keyword">in</span> this repository.</span><br><span class="line"></span><br><span class="line">fatal: unable <span class="keyword">to</span> auto-detect email address (got 'Morris@Morris-PC.(<span class="keyword">none</span>)')</span><br></pre></td></tr></table></figure>
+
+<p>这里设置的用户名和邮箱将会显示在提交日志中的作者字段。</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">commit e52c7b8b6063a3046ae73e9c44cbd6b90ab1e532</span><br><span class="line">Author: morris &lt;<span class="symbol">morris131@</span><span class="number">126.</span>com&gt;</span><br><span class="line">Date:   Tue Oct <span class="number">29</span> <span class="number">17</span>:<span class="number">23</span>:<span class="number">50</span> <span class="number">2019</span> +<span class="number">0800</span></span><br><span class="line"></span><br><span class="line">    add version1</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://gitee.com/morris131/morris-book/raw/master/tools/git/images/1574244546193.gif" alt></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/git/" rel="tag"><i class="fa fa-tag"></i> git</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/post/9fa19065.html" rel="next" title="git远程仓库的使用">
+                  <i class="fa fa-chevron-left"></i> git远程仓库的使用
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/post/2e742d51.html" rel="prev" title="git的使用">
+                  git的使用 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#git简介及安装"><span class="nav-number">1.</span> <span class="nav-text">git简介及安装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Git是什么？"><span class="nav-number">1.1.</span> <span class="nav-text">Git是什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集中式-VS-分布式"><span class="nav-number">1.2.</span> <span class="nav-text">集中式 VS 分布式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git的安装"><span class="nav-number">1.3.</span> <span class="nav-text">git的安装</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="https://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Morris"
+    src="/images/morris.png">
+  <p class="site-author-name" itemprop="name">Morris</p>
+  <div class="site-description" itemprop="description">你现在所得到的安逸将来要双倍偿还</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Morris</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: 'Iv1.0719a89e9daaa171',
+      clientSecret: '1be0a26202610ddbd49d231a941981c6649c2aff',
+      repo: 'gitalk',
+      owner: 'morris131',
+      admin: ['morris131'],
+      id: 'f4584196257292c39ea6a56126295002',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>

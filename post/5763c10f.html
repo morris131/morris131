@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="R01DtrTblROr_C2SkIMI9BZFFw_1FH4bT5WNNVAkdm4">
+  <meta name="baidu-site-verification" content="ZORq9vnduv">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="自定义CollectorCollector接口包含了一系列方法，为实现具体的归约操作（即收集器）提供了范本。我们已经看过了Collector接口中实现的许多收集器（由Collector接口的工具类Collector提供），例如toList或groupingBy。">
+<meta name="keywords" content="java8,collector">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自定义Collector">
+<meta property="og:url" content="https:&#x2F;&#x2F;morris131.github.io&#x2F;post&#x2F;5763c10f.html">
+<meta property="og:site_name" content="枪手的博客">
+<meta property="og:description" content="自定义CollectorCollector接口包含了一系列方法，为实现具体的归约操作（即收集器）提供了范本。我们已经看过了Collector接口中实现的许多收集器（由Collector接口的工具类Collector提供），例如toList或groupingBy。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-09T16:00:00.000Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://morris131.github.io/post/5763c10f.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>自定义Collector | 枪手的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?2c9b55a761d135ab6f0695a694c71065";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="https://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">枪手的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">知识改变命运，编程照亮人生</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">13</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">6</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">55</span></a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/5763c10f.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          自定义Collector
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-10 00:00:00" itemprop="dateCreated datePublished" datetime="2019-11-10T00:00:00+08:00">2019-11-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java8/" itemprop="url" rel="index">
+                    <span itemprop="name">java8</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="自定义Collector"><a href="#自定义Collector" class="headerlink" title="自定义Collector"></a>自定义Collector</h1><p>Collector接口包含了一系列方法，为实现具体的归约操作（即收集器）提供了范本。我们已经看过了Collector接口中实现的许多收集器（由Collector接口的工具类Collector提供），例如toList或groupingBy。</p><a id="more"></a>
+<p>这也意味着你可以为Collector接口提供自己的实现，从而自由地创建自定义归约操作。</p>
+<p>要实现自定义收集器，只需要实现<code>java.util.stream.Collector&lt;T, A, R&gt;</code>接口即可.</p>
+<p>Collector接口的声明如下：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public<span class="built_in"> interface </span>Collector&lt;T, A, R&gt; &#123;</span><br><span class="line"></span><br><span class="line">    Supplier&lt;A&gt; supplier();</span><br><span class="line"></span><br><span class="line">    BiConsumer&lt;A, T&gt; accumulator();</span><br><span class="line"></span><br><span class="line">    BinaryOperator&lt;A&gt; combiner();</span><br><span class="line"></span><br><span class="line">    Function&lt;A, R&gt; finisher();</span><br><span class="line"></span><br><span class="line">    Set&lt;Characteristics&gt; characteristics();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="泛型介绍"><a href="#泛型介绍" class="headerlink" title="泛型介绍"></a>泛型介绍</h2><ul>
+<li>T：stream在调用collect方法收集前的数据类型</li>
+<li>A：A是T的累加器，遍历T的时候，会把T按照一定的方式添加到A中，换句话说就是把一些T通过一种方式变成A</li>
+<li>R：R可以看成是A的累加器，是最终的结果，是把A汇聚之后的数据类型，换句话说就是把一些A通过一种方式变成R</li>
+</ul>
+<h2 id="接口介绍"><a href="#接口介绍" class="headerlink" title="接口介绍"></a>接口介绍</h2><ul>
+<li>supplier: 怎么创建一个累加器</li>
+<li>accumulator:怎么把一个对象添加到累加器中</li>
+<li>combiner: 怎么把一个累加器和另一个累加器合并起来，此方法并行时才会调用</li>
+<li>finisher: 怎么把A转化为R</li>
+<li>characteristics: 特征值，告诉collect方法在执行归约操作的时候可以应用哪些优化</li>
+</ul>
+<h2 id="Characteristics"><a href="#Characteristics" class="headerlink" title="Characteristics"></a>Characteristics</h2><p>包含三个项目的枚举：</p>
+<ul>
+<li>UNORDERED–归约结果不受流中项目的遍历和累积顺序的影响</li>
+<li>CONCURRENT–accumulator函数可以从多个线程同时调用，且该收集器可以并行归约流。如果收集器没有标为UNORDERED, 那它仅在用于无序数据源时才可以并行归约。</li>
+<li>IDENTITY_FINISH–这表明完成器方法返回的函数是一个恒等函数，可以跳过。这种情况下，累加器对象将会直接用做归约过程的最终结果。这也意味着，将累加器A不加检查地转换为结果R是安全的。</li>
+</ul>
+<p>当Collector设置为IDENTITY_FINISH，finisher方法不会调用，因为不用再类型转换了，中间数据类型就是最终的数据类型。</p>
+<h2 id="Stream-collect-源码分析"><a href="#Stream-collect-源码分析" class="headerlink" title="Stream#collect()源码分析"></a>Stream#collect()源码分析</h2><p>下面的Stream的实现类ReferencePipeline的collect方法的源码</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public final &lt;R, A&gt; R collect(Collector&lt;? super P_OUT, A, R&gt; collector) &#123; <span class="comment">// @1</span></span><br><span class="line">    A container;</span><br><span class="line">    <span class="keyword">if</span> (is<span class="constructor">Parallel()</span></span><br><span class="line"><span class="operator">            &amp;&amp; </span>(collector.characteristics<span class="literal">()</span>.contains(Collector.Characteristics.CONCURRENT))</span><br><span class="line"><span class="operator">            &amp;&amp; </span>(!is<span class="constructor">Ordered()</span><span class="operator"> || </span>collector.characteristics<span class="literal">()</span>.contains(Collector.Characteristics.UNORDERED))) &#123; <span class="comment">// @2</span></span><br><span class="line">        container = collector.supplier<span class="literal">()</span>.get<span class="literal">()</span>; <span class="comment">// @3</span></span><br><span class="line">        BiConsumer&lt;A, ? super P_OUT&gt; accumulator = collector.accumulator<span class="literal">()</span>;</span><br><span class="line">        for<span class="constructor">Each(<span class="params">u</span> -&gt; <span class="params">accumulator</span>.<span class="params">accept</span>(<span class="params">container</span>, <span class="params">u</span>)</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        container = evaluate(<span class="module-access"><span class="module"><span class="identifier">ReduceOps</span>.</span></span>make<span class="constructor">Ref(<span class="params">collector</span>)</span>); <span class="comment">// @4</span></span><br><span class="line">    &#125;</span><br><span class="line">    return collector.characteristics<span class="literal">()</span>.contains(Collector.Characteristics.IDENTITY_FINISH)</span><br><span class="line">           ? (R) container</span><br><span class="line">           : collector.finisher<span class="literal">()</span>.apply(container); <span class="comment">// @5</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>代码@1：函数声明，该方法返回的结果类型为R，传入的行为参数接口为Collector。</li>
+<li>代码@2：判断是否符合并行化累积与规约的条件。<ul>
+<li>是否是并行流，Stream.stream()方法的流是非并行化流，如果要支持并行化执行，需要使用Stream.parallelStream()方法。</li>
+<li>Collector(收集器，行为化参数)中收集器行为集合中是否包含Characteristics.CONCURRENT(并行执行)，如果不包含该行为，则不支持并行执行。</li>
+<li>原始流是否有顺序或者收集器的行为集合中明确包含Characteristics.UNORDERED(不要求顺序性)。</li>
+<li>上述三个条件必须同时满足，才能并行执行，否则串行执行。</li>
+</ul>
+</li>
+<li>代码@3：并行执行收集动作。</li>
+<li>代码@4：串行执行收集动作。</li>
+<li>代码@5：如果收集器收集行为集合中包含Characteristics.IDENTITY_FINISH，则直接返回原始值，否则使用Collector.finishier()方式对计算的值进行函数式计算。</li>
+</ul>
+<h2 id="自定义toList"><a href="#自定义toList" class="headerlink" title="自定义toList"></a>自定义toList</h2><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">package com.morris.java8.collector;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">import</span> java.util.<span class="keyword">function</span>.BiConsumer;</span><br><span class="line"><span class="keyword">import</span> java.util.<span class="keyword">function</span>.BinaryOperator;</span><br><span class="line"><span class="keyword">import</span> java.util.<span class="keyword">function</span>.<span class="keyword">Function</span>;</span><br><span class="line"><span class="keyword">import</span> java.util.<span class="keyword">function</span>.Supplier;</span><br><span class="line"><span class="keyword">import</span> java.util.stream.Collector;</span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> <span class="keyword">class</span> ToListCollector&lt;T&gt; implements Collector&lt;T, List&lt;T&gt;, List&lt;T&gt;&gt; &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="built_in">public</span> Supplier&lt;List&lt;T&gt;&gt; supplier() &#123;</span><br><span class="line">        <span class="keyword">return</span> ArrayList::<span class="built_in">new</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="built_in">public</span> BiConsumer&lt;List&lt;T&gt;, T&gt; accumulator() &#123;</span><br><span class="line">        <span class="keyword">return</span> List::<span class="keyword">add</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="built_in">public</span> BinaryOperator&lt;List&lt;T&gt;&gt; combiner() &#123;</span><br><span class="line">        <span class="keyword">return</span> (left, right) -&gt; &#123;</span><br><span class="line">            left.addAll(right);</span><br><span class="line">            <span class="keyword">return</span> left;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="built_in">public</span> <span class="keyword">Function</span>&lt;List&lt;T&gt;, List&lt;T&gt;&gt; finisher() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">Function</span>.<span class="keyword">identity</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="built_in">public</span> <span class="keyword">Set</span>&lt;<span class="keyword">Characteristics</span>&gt; <span class="keyword">characteristics</span>() &#123;</span><br><span class="line">        <span class="keyword">return</span> Collections.unmodifiableSet(EnumSet.<span class="keyword">of</span>(Collector.<span class="keyword">Characteristics</span>.IDENTITY_FINISH));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">public</span> static <span class="type">void</span> main(String[] args) &#123;</span><br><span class="line">        List&lt;Dish&gt; dishList = Dish.createList().stream().<span class="keyword">filter</span>(Dish::isVegetarian).collect(<span class="built_in">new</span> ToListCollector&lt;&gt;());</span><br><span class="line">        <span class="keyword">System</span>.<span class="keyword">out</span>.println(dishList);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="自定义joining"><a href="#自定义joining" class="headerlink" title="自定义joining"></a>自定义joining</h2><figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.java8.collector;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">import</span> java.util.<span class="keyword">function</span>.BiConsumer;</span><br><span class="line"><span class="keyword">import</span> java.util.<span class="keyword">function</span>.BinaryOperator;</span><br><span class="line"><span class="keyword">import</span> java.util.<span class="keyword">function</span>.Function;</span><br><span class="line"><span class="keyword">import</span> java.util.<span class="keyword">function</span>.Supplier;</span><br><span class="line"><span class="keyword">import</span> java.util.stream.Collector;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JoiningCollector</span> <span class="keyword"><span class="keyword">implements</span> <span class="type">Collector</span></span>&lt;<span class="title">String</span>, <span class="title">StringBuilder</span>, <span class="title">String</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">String</span> seperator = <span class="string">","</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> JoiningCollector() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> JoiningCollector(<span class="keyword">String</span> seperator) &#123;</span><br><span class="line">        <span class="built_in">this</span>.seperator = seperator;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="keyword">public</span> Supplier&lt;StringBuilder&gt; supplier() &#123;</span><br><span class="line">        <span class="keyword">return</span> StringBuilder:<span class="type"></span>:<span class="keyword">new</span><span class="type"></span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="keyword">public</span> BiConsumer&lt;StringBuilder, <span class="keyword">String</span>&gt; accumulator() &#123;</span><br><span class="line">        <span class="keyword">return</span> (sb, str) -&gt; sb.append(str).append(seperator);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="keyword">public</span> BinaryOperator&lt;StringBuilder&gt; combiner() &#123;</span><br><span class="line">        <span class="keyword">return</span> StringBuilder:<span class="type"></span>:append;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="keyword">public</span> Function&lt;StringBuilder, <span class="keyword">String</span>&gt; finisher() &#123;</span><br><span class="line">        <span class="keyword">return</span> c -&gt; &#123;</span><br><span class="line">            <span class="keyword">String</span> ret = c.toString();</span><br><span class="line">            <span class="keyword">if</span> (ret.endsWith(seperator)) &#123;</span><br><span class="line">                <span class="keyword">return</span> ret.substring(<span class="number">0</span>, ret.length() - <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> ret;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="keyword">public</span> Set&lt;Characteristics&gt; characteristics() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="type">HashSet</span>&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) &#123;</span><br><span class="line">        <span class="keyword">String</span> collect = Arrays.asList(<span class="string">"hello"</span>, <span class="string">"world"</span>, <span class="string">"java"</span>, <span class="string">"stream"</span>).stream().collect(<span class="keyword">new</span> <span class="type">JoiningCollector</span>(<span class="string">"|"</span>));</span><br><span class="line">        System.out.println(collect);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/java8/" rel="tag"><i class="fa fa-tag"></i> java8</a>
+              <a href="/tags/collector/" rel="tag"><i class="fa fa-tag"></i> collector</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/post/6b148d3e.html" rel="next" title="Collector的使用">
+                  <i class="fa fa-chevron-left"></i> Collector的使用
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/post/68cc3b9e.html" rel="prev" title="并行Stream流">
+                  并行Stream流 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#自定义Collector"><span class="nav-number">1.</span> <span class="nav-text">自定义Collector</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#泛型介绍"><span class="nav-number">1.1.</span> <span class="nav-text">泛型介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接口介绍"><span class="nav-number">1.2.</span> <span class="nav-text">接口介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Characteristics"><span class="nav-number">1.3.</span> <span class="nav-text">Characteristics</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Stream-collect-源码分析"><span class="nav-number">1.4.</span> <span class="nav-text">Stream#collect()源码分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义toList"><span class="nav-number">1.5.</span> <span class="nav-text">自定义toList</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义joining"><span class="nav-number">1.6.</span> <span class="nav-text">自定义joining</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="https://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Morris"
+    src="/images/morris.png">
+  <p class="site-author-name" itemprop="name">Morris</p>
+  <div class="site-description" itemprop="description">你现在所得到的安逸将来要双倍偿还</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Morris</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: 'Iv1.0719a89e9daaa171',
+      clientSecret: '1be0a26202610ddbd49d231a941981c6649c2aff',
+      repo: 'gitalk',
+      owner: 'morris131',
+      admin: ['morris131'],
+      id: '22670c623fbd37ceaa56a6097d1b4a97',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="R01DtrTblROr_C2SkIMI9BZFFw_1FH4bT5WNNVAkdm4">
+  <meta name="baidu-site-verification" content="ZORq9vnduv">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Stream流（上）Stream是从某个数据源获得的支持聚合操作的元素序列。">
+<meta name="keywords" content="java8,stream">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Stream流（上）">
+<meta property="og:url" content="https:&#x2F;&#x2F;morris131.github.io&#x2F;post&#x2F;71cd5084.html">
+<meta property="og:site_name" content="枪手的博客">
+<meta property="og:description" content="Stream流（上）Stream是从某个数据源获得的支持聚合操作的元素序列。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-04T16:00:00.000Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://morris131.github.io/post/71cd5084.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Stream流（上） | 枪手的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?2c9b55a761d135ab6f0695a694c71065";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="https://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">枪手的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">知识改变命运，编程照亮人生</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">13</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">6</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">55</span></a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/71cd5084.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Stream流（上）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-05 00:00:00" itemprop="dateCreated datePublished" datetime="2019-11-05T00:00:00+08:00">2019-11-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java8/" itemprop="url" rel="index">
+                    <span itemprop="name">java8</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Stream流（上）"><a href="#Stream流（上）" class="headerlink" title="Stream流（上）"></a>Stream流（上）</h1><p>Stream是从某个数据源获得的支持聚合操作的元素序列。</p><a id="more"></a>
+<ul>
+<li>元素序列：针对特定元素类型的有序集合流提供了一个接口。流不会存储元素，只会按需计算。</li>
+<li>数据源：流所用到的数据源来自集合、数组或者I/O。</li>
+<li>聚合操作：类似SQL语句一样的操作， 比如filter, map, reduce, find, match, sorted等。</li>
+</ul>
+<h2 id="流的创建"><a href="#流的创建" class="headerlink" title="流的创建"></a>流的创建</h2><p>Java8在推出流的同时，对集合框架也进行了一些比较大变更。主要是在Collection接口上提供了两种生成 Stream 的方法:</p>
+<ul>
+<li>stream() 方法，该方法以集合作为源，返回集合中的所有元素以在集合中出现的顺序组成的流。</li>
+<li>parallelStream() 方法，该方法以集合作为源，返回一个支持并发操作的流。</li>
+</ul>
+<h2 id="流的操作"><a href="#流的操作" class="headerlink" title="流的操作"></a>流的操作</h2><p>流的使用一般包括三件事:</p>
+<ul>
+<li>一个数据源来执行一个查询;</li>
+<li>一个中间操作链,形成一条流的流水线;</li>
+<li>一个终端操作,执行流水线,并能生成结果</li>
+</ul>
+<h3 id="中间操作"><a href="#中间操作" class="headerlink" title="中间操作"></a>中间操作</h3><table>
+<thead>
+<tr>
+<th>操作</th>
+<th>操作参数</th>
+<th>函数描述符</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>filter</td>
+<td>Predicate</td>
+<td>T -&gt; boolean</td>
+</tr>
+<tr>
+<td>map</td>
+<td>Function&lt;T,R&gt;</td>
+<td>T-&gt;R</td>
+</tr>
+<tr>
+<td>limit</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>sorted</td>
+<td>Comparator</td>
+<td>(T,T)-&gt;int</td>
+</tr>
+<tr>
+<td>distinct</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="终端操作"><a href="#终端操作" class="headerlink" title="终端操作"></a>终端操作</h3><table>
+<thead>
+<tr>
+<th>操作</th>
+<th>目的</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>forEach</td>
+<td>消费流中的每个元素并对其应用Lambda.这一操作返回void</td>
+</tr>
+<tr>
+<td>count</td>
+<td>返回流中元素的个数,这一操作返回long</td>
+</tr>
+<tr>
+<td>collect</td>
+<td>把流归约成一个集合,比如List,Map甚至是Integer</td>
+</tr>
+<tr>
+<td>reduce</td>
+<td>归约，统计</td>
+</tr>
+</tbody></table>
+<h2 id="流的使用"><a href="#流的使用" class="headerlink" title="流的使用"></a>流的使用</h2><h3 id="forEach"><a href="#forEach" class="headerlink" title="forEach"></a>forEach</h3><p>迭代流的每个元素</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">dishList</span><span class="selector-class">.stream</span>()<span class="selector-class">.forEach</span>(<span class="selector-tag">System</span><span class="selector-class">.out</span><span class="selector-pseudo">::println)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="sorted"><a href="#sorted" class="headerlink" title="sorted"></a>sorted</h3><p>对流中元素进行排序</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dishList.stream<span class="literal">()</span>.sorted(<span class="module-access"><span class="module"><span class="identifier">Comparator</span>.</span></span>comparing<span class="constructor">Int(Dish::<span class="params">getCalories</span>)</span>).for<span class="constructor">Each(System.<span class="params">out</span>::<span class="params">println</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="filter"><a href="#filter" class="headerlink" title="filter"></a>filter</h3><p>过滤元素</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Dish&gt;<span class="built_in"> filter </span>= dishList.stream().filter(Dish::isVegetarian).collect(Collectors.toList());</span><br></pre></td></tr></table></figure>
+
+<h3 id="distinct"><a href="#distinct" class="headerlink" title="distinct"></a>distinct</h3><p>去除重复元素</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; distinct = Arrays.asList(<span class="number">1</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">1</span>, <span class="number">9</span>, <span class="number">10</span>).stream().distinct().collect(Collectors.toList());</span><br></pre></td></tr></table></figure>
+
+<h3 id="limit"><a href="#limit" class="headerlink" title="limit"></a>limit</h3><p>限制返回元素个数</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; limit = Arrays.asList(<span class="number">1</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">1</span>, <span class="number">9</span>, <span class="number">10</span>).stream().distinct().limit(<span class="number">3</span>).collect(Collectors.toList());</span><br></pre></td></tr></table></figure>
+
+<h3 id="skip"><a href="#skip" class="headerlink" title="skip"></a>skip</h3><p>跳过前面的元素个数，与limit联合使用可以实现类似sql的分页功能</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; skip = Arrays.asList(<span class="number">1</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">1</span>, <span class="number">9</span>, <span class="number">10</span>).stream().distinct().skip(<span class="number">2</span>).limit(<span class="number">3</span>).collect(Collectors.toList());</span><br></pre></td></tr></table></figure>
+
+<h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><p>可以将流转换成另外一个元素的流</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; <span class="built_in">map</span> = dishList.stream().<span class="built_in">map</span>(Dish<span class="type">::getName</span>).collect(Collectors.toList());</span><br></pre></td></tr></table></figure>
+
+<h3 id="flatMap"><a href="#flatMap" class="headerlink" title="flatMap"></a>flatMap</h3><p>流的扁平化（将流中的流扁平化为一个流）</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; flatMap = dishList.stream<span class="literal">()</span>.flat<span class="constructor">Map(<span class="params">d</span> -&gt; Arrays.<span class="params">stream</span>(<span class="params">d</span>.<span class="params">getName</span>()</span>.split(<span class="string">""</span>))).distinct<span class="literal">()</span>.collect(<span class="module-access"><span class="module"><span class="identifier">Collectors</span>.</span></span><span class="keyword">to</span><span class="constructor">List()</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="anyMatch"><a href="#anyMatch" class="headerlink" title="anyMatch"></a>anyMatch</h3><p>只要有一个元素匹配就返回true</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">bool</span>ean anyMatch = Arrays.asList(<span class="number">1</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">1</span>, <span class="number">9</span>, <span class="number">10</span>).stream().anyMatch(i -&gt; i % <span class="number">2</span> == <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="allMatch"><a href="#allMatch" class="headerlink" title="allMatch"></a>allMatch</h3><p>所有元素匹配返回true</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">bool</span>ean allMatch = Arrays.asList(<span class="number">1</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">1</span>, <span class="number">9</span>, <span class="number">10</span>).stream().allMatch(i -&gt; i % <span class="number">2</span> == <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="findAny"><a href="#findAny" class="headerlink" title="findAny"></a>findAny</h3><p>找到任意一个元素就返回</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Arrays.asList(<span class="number">1</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">1</span>, <span class="number">9</span>, <span class="number">10</span>).stream().findAny().ifPresent(System.<span class="keyword">out</span>::println);</span><br></pre></td></tr></table></figure>
+
+<h3 id="findFirst"><a href="#findFirst" class="headerlink" title="findFirst"></a>findFirst</h3><p>返回第一个元素</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Arrays.asList(<span class="number">1</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">1</span>, <span class="number">9</span>, <span class="number">10</span>).stream().findFirst().ifPresent(System.<span class="keyword">out</span>::println);</span><br></pre></td></tr></table></figure>
+
+<h3 id="sum"><a href="#sum" class="headerlink" title="sum"></a>sum</h3><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="module-access"><span class="module"><span class="identifier">Optional</span>.</span></span><span class="keyword">of</span><span class="constructor">Nullable(<span class="params">dishList</span>.<span class="params">stream</span>()</span>.map(Dish::getCalories).reduce(<span class="number">0</span>, Integer::sum)).<span class="keyword">if</span><span class="constructor">Present(System.<span class="params">out</span>::<span class="params">println</span>)</span>; <span class="comment">// 等价于下面的，注意返回值不一样</span></span><br><span class="line">dishList.stream<span class="literal">()</span>.map(Dish::getCalories).reduce(Integer::sum).<span class="keyword">if</span><span class="constructor">Present(System.<span class="params">out</span>::<span class="params">println</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="max"><a href="#max" class="headerlink" title="max"></a>max</h3><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">dishList</span><span class="selector-class">.stream</span>()<span class="selector-class">.map</span>(<span class="attribute">Dish</span>::getCalories)<span class="selector-class">.reduce</span>(<span class="attribute">Integer</span>::max)<span class="selector-class">.ifPresent</span>(System.<span class="attribute">out</span>::println);</span><br></pre></td></tr></table></figure>
+
+<h3 id="min"><a href="#min" class="headerlink" title="min"></a>min</h3><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">dishList</span><span class="selector-class">.stream</span>()<span class="selector-class">.map</span>(<span class="attribute">Dish</span>::getCalories)<span class="selector-class">.reduce</span>(<span class="attribute">Integer</span>::min)<span class="selector-class">.ifPresent</span>(System.<span class="attribute">out</span>::println);</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/java8/" rel="tag"><i class="fa fa-tag"></i> java8</a>
+              <a href="/tags/stream/" rel="tag"><i class="fa fa-tag"></i> stream</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/post/71c610d3.html" rel="next" title="单链表">
+                  <i class="fa fa-chevron-left"></i> 单链表
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/post/f3c51558.html" rel="prev" title="git标签管理">
+                  git标签管理 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Stream流（上）"><span class="nav-number">1.</span> <span class="nav-text">Stream流（上）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#流的创建"><span class="nav-number">1.1.</span> <span class="nav-text">流的创建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流的操作"><span class="nav-number">1.2.</span> <span class="nav-text">流的操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#中间操作"><span class="nav-number">1.2.1.</span> <span class="nav-text">中间操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#终端操作"><span class="nav-number">1.2.2.</span> <span class="nav-text">终端操作</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流的使用"><span class="nav-number">1.3.</span> <span class="nav-text">流的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#forEach"><span class="nav-number">1.3.1.</span> <span class="nav-text">forEach</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sorted"><span class="nav-number">1.3.2.</span> <span class="nav-text">sorted</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#filter"><span class="nav-number">1.3.3.</span> <span class="nav-text">filter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#distinct"><span class="nav-number">1.3.4.</span> <span class="nav-text">distinct</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#limit"><span class="nav-number">1.3.5.</span> <span class="nav-text">limit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#skip"><span class="nav-number">1.3.6.</span> <span class="nav-text">skip</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map"><span class="nav-number">1.3.7.</span> <span class="nav-text">map</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#flatMap"><span class="nav-number">1.3.8.</span> <span class="nav-text">flatMap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#anyMatch"><span class="nav-number">1.3.9.</span> <span class="nav-text">anyMatch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#allMatch"><span class="nav-number">1.3.10.</span> <span class="nav-text">allMatch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#findAny"><span class="nav-number">1.3.11.</span> <span class="nav-text">findAny</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#findFirst"><span class="nav-number">1.3.12.</span> <span class="nav-text">findFirst</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sum"><span class="nav-number">1.3.13.</span> <span class="nav-text">sum</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#max"><span class="nav-number">1.3.14.</span> <span class="nav-text">max</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#min"><span class="nav-number">1.3.15.</span> <span class="nav-text">min</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="https://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Morris"
+    src="/images/morris.png">
+  <p class="site-author-name" itemprop="name">Morris</p>
+  <div class="site-description" itemprop="description">你现在所得到的安逸将来要双倍偿还</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Morris</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: 'Iv1.0719a89e9daaa171',
+      clientSecret: '1be0a26202610ddbd49d231a941981c6649c2aff',
+      repo: 'gitalk',
+      owner: 'morris131',
+      admin: ['morris131'],
+      id: 'cb4aabec41d0d6f64a64db7c344a3050',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>
