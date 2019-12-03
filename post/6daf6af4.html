@@ -63,6 +63,8 @@
 <meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;spring&#x2F;images&#x2F;1574762054547.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;spring&#x2F;images&#x2F;1574762156266.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;spring&#x2F;images&#x2F;1574762332215.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;spring&#x2F;images&#x2F;1575006376495.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;spring&#x2F;images&#x2F;1575006644469.png">
 <meta property="og:updated_time" content="2019-11-25T16:00:00.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;spring&#x2F;images&#x2F;1574762054547.png">
@@ -171,7 +173,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">55</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">56</span></a>
 
   </li>
   </ul>
@@ -258,9 +260,40 @@
 <p>引入log4j的依赖和log4j.properties</p>
 <p>运行结果如下：</p>
 <p><img src="https://gitee.com/morris131/morris-book/raw/master/back/java/spring/images/1574762156266.png" alt><br>从运行结果可得知确实使用了log4j来记录日志，可以猜测底层是使用了jcl来记录日志。</p>
-<p>看一下spring4的依赖存在jcl:</p>
+<p>根据日志打印的行数查找</p>
+<blockquote>
+<p>org.springframework.context.support.AbstractApplicationContext 583行</p>
+</blockquote>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (logger.isInfoEnabled()) &#123;</span><br><span class="line">	logger.info(<span class="string">"Refreshing "</span> + <span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>查询logger到底是什么类型？</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">org<span class="selector-class">.apache</span><span class="selector-class">.commons</span><span class="selector-class">.logging</span><span class="selector-class">.Log</span></span><br></pre></td></tr></table></figure>
+<p>此类位于spring的依赖jcl中:</p>
 <p><img src="https://gitee.com/morris131/morris-book/raw/master/back/java/spring/images/1574762332215.png" alt></p>
-<h2 id="spring5中的日志"><a href="#spring5中的日志" class="headerlink" title="spring5中的日志"></a>spring5中的日志</h2>
+<h2 id="spring5中的日志"><a href="#spring5中的日志" class="headerlink" title="spring5中的日志"></a>spring5中的日志</h2><p>引入spring5的依赖，去除log4j的依赖，目前项目中只有spring5的依赖，运行SpringLogTest，发现什么日志也没有打印：<br><img src="https://gitee.com/morris131/morris-book/raw/master/back/java/spring/images/1575006376495.png" alt></p>
+<p>再次引入log4j的依赖，发现还是什么日志都没有打印。</p>
+<p>下面从源码中寻找原因。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (logger.is<span class="constructor">DebugEnabled()</span>) &#123;</span><br><span class="line">	<span class="keyword">if</span> (logger.is<span class="constructor">TraceEnabled()</span>) &#123;</span><br><span class="line">		logger.trace(<span class="string">"Refreshing "</span> + this);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		logger.debug(<span class="string">"Refreshing "</span> + get<span class="constructor">DisplayName()</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再次打开<code>org.springframework.context.support.AbstractApplicationContext</code>查询logger的类型，注意此时要打开spring5的源码：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">protected final Log logger = <span class="module-access"><span class="module"><span class="identifier">LogFactory</span>.</span></span>get<span class="constructor">Log(<span class="params">getClass</span>()</span>);</span><br></pre></td></tr></table></figure>
+<p>发现logger类型还是原来那个类型<code>org.apache.commons.logging.Log</code>，但是所处的jar文件名为<br><img src="https://gitee.com/morris131/morris-book/raw/master/back/java/spring/images/1575006644469.png" alt></p>
+<p>查看<code>LogFactory.getLog(getClass())</code>的源码：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">       public static Log get<span class="constructor">Log(Class&lt;?&gt; <span class="params">clazz</span>)</span> &#123;</span><br><span class="line">	return get<span class="constructor">Log(<span class="params">clazz</span>.<span class="params">getName</span>()</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public static Log get<span class="constructor">Log(String <span class="params">name</span>)</span> &#123;</span><br><span class="line">	return <span class="module-access"><span class="module"><span class="identifier">LogAdapter</span>.</span></span>create<span class="constructor">Log(<span class="params">name</span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>会调到</p>
+<blockquote>
+<p>org.apache.commons.logging.LogAdapter#createLog</p>
+</blockquote>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public static Log create<span class="constructor">Log(String <span class="params">name</span>)</span> &#123;</span><br><span class="line">	switch (logApi) &#123;</span><br><span class="line">		case LOG4J:</span><br><span class="line">			return <span class="module-access"><span class="module"><span class="identifier">Log4jAdapter</span>.</span></span>create<span class="constructor">Log(<span class="params">name</span>)</span>; <span class="comment">// 此处是log4j2</span></span><br><span class="line">		case SLF4J_LAL:</span><br><span class="line">			return <span class="module-access"><span class="module"><span class="identifier">Slf4jAdapter</span>.</span></span>create<span class="constructor">LocationAwareLog(<span class="params">name</span>)</span>; <span class="comment">// log4j</span></span><br><span class="line">		case SLF4J:</span><br><span class="line">			return <span class="module-access"><span class="module"><span class="identifier">Slf4jAdapter</span>.</span></span>create<span class="constructor">Log(<span class="params">name</span>)</span>;</span><br><span class="line">		default:</span><br><span class="line">			<span class="comment">// Defensively use lazy-initializing adapter class here as well since the</span></span><br><span class="line">			<span class="comment">// java.logging module is not present by default on JDK 9. We are requiring</span></span><br><span class="line">			<span class="comment">// its presence if neither Log4j nor SLF4J is available; however, in the</span></span><br><span class="line">			<span class="comment">// case of Log4j or SLF4J, we are trying to prevent early initialization</span></span><br><span class="line">			<span class="comment">// of the JavaUtilLog adapter - e.g. by a JVM in debug mode - when eagerly</span></span><br><span class="line">			<span class="comment">// trying to parse the bytecode for all the cases of this switch clause.</span></span><br><span class="line">			return <span class="module-access"><span class="module"><span class="identifier">JavaUtilAdapter</span>.</span></span>create<span class="constructor">Log(<span class="params">name</span>)</span>; <span class="comment">// jul</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>spring会根据logApi的值来确定到底使用哪种日志框架,那么logApi的初始值是什么呢？</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">String</span> LOG4J_SPI = <span class="string">"org.apache.logging.log4j.spi.ExtendedLogger"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">String</span> LOG4J_SLF4J_PROVIDER = <span class="string">"org.apache.logging.slf4j.SLF4JProvider"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">String</span> SLF4J_SPI = <span class="string">"org.slf4j.spi.LocationAwareLogger"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">String</span> SLF4J_API = <span class="string">"org.slf4j.Logger"</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> LogApi logApi;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">	<span class="keyword">if</span> (isPresent(LOG4J_SPI)) &#123;</span><br><span class="line">		<span class="keyword">if</span> (isPresent(LOG4J_SLF4J_PROVIDER) &amp;&amp; isPresent(SLF4J_SPI)) &#123;</span><br><span class="line">			<span class="comment">// log4j-to-slf4j bridge -&gt; we'll rather go with the SLF4J SPI;</span></span><br><span class="line">			<span class="comment">// however, we still prefer Log4j over the plain SLF4J API since</span></span><br><span class="line">			<span class="comment">// the latter does not have location awareness support.</span></span><br><span class="line">			logApi = LogApi.SLF4J_LAL;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">// Use Log4j 2.x directly, including location awareness support</span></span><br><span class="line">			logApi = LogApi.LOG4J;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (isPresent(SLF4J_SPI)) &#123;</span><br><span class="line">		<span class="comment">// Full SLF4J SPI including location awareness support</span></span><br><span class="line">		logApi = LogApi.SLF4J_LAL;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (isPresent(SLF4J_API)) &#123;</span><br><span class="line">		<span class="comment">// Minimal SLF4J API without location awareness support</span></span><br><span class="line">		logApi = LogApi.SLF4J;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="comment">// java.util.logging as default</span></span><br><span class="line">		logApi = LogApi.JUL;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>LogAdapter的静态类回去依次加载log4j2，slf4j，没有找到就使用jul。</p>
+<p>回答spring5不使用log4j打印日志的问题？</p>
+<ol>
+<li>spring5会使用slf4j,要打印日志，还需引入log4j对应的绑定器</li>
+<li>spring5中对应打印日志的那行代码的日志级别为debug，而spring4中是info，jul的默认日志级别为info</li>
+</ol>
+<p>因此将slf4j-api和slf4j-log4j12引入项目，并将log4j的日志级别调为debug，就能看见spring的日志了。</p>
+
     </div>
 
     
@@ -285,8 +318,8 @@
             <span class="post-nav-divider"></span>
 
             <div class="post-nav-prev post-nav-item">
-                <a href="/post/97b50ad5.html" rel="prev" title="slf4j的使用">
-                  slf4j的使用 <i class="fa fa-chevron-right"></i>
+                <a href="/post/376ac22c.html" rel="prev" title="slf4j的桥接器">
+                  slf4j的桥接器 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>
@@ -343,7 +376,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-count">56</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
