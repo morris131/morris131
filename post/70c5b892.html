@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="R01DtrTblROr_C2SkIMI9BZFFw_1FH4bT5WNNVAkdm4">
+  <meta name="baidu-site-verification" content="ZORq9vnduv">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="类加载器根类加载器根类加载器（BootstrapClassLoader）：负责加载存放在JDK\jre\lib下，或被-Xbootclasspath参数指定的路径中的，并且能被虚拟机识别的类库（如rt.jar，所有的java.*开头的类均被Bootstrap ClassLoader加载）。根类加载器是无法被Java程序直接引用的。">
+<meta name="keywords" content="类加载器">
+<meta property="og:type" content="article">
+<meta property="og:title" content="类加载器">
+<meta property="og:url" content="https:&#x2F;&#x2F;morris131.github.io&#x2F;post&#x2F;70c5b892.html">
+<meta property="og:site_name" content="枪手的博客">
+<meta property="og:description" content="类加载器根类加载器根类加载器（BootstrapClassLoader）：负责加载存放在JDK\jre\lib下，或被-Xbootclasspath参数指定的路径中的，并且能被虚拟机识别的类库（如rt.jar，所有的java.*开头的类均被Bootstrap ClassLoader加载）。根类加载器是无法被Java程序直接引用的。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91&#x2F;Java&#x2F;JVM&#x2F;https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;jvm&#x2F;images&#x2F;%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91&#x2F;Java&#x2F;JVM&#x2F;https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;jvm&#x2F;images&#x2F;%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%89%98%E5%8A%A0%E8%BD%BD%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91&#x2F;Java&#x2F;JVM&#x2F;https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;jvm&#x2F;images&#x2F;%E5%88%9D%E5%A7%8B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E5%8F%8A%E5%85%B6%E5%88%97%E8%A1%A8%20.png">
+<meta property="og:updated_time" content="2019-12-03T06:51:50.102Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91&#x2F;Java&#x2F;JVM&#x2F;https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;jvm&#x2F;images&#x2F;%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8.png">
+
+<link rel="canonical" href="https://morris131.github.io/post/70c5b892.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>类加载器 | 枪手的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?2c9b55a761d135ab6f0695a694c71065";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="https://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">枪手的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">知识改变命运，编程照亮人生</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">53</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">13</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">202</span></a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/70c5b892.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          类加载器
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-10-20 00:00:00" itemprop="dateCreated datePublished" datetime="2018-10-20T00:00:00+08:00">2018-10-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-12-03 14:51:50" itemprop="dateModified" datetime="2019-12-03T14:51:50+08:00">2019-12-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h1><p><img src="https://github.com/morris131/morris-book/raw/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/https://gitee.com/morris131/morris-book/raw/master/back/java/jvm/images/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8.png" alt="类加载器"></p><h2 id="根类加载器"><a href="#根类加载器" class="headerlink" title="根类加载器"></a>根类加载器</h2><p>根类加载器（BootstrapClassLoader）：负责加载存放在JDK\jre\lib下，或被-Xbootclasspath参数指定的路径中的，并且能被虚拟机识别的类库（如rt.jar，所有的java.*开头的类均被Bootstrap ClassLoader加载）。根类加载器是无法被Java程序直接引用的。</p><a id="more"></a>
+
+<p><a href="https://github.com/morris131/morris-book/tree/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/jvm/src/main/java/com/morris/jvm/classloader/BootstrapClassLoaderTest.java" target="_blank" rel="noopener">BootstrapClassLoaderTest.java</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.jvm.classloader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BootstrapClassLoaderTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"BootstrapClassLoader:"</span> + String.class.getClassLoader());</span><br><span class="line">        Arrays.asList(System.getProperty(<span class="string">"sun.boot.class.path"</span>).split(<span class="string">";"</span>)).stream().forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下所示，其中String.class的类加载器是根类加载器，根类加载器是获取不到引用的，因此输出为null，而根类加载器所加载的jar可以通过系统属性sun.boot.class.path获取。</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">BootstrapClassLoader:</span>null</span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jdk1.<span class="number">8.0_172</span>\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">resources</span>.<span class="title">jar</span></span></span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jdk1.<span class="number">8.0_172</span>\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">rt</span>.<span class="title">jar</span></span></span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jdk1.<span class="number">8.0_172</span>\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">sunrsasign</span>.<span class="title">jar</span></span></span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jdk1.<span class="number">8.0_172</span>\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">jsse</span>.<span class="title">jar</span></span></span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jdk1.<span class="number">8.0_172</span>\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">jce</span>.<span class="title">jar</span></span></span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jdk1.<span class="number">8.0_172</span>\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">charsets</span>.<span class="title">jar</span></span></span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jdk1.<span class="number">8.0_172</span>\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">jfr</span>.<span class="title">jar</span></span></span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jdk1.<span class="number">8.0_172</span>\jre\classes</span><br></pre></td></tr></table></figure>
+<p>注意：此处运行结果与是jdk还是jre运行有关，上述结果由jdk中java运行所得，如果由jre运行结果如下：</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">BootstrapClassLoader:</span>null</span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">resources</span>.<span class="title">jar</span></span></span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">rt</span>.<span class="title">jar</span></span></span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">sunrsasign</span>.<span class="title">ja</span></span></span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">jsse</span>.<span class="title">jar</span></span></span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">jce</span>.<span class="title">jar</span></span></span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">charsets</span>.<span class="title">jar</span></span></span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">jfr</span>.<span class="title">jar</span></span></span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jre\classes</span><br></pre></td></tr></table></figure>
+
+<p>实验一：自定义一个Hello.java类编译成Hello.class，放入D:\Program Files\Java\jre\lib目录下，用测试类Test主动使用Hello，看Hello是否会被加载？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Hello</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="keyword">this</span>.getClass().getClassLoader());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">new</span> Hello();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行如下：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ java Test</span><br><span class="line">Exception <span class="keyword">in</span> thread <span class="string">"main"</span> java<span class="selector-class">.lang</span><span class="selector-class">.NoClassDefFoundError</span>: Hello</span><br><span class="line">        at Test.main(Test<span class="selector-class">.java</span>:<span class="number">4</span>)</span><br><span class="line">Caused by: java<span class="selector-class">.lang</span><span class="selector-class">.ClassNotFoundException</span>: Hello</span><br><span class="line">        at java<span class="selector-class">.net</span><span class="selector-class">.URLClassLoader</span><span class="selector-class">.findClass</span>(Unknown Source)</span><br><span class="line">        at java<span class="selector-class">.lang</span><span class="selector-class">.ClassLoader</span><span class="selector-class">.loadClass</span>(Unknown Source)</span><br><span class="line">        at sun<span class="selector-class">.misc</span><span class="selector-class">.Launcher</span><span class="variable">$AppClassLoader</span>.loadClass(Unknown Source)</span><br><span class="line">        at java<span class="selector-class">.lang</span><span class="selector-class">.ClassLoader</span><span class="selector-class">.loadClass</span>(Unknown Source)</span><br><span class="line">        ... <span class="number">1</span> more</span><br></pre></td></tr></table></figure>
+
+<p>实验二：将Hello.class放入D:\Program Files\Java\jre\classes，用测试类Test主动使用Hello，看根类加载器是否会加载？</p>
+<p>此目录不存在，需手动创建。</p>
+<p>运行结果如下，发现Hello类被根加载器所加载。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">null</span></span><br></pre></td></tr></table></figure>
+
+<p>实验三：将Hello.class压缩成Hello.jar放入D:\Program Files\Java\jre\lib，用测试类Test主动使用Hello，看根类加载器是否会加载？</p>
+<p>抛出java.lang.ClassNotFoundException</p>
+<p>实验四：在运行时用-Xbootclasspath指定Hello.jar的路径，用测试类Test主动使用Hello，看根类加载器是否会加载？</p>
+<p>-Xbootclasspath的使用方法：</p>
+<ul>
+<li>-Xbootclasspath：完全取代基本核心的Java class搜索路径，否则要重新写所有Java核心class</li>
+<li>-Xbootclasspath/a：加在核心class搜索路径后面</li>
+<li>-Xbootclasspath/p：加在核心class搜索路径前面</li>
+</ul>
+<figure class="highlight taggerscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ java "-Xbootclasspath/a:D:<span class="symbol">\P</span>rogram Files<span class="symbol">\J</span>ava<span class="symbol">\j</span>re<span class="symbol">\l</span>ib<span class="symbol">\H</span>ello.jar" Test</span><br><span class="line">null</span><br></pre></td></tr></table></figure>
+<p>注意：命令中的引号，不加引号里面两个冒号会被错误识别。</p>
+<p>实验结果总结如下：</p>
+<ul>
+<li>根类加载器只会加载jre/lib下指定的jar，并不是所有。</li>
+<li>要让根类加载器加载自定义的类，可以将自定义的类放入jre/classes或通过-Xbootclasspath参数指定jar的路径</li>
+</ul>
+<h2 id="扩展类加载器"><a href="#扩展类加载器" class="headerlink" title="扩展类加载器"></a>扩展类加载器</h2><p>扩展类加载器（Extension ClassLoader）：扩展类加载器的父加载器是根类加载器，该加载器由sun.misc.Launcher$ExtClassLoader实现，它负责加载JDK\jre\lib\ext目录中，或者由java.ext.dirs系统变量指定的路径中的所有类库，开发者可以直接使用扩展类加载器。</p>
+<p><a href="https://github.com/morris131/morris-book/tree/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/jvm/src/main/java/com/morris/jvm/classloader/ExtClassLoaderTest.java" target="_blank" rel="noopener">ExtClassLoaderTest.java</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.jvm.classloader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExtClassLoaderTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"ExtClassLoader:"</span> + com.sun.nio.zipfs.ZipDirectoryStream.class.getClassLoader());</span><br><span class="line">        System.out.println(<span class="string">"ExtClassLoader parent:"</span> + com.sun.nio.zipfs.ZipDirectoryStream.class.getClassLoader().getParent());</span><br><span class="line">        Arrays.asList(System.getProperty(<span class="string">"java.ext.dirs"</span>).split(<span class="string">";"</span>)).stream().forEach(System.out :: println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下所示：</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">ExtClassLoader:</span>sun.misc.Launcher$ExtClassLoader@<span class="number">2503</span>dbd3</span><br><span class="line">ExtClassLoader <span class="symbol">parent:</span>null</span><br><span class="line"><span class="symbol">D:</span>\Program Files\Java\jdk1.<span class="number">8.0_172</span>\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">ext</span></span></span><br><span class="line"><span class="symbol">C:</span>\Windows\Sun\Java\<span class="class"><span class="keyword">lib</span>\<span class="title">ext</span></span></span><br></pre></td></tr></table></figure>
+
+<p>将自定义的类打包成jar(不能是class文件)放入D:\Program Files\Java\jdk1.8.0_172\jre\lib\ext目录下，扩展类加载器会自动加载。</p>
+<h2 id="系统类加载器"><a href="#系统类加载器" class="headerlink" title="系统类加载器"></a>系统类加载器</h2><p>系统类加载器（Application ClassLoader）：系统类加载器的父加载器是扩展类加载器，该类加载器由sun.misc.Launcher$AppClassLoader来实现，它负责加载用户类路径（ClassPath）所指定的类，系统类加载器的加载路径可以通过-classpath来指定，同样也可以通过系统属性java.class.path来获取。</p>
+<p><a href="https://github.com/morris131/morris-book/tree/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/jvm/src/main/java/com/morris/jvm/classloader/AppClassLoaderTest.java" target="_blank" rel="noopener">AppClassLoaderTest.java</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.jvm.classloader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppClassLoaderTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"AppClassLoader:"</span> +AppClassLoaderTest.class.getClassLoader());</span><br><span class="line">        System.out.println(<span class="string">"AppClassLoader parent:"</span> +AppClassLoaderTest.class.getClassLoader().getParent());</span><br><span class="line">        Arrays.asList(System.getProperty(<span class="string">"java.class.path"</span>).split(<span class="string">";"</span>)).stream().forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">AppClassLoader:</span>sun.misc.Launcher$AppClassLoader@<span class="number">73</span>d16e93</span><br><span class="line">AppClassLoader <span class="symbol">parent:</span>sun.misc.Launcher$ExtClassLoader@<span class="number">15</span>db9742</span><br><span class="line">.</span><br><span class="line">%JAVA_HOME%\<span class="class"><span class="keyword">lib</span>\<span class="title">dt</span>.<span class="title">jar</span></span></span><br><span class="line">%JAVA_HOME%\<span class="class"><span class="keyword">lib</span>\<span class="title">tools</span>.<span class="title">jar</span></span></span><br></pre></td></tr></table></figure>
+<p>java.class.path取的环境变量CLASSPATH。</p>
+<h2 id="自定义加载器"><a href="#自定义加载器" class="headerlink" title="自定义加载器"></a>自定义加载器</h2><p>通常情况下，我们都是直接使用系统类加载器。但是，有的时候，我们也需要自定义类加载器。比如应用是通过网络来传输 Java 类的字节码，为保证安全性，这些字节码经过了加密处理，这时系统类加载器就无法对其进行加载，这样则需要自定义类加载器来实现。自定义类加载器一般都是继承自 ClassLoader 类，我们只需要重写 findClass 方法即可。</p>
+<p>自定义类加载器<a href="https://github.com/morris131/morris-book/tree/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/jvm/src/main/java/com/morris/jvm/classloader/MyClassLoader.java" target="_blank" rel="noopener">MyClassLoader.java</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.jvm.classloader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.ByteArrayOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Files;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Path;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Paths;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 自定义类加载器必须继承ClassLoader</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyClassLoader</span> <span class="keyword">extends</span> <span class="title">ClassLoader</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Path DEFAULT_CLASS_DIR = Paths.get(<span class="string">"D:"</span>,<span class="string">"classloader"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Path classDir;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyClassLoader</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.classDir = DEFAULT_CLASS_DIR;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyClassLoader</span><span class="params">(ClassLoader parent)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(parent);</span><br><span class="line">        <span class="keyword">this</span>.classDir = DEFAULT_CLASS_DIR;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> Class&lt;?&gt; findClass(String name) <span class="keyword">throws</span> ClassNotFoundException &#123;</span><br><span class="line">        <span class="keyword">byte</span>[] bytes = <span class="keyword">this</span>.readByte(name);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">null</span> == bytes || <span class="number">0</span> == bytes.length) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ClassNotFoundException(<span class="string">"Can not load the class "</span> + name);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.defineClass(name, bytes, <span class="number">0</span>, bytes.length);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将class文件读入内存</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">byte</span>[] readByte(String name) <span class="keyword">throws</span> ClassNotFoundException&#123;</span><br><span class="line">       String classPath = name.replace(<span class="string">"."</span>, <span class="string">"/"</span>);</span><br><span class="line"></span><br><span class="line">        Path classFullPath = <span class="keyword">this</span>.classDir.resolve(classPath + <span class="string">".class"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(!classFullPath.toFile().exists()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ClassNotFoundException(<span class="string">"The class "</span> + name + <span class="string">" not found."</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ByteArrayOutputStream baos = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Files.copy(classFullPath, baos);</span><br><span class="line">            <span class="keyword">return</span> baos.toByteArray();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ClassNotFoundException(<span class="string">"load the class "</span> + name + <span class="string">" error"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下面写一个简单的HelloWorld程序，使用自定义类加载器对其进行加载。<br>自定义类加载器<a href="https://github.com/morris131/morris-book/tree/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/jvm/src/main/java/com/morris/jvm/classloader/HelloWorld.java" target="_blank" rel="noopener">HelloWorld.java</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.jvm.classloader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloWorld</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">"HelloWorld Class is initialized."</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>将HelloWorld类编译后将class文件复制到D:\classloader\com\morris\jvm\classloader目录下，同时将class path中的HelloWorld.class删除，如果使用的集成开发环境，则需要将HelloWorld.java一并删除，否则将会由系统类加载器加载。</p>
+<p>测试类<a href="https://github.com/morris131/morris-book/tree/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/jvm/src/main/java/com/morris/jvm/classloader/MyClassLoaderTest.java" target="_blank" rel="noopener">MyClassLoaderTest.java</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.jvm.classloader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyClassLoaderTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> ClassNotFoundException </span>&#123;</span><br><span class="line">        MyClassLoader myClassLoader = <span class="keyword">new</span> MyClassLoader();</span><br><span class="line">        Class&lt;?&gt; clazz = myClassLoader.loadClass(<span class="string">"com.morris.jvm.classloader.HelloWorld"</span>);</span><br><span class="line">        System.out.println(clazz.getClassLoader());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下，虽然HelloWorld类被成功加载并且输出了自定义类加载器的信息，但是HelloWorld类的静态代码块并没有输出，因为使用类加载器的loadClass并不会导致类的主动初始化，只是执行了类加载过程中的加载阶段而已。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">com</span><span class="selector-class">.morris</span><span class="selector-class">.jvm</span><span class="selector-class">.classloader</span><span class="selector-class">.MyClassLoader</span>@<span class="keyword">7f31245a</span></span><br></pre></td></tr></table></figure>
+
+<p>Class.forName()和ClassLoader.loadClass()区别</p>
+<ul>
+<li>Class.forName()：将类的.class文件加载到jvm中之外，还会对类进行解释，执行类中的static块；</li>
+<li>ClassLoader.loadClass()：只干一件事情，就是将.class文件加载到jvm中，不会执行static中的内容,只有在newInstance才会去执行static块。</li>
+</ul>
+<p>注：Class.forName(name, initialize, loader)带参函数也可控制是否加载static块。并且只有调用了newInstance()方法采会调用构造函数，创建类的对象。</p>
+<h2 id="双亲委托机制"><a href="#双亲委托机制" class="headerlink" title="双亲委托机制"></a>双亲委托机制</h2><p>如果一个类加载器收到了一个类加载请求，它不会自己去尝试加载这个类，而是把这个请求转交给父类加载器去完成。每一个层次的类加载器都是如此。因此所有的类加载请求都应该传递到最顶层的启动类加载器中，只有到父类加载器反馈自己无法完成这个加载请求（在它的搜索范围没有找到这个类）时，子类加载器才会尝试自己去加载。委派的好处就是避免有些类被重复加载。</p>
+<p>源码分析如下：</p>
+<p>摘自jdk1.8 java.lang.ClassLoader</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">protected Class&lt;?&gt; load<span class="constructor">Class(String <span class="params">name</span>, <span class="params">boolean</span> <span class="params">resolve</span>)</span></span><br><span class="line">    throws ClassNotFoundException</span><br><span class="line">&#123;</span><br><span class="line">    synchronized (get<span class="constructor">ClassLoadingLock(<span class="params">name</span>)</span>) &#123;</span><br><span class="line">        <span class="comment">// 检查是否被加载过</span></span><br><span class="line">        Class&lt;?&gt; c = find<span class="constructor">LoadedClass(<span class="params">name</span>)</span>;</span><br><span class="line">        <span class="keyword">if</span> (c<span class="operator"> == </span>null) &#123;</span><br><span class="line">            long t0 = <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>nano<span class="constructor">Time()</span>;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (parent != null) &#123;</span><br><span class="line">                    <span class="comment">// 父类加载器不为空，则用父类加载器加载</span></span><br><span class="line">                    c = parent.load<span class="constructor">Class(<span class="params">name</span>, <span class="params">false</span>)</span>;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// 父类加载器为空，则用根加载器加载</span></span><br><span class="line">                    c = find<span class="constructor">BootstrapClassOrNull(<span class="params">name</span>)</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; catch (ClassNotFoundException e) &#123;</span><br><span class="line">                <span class="comment">// ClassNotFoundException thrown if class not found</span></span><br><span class="line">                <span class="comment">// from the non-null parent class loader</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (c<span class="operator"> == </span>null) &#123;</span><br><span class="line">                <span class="comment">// If still not found, then invoke findClass in order</span></span><br><span class="line">                <span class="comment">// to find the class.</span></span><br><span class="line">                long t1 = <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>nano<span class="constructor">Time()</span>;</span><br><span class="line">                <span class="comment">// 父类加载失败，则使用自己的findClass方法进行加载</span></span><br><span class="line">                c = find<span class="constructor">Class(<span class="params">name</span>)</span>;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// this is the defining class loader; record the stats</span></span><br><span class="line">                sun.misc.<span class="module-access"><span class="module"><span class="identifier">PerfCounter</span>.</span></span>get<span class="constructor">ParentDelegationTime()</span>.add<span class="constructor">Time(<span class="params">t1</span> - <span class="params">t0</span>)</span>;</span><br><span class="line">                sun.misc.<span class="module-access"><span class="module"><span class="identifier">PerfCounter</span>.</span></span>get<span class="constructor">FindClassTime()</span>.add<span class="constructor">ElapsedTimeFrom(<span class="params">t1</span>)</span>;</span><br><span class="line">                sun.misc.<span class="module-access"><span class="module"><span class="identifier">PerfCounter</span>.</span></span>get<span class="constructor">FindClasses()</span>.increment<span class="literal">()</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (resolve) &#123;</span><br><span class="line">            resolve<span class="constructor">Class(<span class="params">c</span>)</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        return c;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从上面对于java.lang.ClassLoader的loadClass(String name, boolean resolve)方法的解析来看，可以得出以下2个结论：</p>
+<ol>
+<li>如果不想打破双亲委派模型，那么只需要重写findClass方法即可</li>
+<li>如果想打破双亲委派模型，那么就重写整个loadClass方法</li>
+</ol>
+<p>双亲委托机制流程图如下：</p>
+<p><img src="https://github.com/morris131/morris-book/raw/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/https://gitee.com/morris131/morris-book/raw/master/back/java/jvm/images/%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%89%98%E5%8A%A0%E8%BD%BD%E6%B5%81%E7%A8%8B.png" alt="双亲委托机制流程"></p>
+<h2 id="破坏双亲委托机制"><a href="#破坏双亲委托机制" class="headerlink" title="破坏双亲委托机制"></a>破坏双亲委托机制</h2><p>如何在不删除HelloWorld.class文件的情况下使用MyClassLoader加载而不是系统加载器加载？</p>
+<h3 id="设置父类加载器为扩展类加载器"><a href="#设置父类加载器为扩展类加载器" class="headerlink" title="设置父类加载器为扩展类加载器"></a>设置父类加载器为扩展类加载器</h3><p><a href="https://github.com/morris131/morris-book/tree/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/jvm/src/main/java/com/morris/jvm/classloader/BreakClassLoader1.java" target="_blank" rel="noopener">BreakClassLoader1.java</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.jvm.classloader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BreakClassLoader1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> ClassNotFoundException </span>&#123;</span><br><span class="line">        ClassLoader extClassLoader = BreakClassLoader1.class.getClassLoader().getParent();</span><br><span class="line">        MyClassLoader myClassLoader = <span class="keyword">new</span> MyClassLoader(extClassLoader);<span class="comment">// 设置父类加载器为扩展类加载器</span></span><br><span class="line">        Class&lt;?&gt; clazz = myClassLoader.loadClass(<span class="string">"com.morris.jvm.classloader.HelloWorld"</span>);</span><br><span class="line">        System.out.println(clazz.getClassLoader());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="设置父类加载器为null"><a href="#设置父类加载器为null" class="headerlink" title="设置父类加载器为null"></a>设置父类加载器为null</h3><p><a href="https://github.com/morris131/morris-book/tree/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/jvm/src/main/java/com/morris/jvm/classloader/BreakClassLoader2.java" target="_blank" rel="noopener">BreakClassLoader2.java</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.jvm.classloader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BreakClassLoader2</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> ClassNotFoundException </span>&#123;</span><br><span class="line">        MyClassLoader myClassLoader = <span class="keyword">new</span> MyClassLoader(<span class="keyword">null</span>);<span class="comment">// 设置父类加载器为null</span></span><br><span class="line">        Class&lt;?&gt; clazz = myClassLoader.loadClass(<span class="string">"com.morris.jvm.classloader.HelloWorld"</span>);</span><br><span class="line">        System.out.println(clazz.getClassLoader());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="重写父类ClassLoader的loadClass方法"><a href="#重写父类ClassLoader的loadClass方法" class="headerlink" title="重写父类ClassLoader的loadClass方法"></a>重写父类ClassLoader的loadClass方法</h3><p><a href="https://github.com/morris131/morris-book/tree/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/jvm/src/main/java/com/morris/jvm/classloader/BreakDelegateClassLoader.java" target="_blank" rel="noopener">BreakDelegateClassLoader.java</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.jvm.classloader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BreakDelegateClassLoader</span> <span class="keyword">extends</span> <span class="title">MyClassLoader</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> Class&lt;?&gt; loadClass(String name, <span class="keyword">boolean</span> resolve) <span class="keyword">throws</span> ClassNotFoundException &#123;</span><br><span class="line">        <span class="comment">// 根据类的全限定名进行加锁，确保一个类在多线程下只被加载一次</span></span><br><span class="line">        <span class="keyword">synchronized</span> (getClassLoadingLock(name)) &#123;</span><br><span class="line">            <span class="comment">// 到已加载类的缓存中查看是否已经加载过，如果已加载则直接返回</span></span><br><span class="line">            Class&lt;?&gt; c = findLoadedClass(name);</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">null</span> == c) &#123;</span><br><span class="line">                <span class="comment">// 尝试使用自定义类加载器加载</span></span><br><span class="line">                c = <span class="keyword">this</span>.findClass(name);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (resolve) &#123;</span><br><span class="line">                resolveClass(c);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> c;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="是否可以加载自定义java-lang-String类"><a href="#是否可以加载自定义java-lang-String类" class="headerlink" title="是否可以加载自定义java.lang.String类"></a>是否可以加载自定义java.lang.String类</h3><h4 id="尝试一"><a href="#尝试一" class="headerlink" title="尝试一"></a>尝试一</h4><p>在d:\classloader\java\lang 增加String类，并编译为String.class。</p>
+<p>测试类<a href="https://github.com/morris131/morris-book/tree/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/jvm/src/main/java/com/morris/jvm/classloader/StringClassLoaderTest.java" target="_blank" rel="noopener">StringClassLoaderTest.java</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.jvm.classloader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StringClassLoaderTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> ClassNotFoundException </span>&#123;</span><br><span class="line">        BreakDelegateClassLoader myClassLoader = <span class="keyword">new</span> BreakDelegateClassLoader();</span><br><span class="line">        Class&lt;?&gt; clazz = myClassLoader.loadClass(<span class="string">"java.lang.String"</span>);</span><br><span class="line">        System.out.println(clazz.getClassLoader());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Exception <span class="keyword">in</span> thread <span class="string">"main"</span> java<span class="selector-class">.lang</span><span class="selector-class">.SecurityException</span>: Prohibited package name: java.lang</span><br><span class="line">	at java<span class="selector-class">.lang</span><span class="selector-class">.ClassLoader</span><span class="selector-class">.preDefineClass</span>(ClassLoader<span class="selector-class">.java</span>:<span class="number">662</span>)</span><br><span class="line">	at java<span class="selector-class">.lang</span><span class="selector-class">.ClassLoader</span><span class="selector-class">.defineClass</span>(ClassLoader<span class="selector-class">.java</span>:<span class="number">761</span>)</span><br><span class="line">	at java<span class="selector-class">.lang</span><span class="selector-class">.ClassLoader</span><span class="selector-class">.defineClass</span>(ClassLoader<span class="selector-class">.java</span>:<span class="number">642</span>)</span><br><span class="line">	at com<span class="selector-class">.morris</span><span class="selector-class">.jvm</span><span class="selector-class">.load</span><span class="selector-class">.MyClassLoader</span><span class="selector-class">.findClass</span>(MyClassLoader<span class="selector-class">.java</span>:<span class="number">33</span>)</span><br><span class="line">	at com<span class="selector-class">.morris</span><span class="selector-class">.jvm</span><span class="selector-class">.load</span><span class="selector-class">.BreakDelegateClassLoader</span><span class="selector-class">.loadClass</span>(BreakDelegateClassLoader<span class="selector-class">.java</span>:<span class="number">14</span>)</span><br><span class="line">	at java<span class="selector-class">.lang</span><span class="selector-class">.ClassLoader</span><span class="selector-class">.loadClass</span>(ClassLoader<span class="selector-class">.java</span>:<span class="number">357</span>)</span><br><span class="line">	at com<span class="selector-class">.morris</span><span class="selector-class">.jvm</span><span class="selector-class">.load</span><span class="selector-class">.StringClassLoaderTest</span><span class="selector-class">.main</span>(StringClassLoaderTest<span class="selector-class">.java</span>:<span class="number">7</span>)</span><br></pre></td></tr></table></figure>
+<p>JVM出于安全考虑，禁止使用以java开头的包名。以下为相关源码：</p>
+<p>摘自jdk1.8 java.lang.ClassLoader</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">protected final <span class="keyword">Class</span>&lt;?&gt; defineClass(String <span class="type">name</span>, byte[] b, <span class="type">int</span> <span class="keyword">off</span>, <span class="type">int</span> len,</span><br><span class="line">                                     ProtectionDomain protectionDomain)</span><br><span class="line">    throws ClassFormatError</span><br><span class="line">&#123;</span><br><span class="line">    protectionDomain = preDefineClass(<span class="type">name</span>, protectionDomain);</span><br><span class="line">    String source = defineClassSourceLocation(protectionDomain);</span><br><span class="line">    <span class="keyword">Class</span>&lt;?&gt; c = defineClass1(<span class="type">name</span>, b, <span class="keyword">off</span>, len, protectionDomain, source);</span><br><span class="line">    postDefineClass(c, protectionDomain);</span><br><span class="line">    <span class="keyword">return</span> c;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">private ProtectionDomain preDefineClass(String <span class="type">name</span>,</span><br><span class="line">                                        ProtectionDomain pd)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (!checkName(<span class="type">name</span>))</span><br><span class="line">        throw <span class="built_in">new</span> NoClassDefFoundError("IllegalName: " + <span class="type">name</span>);</span><br><span class="line"></span><br><span class="line">    // Note:  Checking logic <span class="keyword">in</span> java.lang.invoke.MemberName.checkForTypeAlias</span><br><span class="line">    // relies <span class="keyword">on</span> the fact that spoofing <span class="keyword">is</span> impossible <span class="keyword">if</span> a <span class="keyword">class</span> has a <span class="type">name</span></span><br><span class="line">    // <span class="keyword">of</span> the form "java.*"</span><br><span class="line">    <span class="keyword">if</span> ((<span class="type">name</span> != <span class="keyword">null</span>) &amp;&amp; <span class="type">name</span>.startsWith("java.")) &#123;</span><br><span class="line">        throw <span class="built_in">new</span> SecurityException</span><br><span class="line">            ("Prohibited package name: " +</span><br><span class="line">             <span class="type">name</span>.substring(<span class="number">0</span>, <span class="type">name</span>.lastIndexOf(<span class="string">'.'</span>)));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (pd == <span class="keyword">null</span>) &#123;</span><br><span class="line">        pd = defaultDomain;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="type">name</span> != <span class="keyword">null</span>) checkCerts(<span class="type">name</span>, pd.getCodeSource());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> pd;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="尝试二"><a href="#尝试二" class="headerlink" title="尝试二"></a>尝试二</h4><p>使用-Xbootclasspath参数指定路径使用根加载器加载。</p>
+<p>-XX:+TraceClassLoading：监控类的加载</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">new</span> java.lang.String();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ java <span class="string">"-Xbootclasspath/p:D:\classloader"</span> -<span class="symbol">XX:</span>+TraceClassLoading  Test</span><br><span class="line">[Path <span class="symbol">D:</span>\classloader]</span><br><span class="line">[Opened <span class="symbol">D:</span>\Program Files\Java\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">rt</span>.<span class="title">jar</span>]</span></span><br><span class="line">[Loaded java.lang.Object from <span class="symbol">D:</span>\Program Files\Java\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">rt</span>.<span class="title">jar</span>]</span></span><br><span class="line">[Loaded java.lang.String from <span class="symbol">D:</span>\classloader]</span><br><span class="line">[Loaded java.io.Serializable from <span class="symbol">D:</span>\Program Files\Java\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">rt</span>.<span class="title">jar</span>]</span></span><br><span class="line">[Loaded java.lang.reflect.AnnotatedElement from <span class="symbol">D:</span>\Program Files\Java\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">rt</span>.<span class="title">jar</span>]</span></span><br><span class="line">[Loaded java.lang.reflect.GenericDeclaration from <span class="symbol">D:</span>\Program Files\Java\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">rt</span>.<span class="title">jar</span>]</span></span><br><span class="line">[Loaded java.lang.reflect.Type from <span class="symbol">D:</span>\Program Files\Java\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">rt</span>.<span class="title">jar</span>]</span></span><br><span class="line">[Loaded java.lang.Class from <span class="symbol">D:</span>\Program Files\Java\jre\<span class="class"><span class="keyword">lib</span>\<span class="title">rt</span>.<span class="title">jar</span>]</span></span><br><span class="line">Invalid layout <span class="keyword">of</span> java.lang.String at value</span><br><span class="line">Error occurred during initialization <span class="keyword">of</span> VM</span><br><span class="line">Invalid layout <span class="keyword">of</span> preloaded <span class="class"><span class="keyword">class</span>: <span class="title">use</span> -<span class="title">XX</span>:+<span class="title">TraceClassLoading</span> <span class="title">to</span> <span class="title">see</span> <span class="title">the</span> <span class="title">origin</span> <span class="title">of</span> <span class="title">the</span> <span class="title">problem</span> <span class="title">class</span></span></span><br></pre></td></tr></table></figure>
+
+<p>猜测：String类在其他地方先被使用，里面并没有原生String类对应的方法导致出错。</p>
+<h4 id="尝试三"><a href="#尝试三" class="headerlink" title="尝试三"></a>尝试三</h4><p>从JDK中复制String.java的源码，添加hello()方法后编译，放入D:\classloader\java\lang目录，在Test方法中调用hello()方法</p>
+<p>运行结果如下：</p>
+<figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ java <span class="string">"-Xbootclasspath/p:D:\classloader"</span>  <span class="keyword">Test</span></span><br><span class="line">HelloWorld <span class="keyword">Class</span> is initialized.</span><br></pre></td></tr></table></figure>
+
+<h2 id="命名空间与运行时包"><a href="#命名空间与运行时包" class="headerlink" title="命名空间与运行时包"></a>命名空间与运行时包</h2><p>每个类加载器都有自己的命名空间。同一个命名空间内的类是相互可见的，命名空间由该加载器及所有父加载器所加载的类组成。</p>
+<p>子加载器的命名空间包含所有父加载器的命名空间。因此由子加载器加载的类能看见父加载器的类。例如系统类加载器加载的类能看见根类加载器加载的类。由父亲加载器加载的类不能看见子加载器加载的类。如果两个加载器之间没有直接或间接的父子关系，那么它们各自加载类相互不可见。</p>
+<p>在同一个命名空间中，不会出现类的完整名字（包括类的包名）相同的两个类；在不同的命名空间中，有可能会出现类的完整名字（包括类的包名）相同的两个类。</p>
+<p>在类的加载过程中，所有参与的类加载器，即时没有亲自加载过该类，都会被标识为该类的初始类加载器，实际加载类的加载器被称为定义类加载器。</p>
+<p><a href="https://github.com/morris131/morris-book/tree/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/jvm/src/main/java/com/morris/jvm/classloader/CustomerClassLoader.java" target="_blank" rel="noopener">CustomerClassLoader.java</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.jvm.classloader;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 自定义类加载器必须继承ClassLoader</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomerClassLoader</span> <span class="keyword">extends</span> <span class="title">ClassLoader</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> Class&lt;?&gt; findClass(String name) <span class="keyword">throws</span> ClassNotFoundException &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.loadClass(name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://github.com/morris131/morris-book/tree/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/jvm/src/main/java/com/morris/jvm/classloader/CustomerClassLoaderTest.java" target="_blank" rel="noopener">CustomerClassLoaderTest.java</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.jvm.classloader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomerClassLoaderTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> ClassNotFoundException </span>&#123;</span><br><span class="line">        CustomerClassLoader myClassLoader = <span class="keyword">new</span> CustomerClassLoader();</span><br><span class="line">        Class&lt;?&gt; clazz = myClassLoader.loadClass(<span class="string">"java.lang.String"</span>);</span><br><span class="line">        System.out.println(clazz.getClassLoader());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面例子中，java.lang.String依次经过了CustomerClassLoader类加载器、系统类加载器、扩展类加载器、根类加载器，这些加载器都是java.lang.String的初始类加载器，而根类加载是java.lang.String的定义类加载器，JVM会在每一个类加载器维护的列表中添加该类型。如下图所示：</p>
+<p><img src="https://github.com/morris131/morris-book/raw/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/https://gitee.com/morris131/morris-book/raw/master/back/java/jvm/images/%E5%88%9D%E5%A7%8B%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E5%8F%8A%E5%85%B6%E5%88%97%E8%A1%A8%20.png" alt></p>
+<h3 id="同一个类加载器实例加载同一个class"><a href="#同一个类加载器实例加载同一个class" class="headerlink" title="同一个类加载器实例加载同一个class"></a>同一个类加载器实例加载同一个class</h3><p><a href="https://github.com/morris131/morris-book/tree/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/jvm/src/main/java/com/morris/jvm/classloader/NameSpaceTest1.java" target="_blank" rel="noopener">NameSpaceTest1.java</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.jvm.classloader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NameSpaceTest1</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> ClassNotFoundException </span>&#123;</span><br><span class="line">        <span class="comment">// 获取系统类加载器</span></span><br><span class="line">        ClassLoader classLoader = NameSpaceTest1.class.getClassLoader();</span><br><span class="line"></span><br><span class="line">        Class&lt;?&gt; aClass = classLoader.loadClass(<span class="string">"com.morris.jvm.classloader.HelloWorld"</span>);</span><br><span class="line">        Class&lt;?&gt; bClass = classLoader.loadClass(<span class="string">"com.morris.jvm.classloader.HelloWorld"</span>);</span><br><span class="line"></span><br><span class="line">        System.out.println(aClass == bClass); <span class="comment">// true</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用同一个类加载器实例不论load多少次，都只会返回同一个class对象。</p>
+<h3 id="不同类加载器加载同一个class"><a href="#不同类加载器加载同一个class" class="headerlink" title="不同类加载器加载同一个class"></a>不同类加载器加载同一个class</h3><p><a href="https://github.com/morris131/morris-book/tree/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/jvm/src/main/java/com/morris/jvm/classloader/NameSpaceTest2.java" target="_blank" rel="noopener">NameSpaceTest2.java</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.jvm.classloader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NameSpaceTest2</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> ClassNotFoundException </span>&#123;</span><br><span class="line">        </span><br><span class="line">        ClassLoader classLoader = <span class="keyword">new</span> MyClassLoader();</span><br><span class="line">        ClassLoader classLoader2 = <span class="keyword">new</span> BreakDelegateClassLoader();</span><br><span class="line"></span><br><span class="line">        Class&lt;?&gt; aClass = classLoader.loadClass(<span class="string">"com.morris.jvm.classloader.HelloWorld"</span>);</span><br><span class="line">        Class&lt;?&gt; bClass = classLoader2.loadClass(<span class="string">"com.morris.jvm.classloader.HelloWorld"</span>);</span><br><span class="line"></span><br><span class="line">        System.out.println(aClass == bClass); <span class="comment">// false</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用不同的类加载器实例加载同一个class，会在堆内存产生多个class对象。</p>
+<h3 id="相同类加载器加载同一个class"><a href="#相同类加载器加载同一个class" class="headerlink" title="相同类加载器加载同一个class"></a>相同类加载器加载同一个class</h3><p><a href="https://github.com/morris131/morris-book/tree/master/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/Java/JVM/jvm/src/main/java/com/morris/jvm/classloader/NameSpaceTest3.java" target="_blank" rel="noopener">NameSpaceTest3.java</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.morris.jvm.classloader;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NameSpaceTest3</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> ClassNotFoundException </span>&#123;</span><br><span class="line"></span><br><span class="line">        ClassLoader classLoader = <span class="keyword">new</span> MyClassLoader();</span><br><span class="line">        ClassLoader classLoader2 = <span class="keyword">new</span> MyClassLoader();</span><br><span class="line"></span><br><span class="line">        Class&lt;?&gt; aClass = classLoader.loadClass(<span class="string">"com.morris.jvm.classloader.HelloWorld"</span>);</span><br><span class="line">        System.out.println(aClass.getClassLoader());</span><br><span class="line">        Class&lt;?&gt; bClass = classLoader2.loadClass(<span class="string">"com.morris.jvm.classloader.HelloWorld"</span>);</span><br><span class="line">        System.out.println(bClass.getClassLoader());</span><br><span class="line"></span><br><span class="line">        System.out.println(aClass == bClass); <span class="comment">// false</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用相同的类加载器实例加载同一个class，会在堆内存产生多个class对象。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8/" rel="tag"><i class="fa fa-tag"></i> 类加载器</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/post/6208627e.html" rel="next" title="责任链模式">
+                  <i class="fa fa-chevron-left"></i> 责任链模式
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/post/2f01b447.html" rel="prev" title="JDK命令行工具">
+                  JDK命令行工具 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#类加载器"><span class="nav-number">1.</span> <span class="nav-text">类加载器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#根类加载器"><span class="nav-number">1.1.</span> <span class="nav-text">根类加载器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展类加载器"><span class="nav-number">1.2.</span> <span class="nav-text">扩展类加载器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#系统类加载器"><span class="nav-number">1.3.</span> <span class="nav-text">系统类加载器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义加载器"><span class="nav-number">1.4.</span> <span class="nav-text">自定义加载器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#双亲委托机制"><span class="nav-number">1.5.</span> <span class="nav-text">双亲委托机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#破坏双亲委托机制"><span class="nav-number">1.6.</span> <span class="nav-text">破坏双亲委托机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设置父类加载器为扩展类加载器"><span class="nav-number">1.6.1.</span> <span class="nav-text">设置父类加载器为扩展类加载器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置父类加载器为null"><span class="nav-number">1.6.2.</span> <span class="nav-text">设置父类加载器为null</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重写父类ClassLoader的loadClass方法"><span class="nav-number">1.6.3.</span> <span class="nav-text">重写父类ClassLoader的loadClass方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#是否可以加载自定义java-lang-String类"><span class="nav-number">1.6.4.</span> <span class="nav-text">是否可以加载自定义java.lang.String类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#尝试一"><span class="nav-number">1.6.4.1.</span> <span class="nav-text">尝试一</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#尝试二"><span class="nav-number">1.6.4.2.</span> <span class="nav-text">尝试二</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#尝试三"><span class="nav-number">1.6.4.3.</span> <span class="nav-text">尝试三</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命名空间与运行时包"><span class="nav-number">1.7.</span> <span class="nav-text">命名空间与运行时包</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#同一个类加载器实例加载同一个class"><span class="nav-number">1.7.1.</span> <span class="nav-text">同一个类加载器实例加载同一个class</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不同类加载器加载同一个class"><span class="nav-number">1.7.2.</span> <span class="nav-text">不同类加载器加载同一个class</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相同类加载器加载同一个class"><span class="nav-number">1.7.3.</span> <span class="nav-text">相同类加载器加载同一个class</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="https://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Morris"
+    src="/images/morris.png">
+  <p class="site-author-name" itemprop="name">Morris</p>
+  <div class="site-description" itemprop="description">你现在所得到的安逸将来要双倍偿还</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">202</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">53</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Morris</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: 'Iv1.0719a89e9daaa171',
+      clientSecret: '1be0a26202610ddbd49d231a941981c6649c2aff',
+      repo: 'gitalk',
+      owner: 'morris131',
+      admin: ['morris131'],
+      id: 'f485ce4f8035cf49524e7c74c382dea5',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>

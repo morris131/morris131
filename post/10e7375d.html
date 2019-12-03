@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="R01DtrTblROr_C2SkIMI9BZFFw_1FH4bT5WNNVAkdm4">
+  <meta name="baidu-site-verification" content="ZORq9vnduv">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="事件类型与连接状态1234567891011121314151617181920212223242526public static ZooKeeper getInstance() throws IOException, InterruptedException &amp;#123;    if(null == zooKeeper) &amp;#123;        &#x2F;&#x2F; connectString：连接地址">
+<meta property="og:type" content="article">
+<meta property="og:title" content="back&#x2F;java&#x2F;zookeeper&#x2F;zookeeper的watcher监听机制">
+<meta property="og:url" content="https:&#x2F;&#x2F;morris131.github.io&#x2F;post&#x2F;10e7375d.html">
+<meta property="og:site_name" content="枪手的博客">
+<meta property="og:description" content="事件类型与连接状态1234567891011121314151617181920212223242526public static ZooKeeper getInstance() throws IOException, InterruptedException &amp;#123;    if(null == zooKeeper) &amp;#123;        &#x2F;&#x2F; connectString：连接地址">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-12-03T06:51:50.204Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://morris131.github.io/post/10e7375d.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>back/java/zookeeper/zookeeper的watcher监听机制 | 枪手的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?2c9b55a761d135ab6f0695a694c71065";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="https://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">枪手的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">知识改变命运，编程照亮人生</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">53</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">13</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">202</span></a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/10e7375d.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          back/java/zookeeper/zookeeper的watcher监听机制
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-03 14:51:50" itemprop="dateCreated datePublished" datetime="2019-12-03T14:51:50+08:00">2019-12-03</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="事件类型与连接状态"><a href="#事件类型与连接状态" class="headerlink" title="事件类型与连接状态"></a>事件类型与连接状态</h3><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public static ZooKeeper get<span class="constructor">Instance()</span> throws IOException, InterruptedException &#123;</span><br><span class="line">    <span class="keyword">if</span>(null<span class="operator"> == </span>zooKeeper) &#123;</span><br><span class="line">        <span class="comment">// connectString：连接地址</span></span><br><span class="line">        <span class="comment">// sessionTimeout：会话超时时间</span></span><br><span class="line">        <span class="comment">// watcher：事件通知处理器</span></span><br><span class="line">        zooKeeper = <span class="keyword">new</span> <span class="constructor">ZooKeeper(<span class="params">connectString</span>, <span class="params">sessionTimeout</span>, <span class="params">new</span> Watcher()</span> &#123;</span><br><span class="line">            public void process(WatchedEvent watchedEvent) &#123;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// 获取事件的状态</span></span><br><span class="line">                Event.KeeperState state = watchedEvent.get<span class="constructor">State()</span>;</span><br><span class="line">                <span class="comment">// 获取事件的类型</span></span><br><span class="line">                Event.EventType <span class="keyword">type</span> = watchedEvent.get<span class="constructor">Type()</span>;</span><br><span class="line">                <span class="keyword">if</span> (<span class="module-access"><span class="module"><span class="identifier">Event</span>.</span><span class="module"><span class="identifier">KeeperState</span>.</span><span class="module"><span class="identifier">SyncConnected</span>.</span></span>equals(state)) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (<span class="module-access"><span class="module"><span class="identifier">Event</span>.</span><span class="module"><span class="identifier">EventType</span>.</span><span class="module"><span class="identifier">None</span>.</span></span>equals(<span class="keyword">type</span>)) &#123;</span><br><span class="line">                        <span class="comment">// 连接建立成功，则释放信号量，让阻塞的程序继续向下执行</span></span><br><span class="line">                        countDownLatch.count<span class="constructor">Down()</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        countDownLatch.await<span class="literal">()</span>;</span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"zookeeper session established."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    return zooKeeper;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><a id="more"></a>
+
+
+<p>在创建zookeeper会话时会传入一个Watcher,里面有两个特别关键的类：KeeperState（连接状态）和EventType（事件类型）</p>
+<h4 id="KeeperState"><a href="#KeeperState" class="headerlink" title="KeeperState"></a>KeeperState</h4><p>KeeperState表示的是客户端与服务端连接的状态。</p>
+<table>
+<thead>
+<tr>
+<th>连接状态</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Disconnected</td>
+<td>客户端与服务器断开连接</td>
+</tr>
+<tr>
+<td>SyncConnected</td>
+<td>客户端与服务器建立连接</td>
+</tr>
+<tr>
+<td>AuthFailed</td>
+<td>客户端进行连接认证失败</td>
+</tr>
+<tr>
+<td>ConnectedReadOnly</td>
+<td>客户端连接到的zookeeper服务是只读的</td>
+</tr>
+<tr>
+<td>SaslAuthenticated</td>
+<td>用于通知客户端它们是SASL认证的</td>
+</tr>
+<tr>
+<td>Expired</td>
+<td>客户端心跳检测没有收到服务端的响应时即认定断开连接，session失效</td>
+</tr>
+</tbody></table>
+<h4 id="EventType"><a href="#EventType" class="headerlink" title="EventType"></a>EventType</h4><p>EventType表示的是节点发生变化时所触发的事件类型。</p>
+<table>
+<thead>
+<tr>
+<th>事件类型</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>NodeCreated</td>
+<td>被监听的节点被创建</td>
+</tr>
+<tr>
+<td>NodeChildrenChanged</td>
+<td>被监听的节点的直接子节点被创建、被删除、子节点数据发生变更</td>
+</tr>
+<tr>
+<td>NodeDataChanged</td>
+<td>被监听的节点的数据发生变更</td>
+</tr>
+<tr>
+<td>NodeDeleted</td>
+<td>被监听的节点被删除</td>
+</tr>
+<tr>
+<td>None</td>
+<td>客户端的连接状态（KeeperState）发生变更</td>
+</tr>
+</tbody></table>
+<h3 id="zookeeper中的watcher"><a href="#zookeeper中的watcher" class="headerlink" title="zookeeper中的watcher"></a>zookeeper中的watcher</h3><p>zookeeper中给节点添加watcher的方式有两种：</p>
+<ul>
+<li>使用默认的watcher：<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">List&lt;<span class="keyword">String</span>&gt; getChildren(<span class="keyword">String</span> path, <span class="keyword">boolean</span> watch)</span><br><span class="line"><span class="keyword">byte</span>[] getData(<span class="keyword">String</span> path, <span class="keyword">boolean</span> watch, Stat stat)</span><br><span class="line">Stat <span class="built_in">exists</span>(<span class="keyword">String</span> path, <span class="keyword">boolean</span> watch)</span><br></pre></td></tr></table></figure>
+上面三个方法中都有一个boolean类型的watch参数，当watch==true时使用的就是默认的watcher，而默认的watcher就是创建连接的构造方法中的watcher，也可以通过register(Watcher watcher)注册默认的watcher。</li>
+<li>给节点指定的watcher：<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; get<span class="constructor">Children(String <span class="params">path</span>, Watcher <span class="params">watcher</span>)</span></span><br><span class="line">byte<span class="literal">[]</span> get<span class="constructor">Data(String <span class="params">path</span>, Watcher <span class="params">watcher</span>, Stat <span class="params">stat</span>)</span></span><br><span class="line">Stat exists(String path, Watcher watcher)</span><br></pre></td></tr></table></figure>
+上面三个方法中都有个Watcher类型的watch参数，可以通过传递这个参数给节点指定watcher。</li>
+</ul>
+<h3 id="watcher测试"><a href="#watcher测试" class="headerlink" title="watcher测试"></a>watcher测试</h3><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br></pre></td><td class="code"><pre><span class="line">package com.morris.zookeeper;</span><br><span class="line"></span><br><span class="line">import org.apache.zookeeper.*;</span><br><span class="line">import org.apache.zookeeper.data.Stat;</span><br><span class="line"></span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.util.concurrent.CountDownLatch;</span><br><span class="line"></span><br><span class="line">public <span class="keyword">class</span> ZookeeperWatcher implements Watcher &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> final String connectString = <span class="string">"192.168.252.10:2181"</span>;<span class="comment">//连接zk服务端的ip:port,如果多个格式为 ip:port,ip:port......</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ZooKeeper zookeeper;</span><br><span class="line">    <span class="keyword">private</span> final <span class="built_in">int</span> sessionTimeout = <span class="number">2000</span>;<span class="comment">//客户端连接超时时间 单位 ms</span></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 信号量，阻塞程序执行，用于等待zookeeper连接成功，发送成功信号</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> CountDownLatch countDown = <span class="keyword">new</span> <span class="constructor">CountDownLatch(1)</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public ZooKeeper get<span class="constructor">ZkClient()</span> throws InterruptedException, IOException &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(null<span class="operator"> == </span>zookeeper) &#123;</span><br><span class="line">            zookeeper = <span class="keyword">new</span> <span class="constructor">ZooKeeper(<span class="params">connectString</span>, <span class="params">sessionTimeout</span>, <span class="params">this</span>)</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//计数器到达0之前，一直阻塞，只有当信号量被释放，才会继续向下执行</span></span><br><span class="line">            countDown.await<span class="literal">()</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        return zookeeper;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void process(WatchedEvent watchedEvent) &#123;</span><br><span class="line">        <span class="comment">//获取事件的状态</span></span><br><span class="line">        Event.KeeperState state = watchedEvent.get<span class="constructor">State()</span>;</span><br><span class="line">        <span class="comment">//获取事件的类型</span></span><br><span class="line">        Event.EventType <span class="keyword">type</span> = watchedEvent.get<span class="constructor">Type()</span>;</span><br><span class="line">        <span class="keyword">if</span> (<span class="module-access"><span class="module"><span class="identifier">Event</span>.</span><span class="module"><span class="identifier">KeeperState</span>.</span><span class="module"><span class="identifier">SyncConnected</span>.</span></span>equals(state)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="module-access"><span class="module"><span class="identifier">Event</span>.</span><span class="module"><span class="identifier">EventType</span>.</span><span class="module"><span class="identifier">None</span>.</span></span>equals(<span class="keyword">type</span>)) &#123;</span><br><span class="line">                <span class="comment">//连接建立成功，则释放信号量，让阻塞的程序继续向下执行</span></span><br><span class="line">                <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"zookeeper session established."</span>);</span><br><span class="line">                countDown.count<span class="constructor">Down()</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span>(<span class="module-access"><span class="module"><span class="identifier">Event</span>.</span><span class="module"><span class="identifier">EventType</span>.</span><span class="module"><span class="identifier">NodeCreated</span>.</span></span>equals(<span class="keyword">type</span>)) &#123;</span><br><span class="line">                <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"[default watcher] create node:"</span> + watchedEvent.get<span class="constructor">Path()</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span>((<span class="module-access"><span class="module"><span class="identifier">Event</span>.</span><span class="module"><span class="identifier">EventType</span>.</span><span class="module"><span class="identifier">NodeChildrenChanged</span>.</span></span>equals(<span class="keyword">type</span>))) &#123;</span><br><span class="line">                <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"[default watcher] node children change:"</span> + watchedEvent.get<span class="constructor">Path()</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span>((<span class="module-access"><span class="module"><span class="identifier">Event</span>.</span><span class="module"><span class="identifier">EventType</span>.</span><span class="module"><span class="identifier">NodeDataChanged</span>.</span></span>equals(<span class="keyword">type</span>))) &#123;</span><br><span class="line">                <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"[default watcher] node data change:"</span> + watchedEvent.get<span class="constructor">Path()</span>);</span><br><span class="line">            &#125;  <span class="keyword">else</span> <span class="keyword">if</span>((<span class="module-access"><span class="module"><span class="identifier">Event</span>.</span><span class="module"><span class="identifier">EventType</span>.</span><span class="module"><span class="identifier">NodeDeleted</span>.</span></span>equals(<span class="keyword">type</span>))) &#123;</span><br><span class="line">                <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"[default watcher] delete node:"</span> + watchedEvent.get<span class="constructor">Path()</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String<span class="literal">[]</span> args) throws IOException, InterruptedException, KeeperException &#123;</span><br><span class="line"></span><br><span class="line">        ZookeeperWatcher watcher = <span class="keyword">new</span> <span class="constructor">ZookeeperWatcher()</span>;</span><br><span class="line">        ZooKeeper zkClient = watcher.get<span class="constructor">ZkClient()</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// test exist</span></span><br><span class="line">        zkClient.exists(<span class="string">"/p"</span>, <span class="literal">true</span>);</span><br><span class="line">        zkClient.create(<span class="string">"/p"</span>, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);</span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"----------------"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// test getData</span></span><br><span class="line">        zkClient.get<span class="constructor">Data(<span class="string">"/p"</span>, <span class="params">true</span>, <span class="params">null</span>)</span>;</span><br><span class="line">        zkClient.set<span class="constructor">Data(<span class="string">"/p"</span>, <span class="string">"p"</span>.<span class="params">getBytes</span>()</span>, -<span class="number">1</span>);</span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"----------------"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// test getChildren</span></span><br><span class="line">        zkClient.get<span class="constructor">Children(<span class="string">"/p"</span>, <span class="params">true</span>)</span>;</span><br><span class="line">        zkClient.create(<span class="string">"/p/c"</span>, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);</span><br><span class="line">        zkClient.create(<span class="string">"/p/d"</span>, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT); <span class="comment">// 创建之前未注册watcher，不会触发事件</span></span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"----------------"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 在一个节点注册过个watcher</span></span><br><span class="line">        zkClient.exists(<span class="string">"/p"</span>, <span class="literal">true</span>);</span><br><span class="line">        zkClient.exists(<span class="string">"/p"</span>, <span class="keyword">new</span> <span class="constructor">CustomWatcher()</span>);</span><br><span class="line">        zkClient.set<span class="constructor">Data(<span class="string">"/p"</span>, <span class="string">"pp"</span>.<span class="params">getBytes</span>()</span>, -<span class="number">1</span>);</span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"----------------"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 同一个watcher用不同的方法注册多次</span></span><br><span class="line">        zkClient.exists(<span class="string">"/p"</span>, <span class="literal">true</span>);</span><br><span class="line">        zkClient.get<span class="constructor">Data(<span class="string">"/p"</span>, <span class="params">true</span>, <span class="params">null</span>)</span>;</span><br><span class="line">        zkClient.set<span class="constructor">Data(<span class="string">"/p"</span>, <span class="string">"ppp"</span>.<span class="params">getBytes</span>()</span>, -<span class="number">1</span>);</span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"----------------"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 监听删除节点</span></span><br><span class="line">        zkClient.exists(<span class="string">"/p"</span>, <span class="literal">true</span>);</span><br><span class="line">        zkClient.delete(<span class="string">"/p/c"</span>, -<span class="number">1</span>);</span><br><span class="line">        zkClient.exists(<span class="string">"/p"</span>, <span class="literal">true</span>);</span><br><span class="line">        zkClient.delete(<span class="string">"/p/d"</span>, -<span class="number">1</span>);</span><br><span class="line">        zkClient.exists(<span class="string">"/p"</span>, <span class="literal">true</span>);</span><br><span class="line">        zkClient.delete(<span class="string">"/p"</span>, -<span class="number">1</span>);</span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"----------------"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 用getData和getChildren将watcher注册到一个不存在的节点上</span></span><br><span class="line">        <span class="comment">// zkClient.getData("/pppppppp", true, null); // NoNodeException</span></span><br><span class="line">        <span class="comment">// zkClient.getChildren("/ppppppppppp", true); // NoNodeException</span></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    static <span class="keyword">class</span> CustomWatcher implements Watcher &#123;</span><br><span class="line"></span><br><span class="line">        public void process(WatchedEvent watchedEvent) &#123;</span><br><span class="line">            <span class="comment">//获取事件的状态</span></span><br><span class="line">            Event.KeeperState state = watchedEvent.get<span class="constructor">State()</span>;</span><br><span class="line">            <span class="comment">//获取事件的类型</span></span><br><span class="line">            Event.EventType <span class="keyword">type</span> = watchedEvent.get<span class="constructor">Type()</span>;</span><br><span class="line">            <span class="keyword">if</span> (<span class="module-access"><span class="module"><span class="identifier">Event</span>.</span><span class="module"><span class="identifier">KeeperState</span>.</span><span class="module"><span class="identifier">SyncConnected</span>.</span></span>equals(state)) &#123;</span><br><span class="line">                <span class="keyword">if</span> (<span class="module-access"><span class="module"><span class="identifier">Event</span>.</span><span class="module"><span class="identifier">EventType</span>.</span><span class="module"><span class="identifier">None</span>.</span></span>equals(<span class="keyword">type</span>)) &#123;</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span>(<span class="module-access"><span class="module"><span class="identifier">Event</span>.</span><span class="module"><span class="identifier">EventType</span>.</span><span class="module"><span class="identifier">NodeCreated</span>.</span></span>equals(<span class="keyword">type</span>)) &#123;</span><br><span class="line">                    <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"[custom watcher] create node:"</span> + watchedEvent.get<span class="constructor">Path()</span>);</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span>((<span class="module-access"><span class="module"><span class="identifier">Event</span>.</span><span class="module"><span class="identifier">EventType</span>.</span><span class="module"><span class="identifier">NodeChildrenChanged</span>.</span></span>equals(<span class="keyword">type</span>))) &#123;</span><br><span class="line">                    <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"[custom watcher] node children change:"</span> + watchedEvent.get<span class="constructor">Path()</span>);</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span>((<span class="module-access"><span class="module"><span class="identifier">Event</span>.</span><span class="module"><span class="identifier">EventType</span>.</span><span class="module"><span class="identifier">NodeDataChanged</span>.</span></span>equals(<span class="keyword">type</span>))) &#123;</span><br><span class="line">                    <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"[custom watcher] node data change:"</span> + watchedEvent.get<span class="constructor">Path()</span>);</span><br><span class="line">                &#125;  <span class="keyword">else</span> <span class="keyword">if</span>((<span class="module-access"><span class="module"><span class="identifier">Event</span>.</span><span class="module"><span class="identifier">EventType</span>.</span><span class="module"><span class="identifier">NodeDeleted</span>.</span></span>equals(<span class="keyword">type</span>))) &#123;</span><br><span class="line">                    <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(<span class="string">"[custom watcher] delete node:"</span> + watchedEvent.get<span class="constructor">Path()</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过观察运行结果，总结如下：</p>
+<ul>
+<li>注册一次watcher只会收到一次通知，想一直监听就得收到通知后再次注册。</li>
+<li>同一个watcher实例被例如exists，getData等方法多次注册，zookeeper客户端也只会收到一次通知。</li>
+<li>当一个节点注册多个不同的watcher实例时，会通知多次，即每个被注册的watcher都会收到通知。</li>
+<li>getData和getChildren不能监控一个不存在的节点，否则会报NoNodeException。</li>
+</ul>
+<h3 id="不同的注册watcher的方法与可监听事件的关系"><a href="#不同的注册watcher的方法与可监听事件的关系" class="headerlink" title="不同的注册watcher的方法与可监听事件的关系"></a>不同的注册watcher的方法与可监听事件的关系</h3><table>
+<thead>
+<tr>
+<th>注册方式</th>
+<th>NodeCreated</th>
+<th>NodeChildrenChanged</th>
+<th>NodeDataChanged</th>
+<th>NodeDeleted</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>getChildren</td>
+<td></td>
+<td>Y</td>
+<td></td>
+<td>Y</td>
+</tr>
+<tr>
+<td>exists</td>
+<td>Y</td>
+<td></td>
+<td>Y</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>getData</td>
+<td></td>
+<td></td>
+<td>Y</td>
+<td>Y</td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/post/7a6c6efc.html" rel="next" title="back/java/zookeeper/zookeeper常用命令">
+                  <i class="fa fa-chevron-left"></i> back/java/zookeeper/zookeeper常用命令
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/post/b65a8937.html" rel="prev" title="back/java/zookeeper/zookeeper简介">
+                  back/java/zookeeper/zookeeper简介 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#事件类型与连接状态"><span class="nav-number">1.</span> <span class="nav-text">事件类型与连接状态</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#KeeperState"><span class="nav-number">1.1.</span> <span class="nav-text">KeeperState</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#EventType"><span class="nav-number">1.2.</span> <span class="nav-text">EventType</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#zookeeper中的watcher"><span class="nav-number">2.</span> <span class="nav-text">zookeeper中的watcher</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#watcher测试"><span class="nav-number">3.</span> <span class="nav-text">watcher测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不同的注册watcher的方法与可监听事件的关系"><span class="nav-number">4.</span> <span class="nav-text">不同的注册watcher的方法与可监听事件的关系</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="https://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Morris"
+    src="/images/morris.png">
+  <p class="site-author-name" itemprop="name">Morris</p>
+  <div class="site-description" itemprop="description">你现在所得到的安逸将来要双倍偿还</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">202</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">53</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Morris</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: 'Iv1.0719a89e9daaa171',
+      clientSecret: '1be0a26202610ddbd49d231a941981c6649c2aff',
+      repo: 'gitalk',
+      owner: 'morris131',
+      admin: ['morris131'],
+      id: '0bcccfbc01fd60e4af68e9293e4ea0fa',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>
