@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="R01DtrTblROr_C2SkIMI9BZFFw_1FH4bT5WNNVAkdm4">
+  <meta name="baidu-site-verification" content="ZORq9vnduv">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="mybatis中的日志不引入log4j项目中依赖如下：1234567891011&amp;lt;dependency&amp;gt;    &amp;lt;groupId&amp;gt;org.mybatis&amp;lt;&#x2F;groupId&amp;gt;    &amp;lt;artifactId&amp;gt;mybatis&amp;lt;&#x2F;artifactId&amp;gt;    &amp;lt;version&amp;gt;3.5.3&amp;lt;&#x2F;version&amp;gt;&amp;lt;&#x2F;dep">
+<meta name="keywords" content="mybatis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mybatis中的日志">
+<meta property="og:url" content="https:&#x2F;&#x2F;morris131.github.io&#x2F;post&#x2F;3b03ab43.html">
+<meta property="og:site_name" content="枪手的博客">
+<meta property="og:description" content="mybatis中的日志不引入log4j项目中依赖如下：1234567891011&amp;lt;dependency&amp;gt;    &amp;lt;groupId&amp;gt;org.mybatis&amp;lt;&#x2F;groupId&amp;gt;    &amp;lt;artifactId&amp;gt;mybatis&amp;lt;&#x2F;artifactId&amp;gt;    &amp;lt;version&amp;gt;3.5.3&amp;lt;&#x2F;version&amp;gt;&amp;lt;&#x2F;dep">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-12-02T16:00:00.000Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://morris131.github.io/post/3b03ab43.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>mybatis中的日志 | 枪手的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?2c9b55a761d135ab6f0695a694c71065";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="https://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">枪手的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">知识改变命运，编程照亮人生</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">14</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">7</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">62</span></a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/3b03ab43.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mybatis中的日志
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-03 00:00:00" itemprop="dateCreated datePublished" datetime="2019-12-03T00:00:00+08:00">2019-12-03</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/mybatis/" itemprop="url" rel="index">
+                    <span itemprop="name">mybatis</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="mybatis中的日志"><a href="#mybatis中的日志" class="headerlink" title="mybatis中的日志"></a>mybatis中的日志</h1><h2 id="不引入log4j"><a href="#不引入log4j" class="headerlink" title="不引入log4j"></a>不引入log4j</h2><p>项目中依赖如下：</p><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.mybatis<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mybatis<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.5.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>8.0.18<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure><a id="more"></a>
+
+<p>MybatisLogTest</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">package com.morris.mybatis.log;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.morris.mybatis.cache.SqlSessionFactoryUtil;</span><br><span class="line"><span class="keyword">import</span> com.morris.mybatis.cache.UserMapper;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.session.SqlSession;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.session.SqlSessionFactory;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MybatisLogTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="type">String</span>[] args) &#123;</span><br><span class="line">        <span class="type">SqlSessionFactory</span> sqlSessionFactory = <span class="type">SqlSessionFactoryUtil</span>.createSqlSessionFactory();</span><br><span class="line"></span><br><span class="line">        <span class="type">SqlSession</span> sqlSession = sqlSessionFactory.openSession();</span><br><span class="line">        <span class="type">UserMapper</span> userMapper = sqlSession.getMapper(<span class="type">UserMapper</span>.<span class="keyword">class</span>);</span><br><span class="line">        <span class="type">System</span>.out.<span class="built_in">println</span>(userMapper.query(<span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行MybatisLogTest结果如下：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attribute">user_id</span>=1, <span class="attribute">role_id</span>=1&#125;</span><br></pre></td></tr></table></figure>
+<p>控制台并无任何日志打印</p>
+<h2 id="引入log4j"><a href="#引入log4j" class="headerlink" title="引入log4j"></a>引入log4j</h2><p>引入log4j依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>log4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>log4j<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2.17<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>并加入log4j.properties,日志级别为debug(如果为info，还是没有日志打印)</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Root logger option</span></span><br><span class="line"><span class="attr">log4j.rootLogger</span>=debug, stdout</span><br><span class="line"></span><br><span class="line"><span class="comment"># Direct log messages to stdout</span></span><br><span class="line"><span class="attr">log4j.appender.stdout</span>=org.apache.log4j.ConsoleAppender</span><br><span class="line"><span class="attr">log4j.appender.stdout.Target</span>=System.out</span><br><span class="line"><span class="attr">log4j.appender.stdout.layout</span>=org.apache.log4j.PatternLayout</span><br><span class="line"><span class="attr">log4j.appender.stdout.layout.ConversionPattern</span>=%d&#123;yyyy-MM-dd HH:mm:ss&#125; %-<span class="number">5</span>p %c&#123;<span class="number">1</span>&#125;:%L - %m%n</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-04</span> <span class="number">13</span>:<span class="number">49</span>:<span class="number">01</span> DEBUG LogFactory:<span class="number">105</span> - Logging initialized using <span class="string">'class org.apache.ibatis.logging.log4j.Log4jImpl'</span> adapter.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-04</span> <span class="number">13</span>:<span class="number">49</span>:<span class="number">01</span> DEBUG PooledDataSource:<span class="number">353</span> - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-04</span> <span class="number">13</span>:<span class="number">49</span>:<span class="number">01</span> DEBUG PooledDataSource:<span class="number">353</span> - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-04</span> <span class="number">13</span>:<span class="number">49</span>:<span class="number">01</span> DEBUG PooledDataSource:<span class="number">353</span> - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-04</span> <span class="number">13</span>:<span class="number">49</span>:<span class="number">01</span> DEBUG PooledDataSource:<span class="number">353</span> - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-04</span> <span class="number">13</span>:<span class="number">49</span>:<span class="number">01</span> DEBUG UserMapper:<span class="number">60</span> - Cache Hit Ratio [com.morris.mybatis.cache.UserMapper]: <span class="number">0.0</span></span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-04</span> <span class="number">13</span>:<span class="number">49</span>:<span class="number">01</span> DEBUG JdbcTransaction:<span class="number">136</span> - Opening JDBC Connection</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-04</span> <span class="number">13</span>:<span class="number">49</span>:<span class="number">02</span> DEBUG PooledDataSource:<span class="number">424</span> - Created connection <span class="number">843467284.</span></span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-04</span> <span class="number">13</span>:<span class="number">49</span>:<span class="number">02</span> DEBUG JdbcTransaction:<span class="number">100</span> - Setting <span class="built_in">auto</span>commit to <span class="literal">false</span> on JDBC Connection [com.mysql.cj.jdbc.<span class="symbol">ConnectionImpl@</span><span class="number">32464</span>a14]</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-04</span> <span class="number">13</span>:<span class="number">49</span>:<span class="number">02</span> DEBUG query:<span class="number">143</span> - ==&gt;  Preparing: select * <span class="keyword">from</span> sys_user_role where user_id = ? </span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-04</span> <span class="number">13</span>:<span class="number">49</span>:<span class="number">02</span> DEBUG query:<span class="number">143</span> - ==&gt; Parameters: <span class="number">1</span>(Integer)</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-04</span> <span class="number">13</span>:<span class="number">49</span>:<span class="number">02</span> DEBUG query:<span class="number">143</span> - &lt;==      Total: <span class="number">1</span></span><br><span class="line">&#123;user_id=<span class="number">1</span>, role_id=<span class="number">1</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="源码阅读"><a href="#源码阅读" class="headerlink" title="源码阅读"></a>源码阅读</h2><p>根据上面日志打印的<code>LogFactory:105</code>，查看LogFactory的内容，先下载源码</p>
+<p>org.apache.ibatis.logging.LogFactory关键代码如下：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line">package org.apache.ibatis.logging;</span><br><span class="line"></span><br><span class="line">import java.lang.reflect.Constructor;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @author Clinton Begin</span></span><br><span class="line"><span class="comment"> * @author Eduardo Macarron</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">public final <span class="keyword">class</span> LogFactory &#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Marker to be used by logging implementations that support markers.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  public static final String MARKER = <span class="string">"MYBATIS"</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> static Constructor&lt;? extends Log&gt; logConstructor;</span><br><span class="line"></span><br><span class="line">  static &#123;</span><br><span class="line">    <span class="keyword">try</span><span class="constructor">Implementation(LogFactory::<span class="params">useSlf4jLogging</span>)</span>;</span><br><span class="line">    <span class="keyword">try</span><span class="constructor">Implementation(LogFactory::<span class="params">useCommonsLogging</span>)</span>;</span><br><span class="line">    <span class="keyword">try</span><span class="constructor">Implementation(LogFactory::<span class="params">useLog4J2Logging</span>)</span>;</span><br><span class="line">    <span class="keyword">try</span><span class="constructor">Implementation(LogFactory::<span class="params">useLog4JLogging</span>)</span>;</span><br><span class="line">    <span class="keyword">try</span><span class="constructor">Implementation(LogFactory::<span class="params">useJdkLogging</span>)</span>;</span><br><span class="line">    <span class="keyword">try</span><span class="constructor">Implementation(LogFactory::<span class="params">useNoLogging</span>)</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="constructor">LogFactory()</span> &#123;</span><br><span class="line">    <span class="comment">// disable construction</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public static Log get<span class="constructor">Log(Class&lt;?&gt; <span class="params">aClass</span>)</span> &#123;</span><br><span class="line">    return get<span class="constructor">Log(<span class="params">aClass</span>.<span class="params">getName</span>()</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public static Log get<span class="constructor">Log(String <span class="params">logger</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      return logConstructor.<span class="keyword">new</span><span class="constructor">Instance(<span class="params">logger</span>)</span>;</span><br><span class="line">    &#125; catch (Throwable t) &#123;</span><br><span class="line">      throw <span class="keyword">new</span> <span class="constructor">LogException(<span class="string">"Error creating logger for logger "</span> + <span class="params">logger</span> + <span class="string">".  Cause: "</span> + <span class="params">t</span>, <span class="params">t</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public static synchronized void use<span class="constructor">CustomLogging(Class&lt;? <span class="params">extends</span> Log&gt; <span class="params">clazz</span>)</span> &#123;</span><br><span class="line">    set<span class="constructor">Implementation(<span class="params">clazz</span>)</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public static synchronized void use<span class="constructor">Slf4jLogging()</span> &#123;</span><br><span class="line">    set<span class="constructor">Implementation(<span class="params">org</span>.<span class="params">apache</span>.<span class="params">ibatis</span>.<span class="params">logging</span>.<span class="params">slf4j</span>.Slf4jImpl.<span class="params">class</span>)</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public static synchronized void use<span class="constructor">CommonsLogging()</span> &#123;</span><br><span class="line">    set<span class="constructor">Implementation(<span class="params">org</span>.<span class="params">apache</span>.<span class="params">ibatis</span>.<span class="params">logging</span>.<span class="params">commons</span>.JakartaCommonsLoggingImpl.<span class="params">class</span>)</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public static synchronized void use<span class="constructor">Log4JLogging()</span> &#123;</span><br><span class="line">    set<span class="constructor">Implementation(<span class="params">org</span>.<span class="params">apache</span>.<span class="params">ibatis</span>.<span class="params">logging</span>.<span class="params">log4j</span>.Log4jImpl.<span class="params">class</span>)</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public static synchronized void use<span class="constructor">Log4J2Logging()</span> &#123;</span><br><span class="line">    set<span class="constructor">Implementation(<span class="params">org</span>.<span class="params">apache</span>.<span class="params">ibatis</span>.<span class="params">logging</span>.<span class="params">log4j2</span>.Log4j2Impl.<span class="params">class</span>)</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public static synchronized void use<span class="constructor">JdkLogging()</span> &#123;</span><br><span class="line">    set<span class="constructor">Implementation(<span class="params">org</span>.<span class="params">apache</span>.<span class="params">ibatis</span>.<span class="params">logging</span>.<span class="params">jdk14</span>.Jdk14LoggingImpl.<span class="params">class</span>)</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public static synchronized void use<span class="constructor">StdOutLogging()</span> &#123;</span><br><span class="line">    set<span class="constructor">Implementation(<span class="params">org</span>.<span class="params">apache</span>.<span class="params">ibatis</span>.<span class="params">logging</span>.<span class="params">stdout</span>.StdOutImpl.<span class="params">class</span>)</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public static synchronized void use<span class="constructor">NoLogging()</span> &#123;</span><br><span class="line">    set<span class="constructor">Implementation(<span class="params">org</span>.<span class="params">apache</span>.<span class="params">ibatis</span>.<span class="params">logging</span>.<span class="params">nologging</span>.NoLoggingImpl.<span class="params">class</span>)</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> static void <span class="keyword">try</span><span class="constructor">Implementation(Runnable <span class="params">runnable</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (logConstructor<span class="operator"> == </span>null) &#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        runnable.run<span class="literal">()</span>;</span><br><span class="line">      &#125; catch (Throwable t) &#123;</span><br><span class="line">        <span class="comment">// ignore</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> static void set<span class="constructor">Implementation(Class&lt;? <span class="params">extends</span> Log&gt; <span class="params">implClass</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      Constructor&lt;? extends Log&gt; candidate = implClass.get<span class="constructor">Constructor(String.<span class="params">class</span>)</span>;</span><br><span class="line">      Log log = candidate.<span class="keyword">new</span><span class="constructor">Instance(LogFactory.<span class="params">class</span>.<span class="params">getName</span>()</span>);</span><br><span class="line">      <span class="keyword">if</span> (log.is<span class="constructor">DebugEnabled()</span>) &#123;</span><br><span class="line">        log.debug(<span class="string">"Logging initialized using '"</span> + implClass + <span class="string">"' adapter."</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      logConstructor = candidate;</span><br><span class="line">    &#125; catch (Throwable t) &#123;</span><br><span class="line">      throw <span class="keyword">new</span> <span class="constructor">LogException(<span class="string">"Error setting Log implementation.  Cause: "</span> + <span class="params">t</span>, <span class="params">t</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>LogFactory中静态方法会依次判断项目中是否存在slf4j,jcl,log4j2,log4j,jul,如果存在就就用这个框架记录日志，如果没有就会使用jul记录日志，由于jul默认的日志级别是info,所有不引入任何日志框架，不会打印日志。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">tryImplementation(<span class="name">LogFactory</span>:<span class="symbol">:useSlf4jLogging</span>)<span class="comment">;</span></span><br><span class="line">tryImplementation(<span class="name">LogFactory</span>:<span class="symbol">:useCommonsLogging</span>)<span class="comment">;</span></span><br><span class="line">tryImplementation(<span class="name">LogFactory</span>:<span class="symbol">:useLog4J2Logging</span>)<span class="comment">;</span></span><br><span class="line">tryImplementation(<span class="name">LogFactory</span>:<span class="symbol">:useLog4JLogging</span>)<span class="comment">;</span></span><br><span class="line">tryImplementation(<span class="name">LogFactory</span>:<span class="symbol">:useJdkLogging</span>)<span class="comment">;</span></span><br><span class="line">tryImplementation(<span class="name">LogFactory</span>:<span class="symbol">:useNoLogging</span>)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>如果项目中引入了log4j,就会去调用useLog4JLogging方法加载log4j打印日志</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public static synchronized void use<span class="constructor">Log4JLogging()</span> &#123;</span><br><span class="line">  set<span class="constructor">Implementation(<span class="params">org</span>.<span class="params">apache</span>.<span class="params">ibatis</span>.<span class="params">logging</span>.<span class="params">log4j</span>.Log4jImpl.<span class="params">class</span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> <span class="keyword">private</span> static void set<span class="constructor">Implementation(Class&lt;? <span class="params">extends</span> Log&gt; <span class="params">implClass</span>)</span> &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    Constructor&lt;? extends Log&gt; candidate = implClass.get<span class="constructor">Constructor(String.<span class="params">class</span>)</span>;</span><br><span class="line">    Log log = candidate.<span class="keyword">new</span><span class="constructor">Instance(LogFactory.<span class="params">class</span>.<span class="params">getName</span>()</span>);</span><br><span class="line">    <span class="keyword">if</span> (log.is<span class="constructor">DebugEnabled()</span>) &#123;</span><br><span class="line">      log.debug(<span class="string">"Logging initialized using '"</span> + implClass + <span class="string">"' adapter."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    logConstructor = candidate;</span><br><span class="line">  &#125; catch (Throwable t) &#123;</span><br><span class="line">    throw <span class="keyword">new</span> <span class="constructor">LogException(<span class="string">"Error setting Log implementation.  Cause: "</span> + <span class="params">t</span>, <span class="params">t</span>)</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>去看下org.apache.ibatis.logging.log4j.Log4jImpl的内容，发现里面内置了org.apache.log4j.Logger对象，所有的方法都会委托log4j来实现。</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.apache.ibatis.logging.log4j;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.logging.Log;</span><br><span class="line"><span class="keyword">import</span> org.apache.log4j.Level;</span><br><span class="line"><span class="keyword">import</span> org.apache.log4j.Logger;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> class Log4jImpl implements Log &#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">String</span> FQCN = Log4jImpl.class.getName();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">final</span> Logger <span class="built_in">log</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> Log4jImpl(<span class="keyword">String</span> clazz) &#123;</span><br><span class="line">    <span class="built_in">log</span> = Logger.getLogger(clazz);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  <span class="keyword">public</span> <span class="built_in">boolean</span> isDebugEnabled() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">log</span>.isDebugEnabled();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  <span class="keyword">public</span> <span class="built_in">boolean</span> isTraceEnabled() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">log</span>.isTraceEnabled();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> error(<span class="keyword">String</span> s, Throwable e) &#123;</span><br><span class="line">    <span class="built_in">log</span>.<span class="built_in">log</span>(FQCN, Level.ERROR, s, e);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> error(<span class="keyword">String</span> s) &#123;</span><br><span class="line">    <span class="built_in">log</span>.<span class="built_in">log</span>(FQCN, Level.ERROR, s, <span class="keyword">null</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> debug(<span class="keyword">String</span> s) &#123;</span><br><span class="line">    <span class="built_in">log</span>.<span class="built_in">log</span>(FQCN, Level.DEBUG, s, <span class="keyword">null</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> trace(<span class="keyword">String</span> s) &#123;</span><br><span class="line">    <span class="built_in">log</span>.<span class="built_in">log</span>(FQCN, Level.TRACE, s, <span class="keyword">null</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> warn(<span class="keyword">String</span> s) &#123;</span><br><span class="line">    <span class="built_in">log</span>.<span class="built_in">log</span>(FQCN, Level.WARN, s, <span class="keyword">null</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="引入spring5"><a href="#引入spring5" class="headerlink" title="引入spring5"></a>引入spring5</h2><p>如果在上面的项目中引入spring5，会发现日志又不打印了</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-context<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.2.1.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>从上面的源码可以看出mybatis的日志会根据这个顺序查找：slf4j,jcl,log4j2,log4j,jul,</p>
+<p>mybatis的日志会先找到项目中有个<code>org.apache.ibatis.logging.commons.JakartaCommonsLoggingImpl</code>的类，这个类是jcl的。</p>
+<p>而这个jcl是spring中的spring-jcl, spring5重写了jcl的逻辑，核心代码如下：</p>
+<p>会调到</p>
+<blockquote>
+<p>org.apache.commons.logging.LogAdapter#createLog</p>
+</blockquote>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public static Log create<span class="constructor">Log(String <span class="params">name</span>)</span> &#123;</span><br><span class="line">	switch (logApi) &#123;</span><br><span class="line">		case LOG4J:</span><br><span class="line">			return <span class="module-access"><span class="module"><span class="identifier">Log4jAdapter</span>.</span></span>create<span class="constructor">Log(<span class="params">name</span>)</span>; <span class="comment">// 此处是log4j2</span></span><br><span class="line">		case SLF4J_LAL:</span><br><span class="line">			return <span class="module-access"><span class="module"><span class="identifier">Slf4jAdapter</span>.</span></span>create<span class="constructor">LocationAwareLog(<span class="params">name</span>)</span>;</span><br><span class="line">		case SLF4J:</span><br><span class="line">			return <span class="module-access"><span class="module"><span class="identifier">Slf4jAdapter</span>.</span></span>create<span class="constructor">Log(<span class="params">name</span>)</span>;</span><br><span class="line">		default:</span><br><span class="line">			<span class="comment">// Defensively use lazy-initializing adapter class here as well since the</span></span><br><span class="line">			<span class="comment">// java.logging module is not present by default on JDK 9. We are requiring</span></span><br><span class="line">			<span class="comment">// its presence if neither Log4j nor SLF4J is available; however, in the</span></span><br><span class="line">			<span class="comment">// case of Log4j or SLF4J, we are trying to prevent early initialization</span></span><br><span class="line">			<span class="comment">// of the JavaUtilLog adapter - e.g. by a JVM in debug mode - when eagerly</span></span><br><span class="line">			<span class="comment">// trying to parse the bytecode for all the cases of this switch clause.</span></span><br><span class="line">			return <span class="module-access"><span class="module"><span class="identifier">JavaUtilAdapter</span>.</span></span>create<span class="constructor">Log(<span class="params">name</span>)</span>; <span class="comment">// jul</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>spring-jcl会根据这个顺序查找日志：log4j2-&gt;slf4j-&gt;jul，spring发现项目中没有log4j2和slf4j，最后会采用jul打印日志，而jul的默认日志级别为info，所有没有日志打印了。</p>
+<p>此时要想使用log4j打印日志，需要引入slf4j和log4j的绑定器，将log4j绑定daoslf4j上，去除log4j的依赖，因为绑定器会自动引入log4j</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.slf4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>slf4j-api<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.7.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.slf4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>slf4j-log4j12<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.7.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>再次运行MybatisLogTest，发现熟悉的日志又回来了。</p>
+<p>其实引入slf4j后，mybatis第一个查找的就是sfl4j，此时与spring的jcl无关了。</p>
+<p>如果上面引入的是spring4,日志就会打印，引入spring4使用了jcl，而jcl默认回去查找有没有log4j。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/mybatis/" rel="tag"><i class="fa fa-tag"></i> mybatis</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/post/9fe7a112.html" rel="next" title="mybatis的二级缓存">
+                  <i class="fa fa-chevron-left"></i> mybatis的二级缓存
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/post/94431d1c.html" rel="prev" title="mybatis自定义日志">
+                  mybatis自定义日志 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#mybatis中的日志"><span class="nav-number">1.</span> <span class="nav-text">mybatis中的日志</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#不引入log4j"><span class="nav-number">1.1.</span> <span class="nav-text">不引入log4j</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#引入log4j"><span class="nav-number">1.2.</span> <span class="nav-text">引入log4j</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源码阅读"><span class="nav-number">1.3.</span> <span class="nav-text">源码阅读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#引入spring5"><span class="nav-number">1.4.</span> <span class="nav-text">引入spring5</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="https://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Morris"
+    src="/images/morris.png">
+  <p class="site-author-name" itemprop="name">Morris</p>
+  <div class="site-description" itemprop="description">你现在所得到的安逸将来要双倍偿还</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">62</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Morris</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: 'Iv1.0719a89e9daaa171',
+      clientSecret: '1be0a26202610ddbd49d231a941981c6649c2aff',
+      repo: 'gitalk',
+      owner: 'morris131',
+      admin: ['morris131'],
+      id: '99c0161ca1c12526daa27d2df74566ae',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>

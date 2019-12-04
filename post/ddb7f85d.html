@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="R01DtrTblROr_C2SkIMI9BZFFw_1FH4bT5WNNVAkdm4">
+  <meta name="baidu-site-verification" content="ZORq9vnduv">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="mybatis的一级缓存建表sql和数据1234567CREATE TABLE IF NOT EXISTS `sys_user_role` (  `user_id` bigint(20) NOT NULL COMMENT &amp;apos;用户ID&amp;apos;,  `role_id` bigint(20) NOT NULL COMMENT &amp;apos;角色ID&amp;apos;,  PRIMARY KEY (`user_id`,`role_id`)">
+<meta name="keywords" content="mybatis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mybatis的一级缓存">
+<meta property="og:url" content="https:&#x2F;&#x2F;morris131.github.io&#x2F;post&#x2F;ddb7f85d.html">
+<meta property="og:site_name" content="枪手的博客">
+<meta property="og:description" content="mybatis的一级缓存建表sql和数据1234567CREATE TABLE IF NOT EXISTS `sys_user_role` (  `user_id` bigint(20) NOT NULL COMMENT &amp;apos;用户ID&amp;apos;,  `role_id` bigint(20) NOT NULL COMMENT &amp;apos;角色ID&amp;apos;,  PRIMARY KEY (`user_id`,`role_id`)">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-12-02T16:00:00.000Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://morris131.github.io/post/ddb7f85d.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>mybatis的一级缓存 | 枪手的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?2c9b55a761d135ab6f0695a694c71065";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="https://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">枪手的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">知识改变命运，编程照亮人生</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">14</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">7</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">62</span></a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/ddb7f85d.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mybatis的一级缓存
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-03 00:00:00" itemprop="dateCreated datePublished" datetime="2019-12-03T00:00:00+08:00">2019-12-03</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/mybatis/" itemprop="url" rel="index">
+                    <span itemprop="name">mybatis</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="mybatis的一级缓存"><a href="#mybatis的一级缓存" class="headerlink" title="mybatis的一级缓存"></a>mybatis的一级缓存</h1><h2 id="建表sql和数据"><a href="#建表sql和数据" class="headerlink" title="建表sql和数据"></a>建表sql和数据</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> <span class="string">`sys_user_role`</span> (</span><br><span class="line">  <span class="string">`user_id`</span> <span class="built_in">bigint</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'用户ID'</span>,</span><br><span class="line">  <span class="string">`role_id`</span> <span class="built_in">bigint</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">COMMENT</span> <span class="string">'角色ID'</span>,</span><br><span class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`user_id`</span>,<span class="string">`role_id`</span>)</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=latin1 <span class="keyword">COMMENT</span>=<span class="string">'用户和角色关联表'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="string">`sys_user_role`</span> (<span class="string">`user_id`</span>, <span class="string">`role_id`</span>) <span class="keyword">VALUES</span> (<span class="number">1</span>, <span class="number">1</span>),(<span class="number">2</span>, <span class="number">2</span>);</span><br></pre></td></tr></table></figure><a id="more"></a>
+
+<h2 id="引入依赖"><a href="#引入依赖" class="headerlink" title="引入依赖"></a>引入依赖</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.mybatis<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mybatis<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.5.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>8.0.18<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>log4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>log4j<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2.17<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>需引入log4j打印sql的日志，日志级别调为debug级别才会打印sql。</p>
+<h2 id="一级缓存的使用"><a href="#一级缓存的使用" class="headerlink" title="一级缓存的使用"></a>一级缓存的使用</h2><p>UserMapper，这里没有使用xml</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">package com.morris.mybatis;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.annotations.Select;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.<span class="built_in">Map</span>;</span><br><span class="line"></span><br><span class="line">public <span class="class"><span class="keyword">interface</span> <span class="title">UserMapper</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Select</span>(<span class="string">"select * from sys_user_role where user_id = #&#123;userId&#125;"</span>)</span><br><span class="line">    <span class="built_in">Map</span>&lt;<span class="built_in">String</span>, <span class="built_in">Object</span>&gt; query(<span class="built_in">int</span> userId);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>SqlSessionFactoryUtil，用于与数据库建立连接</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">package com.morris.mybatis.cache;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.datasource.pooled.PooledDataSource;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.<span class="keyword">mapping</span>.Environment;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.<span class="keyword">session</span>.<span class="keyword">Configuration</span>;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.<span class="keyword">session</span>.SqlSessionFactory;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.<span class="keyword">session</span>.SqlSessionFactoryBuilder;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.<span class="keyword">transaction</span>.TransactionFactory;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.<span class="keyword">transaction</span>.jdbc.JdbcTransactionFactory;</span><br><span class="line"></span><br><span class="line"><span class="built_in">public</span> <span class="keyword">class</span> SqlSessionFactoryUtil &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">public</span> static SqlSessionFactory createSqlSessionFactory() &#123;</span><br><span class="line">        PooledDataSource dataSource = <span class="built_in">new</span> PooledDataSource();</span><br><span class="line">        dataSource.setUrl("jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;useSSL=true&amp;serverTimezone=GMT%2B8");</span><br><span class="line">        dataSource.setDriver("com.mysql.cj.jdbc.Driver");</span><br><span class="line">        dataSource.setUsername("root");</span><br><span class="line">        dataSource.setPassword("root");</span><br><span class="line"></span><br><span class="line">        TransactionFactory transactionFactory = <span class="built_in">new</span> JdbcTransactionFactory();</span><br><span class="line">        Environment environment = <span class="built_in">new</span> Environment("development", transactionFactory, dataSource);</span><br><span class="line">        <span class="keyword">Configuration</span> <span class="keyword">configuration</span> = <span class="built_in">new</span> <span class="keyword">Configuration</span>(environment);</span><br><span class="line">        <span class="keyword">configuration</span>.addMapper(UserMapper.<span class="keyword">class</span>);</span><br><span class="line"></span><br><span class="line">        SqlSessionFactory sqlSessionFactory = <span class="built_in">new</span> SqlSessionFactoryBuilder().build(<span class="keyword">configuration</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> sqlSessionFactory;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="同一个session"><a href="#同一个session" class="headerlink" title="同一个session"></a>同一个session</h3><p>测试类</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">package com.morris.mybatis.cache.one;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.morris.mybatis.cache.SqlSessionFactoryUtil;</span><br><span class="line"><span class="keyword">import</span> com.morris.mybatis.cache.UserMapper;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.session.SqlSession;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.session.SqlSessionFactory;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MybatisCacheTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="type">String</span>[] args) &#123;</span><br><span class="line">        <span class="type">SqlSessionFactory</span> sqlSessionFactory = <span class="type">SqlSessionFactoryUtil</span>.createSqlSessionFactory();</span><br><span class="line"></span><br><span class="line">        <span class="type">SqlSession</span> sqlSession = sqlSessionFactory.openSession();</span><br><span class="line">        <span class="type">UserMapper</span> userMapper = sqlSession.getMapper(<span class="type">UserMapper</span>.<span class="keyword">class</span>);</span><br><span class="line">        <span class="type">System</span>.out.<span class="built_in">println</span>(userMapper.query(<span class="number">1</span>));</span><br><span class="line">        <span class="type">System</span>.out.<span class="built_in">println</span>(userMapper.query(<span class="number">1</span>)); <span class="comment">// 同一个session查两次</span></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">52</span>:<span class="number">25</span> DEBUG LogFactory:<span class="number">105</span> - Logging initialized using <span class="string">'class org.apache.ibatis.logging.log4j.Log4jImpl'</span> adapter.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">52</span>:<span class="number">25</span> DEBUG PooledDataSource:<span class="number">353</span> - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">52</span>:<span class="number">25</span> DEBUG PooledDataSource:<span class="number">353</span> - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">52</span>:<span class="number">25</span> DEBUG PooledDataSource:<span class="number">353</span> - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">52</span>:<span class="number">25</span> DEBUG PooledDataSource:<span class="number">353</span> - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">52</span>:<span class="number">25</span> DEBUG JdbcTransaction:<span class="number">136</span> - Opening JDBC Connection</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">52</span>:<span class="number">25</span> DEBUG PooledDataSource:<span class="number">424</span> - Created connection <span class="number">497359413.</span></span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">52</span>:<span class="number">25</span> DEBUG JdbcTransaction:<span class="number">100</span> - Setting <span class="built_in">auto</span>commit to <span class="literal">false</span> on JDBC Connection [com.mysql.cj.jdbc.<span class="symbol">ConnectionImpl@</span><span class="number">1</span>da51a35]</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">52</span>:<span class="number">25</span> DEBUG query:<span class="number">143</span> - ==&gt;  Preparing: select * <span class="keyword">from</span> sys_user_role where user_id = ? </span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">52</span>:<span class="number">25</span> DEBUG query:<span class="number">143</span> - ==&gt; Parameters: <span class="number">1</span>(Integer)</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">52</span>:<span class="number">25</span> DEBUG query:<span class="number">143</span> - &lt;==      Total: <span class="number">1</span></span><br><span class="line">&#123;user_id=<span class="number">1</span>, role_id=<span class="number">1</span>&#125;</span><br><span class="line">&#123;user_id=<span class="number">1</span>, role_id=<span class="number">1</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>sql只打印了一次，说明只查询了一次数据库。</p>
+<p>在同一个SqlSession中, Mybatis会把执行的方法和参数通过算法生成缓存的键值，将键值和结果存放在一个Map中，如果后续的键值一样，则直接从Map中获取数据。</p>
+<h3 id="不同session"><a href="#不同session" class="headerlink" title="不同session"></a>不同session</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">package com.morris.mybatis.cache.one;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.morris.mybatis.cache.SqlSessionFactoryUtil;</span><br><span class="line"><span class="keyword">import</span> com.morris.mybatis.cache.UserMapper;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.datasource.pooled.PooledDataSource;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.mapping.Environment;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.session.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.session.SqlSession;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.session.SqlSessionFactory;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.session.SqlSessionFactoryBuilder;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.transaction.TransactionFactory;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MybatisCache2Test</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="type">String</span>[] args) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="type">SqlSessionFactory</span> sqlSessionFactory = <span class="type">SqlSessionFactoryUtil</span>.createSqlSessionFactory();</span><br><span class="line"></span><br><span class="line">        <span class="type">SqlSession</span> sqlSession = sqlSessionFactory.openSession();</span><br><span class="line">        <span class="type">UserMapper</span> userMapper = sqlSession.getMapper(<span class="type">UserMapper</span>.<span class="keyword">class</span>);</span><br><span class="line">        <span class="type">System</span>.out.<span class="built_in">println</span>(userMapper.query(<span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">        <span class="type">SqlSession</span> sqlSession2 = sqlSessionFactory.openSession();</span><br><span class="line">        <span class="type">UserMapper</span> userMapper2 = sqlSession2.getMapper(<span class="type">UserMapper</span>.<span class="keyword">class</span>);</span><br><span class="line">        <span class="type">System</span>.out.<span class="built_in">println</span>(userMapper2.query(<span class="number">1</span>)); <span class="comment">// 不同session</span></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下:</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG LogFactory:<span class="number">105</span> - Logging initialized using <span class="string">'class org.apache.ibatis.logging.log4j.Log4jImpl'</span> adapter.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG PooledDataSource:<span class="number">353</span> - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG PooledDataSource:<span class="number">353</span> - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG PooledDataSource:<span class="number">353</span> - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG PooledDataSource:<span class="number">353</span> - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG JdbcTransaction:<span class="number">136</span> - Opening JDBC Connection</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG PooledDataSource:<span class="number">424</span> - Created connection <span class="number">497359413.</span></span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG JdbcTransaction:<span class="number">100</span> - Setting <span class="built_in">auto</span>commit to <span class="literal">false</span> on JDBC Connection [com.mysql.cj.jdbc.<span class="symbol">ConnectionImpl@</span><span class="number">1</span>da51a35]</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG query:<span class="number">143</span> - ==&gt;  Preparing: select * <span class="keyword">from</span> sys_user_role where user_id = ? </span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG query:<span class="number">143</span> - ==&gt; Parameters: <span class="number">1</span>(Integer)</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG query:<span class="number">143</span> - &lt;==      Total: <span class="number">1</span></span><br><span class="line">&#123;user_id=<span class="number">1</span>, role_id=<span class="number">1</span>&#125;</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG JdbcTransaction:<span class="number">136</span> - Opening JDBC Connection</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG PooledDataSource:<span class="number">424</span> - Created connection <span class="number">1225197672.</span></span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG JdbcTransaction:<span class="number">100</span> - Setting <span class="built_in">auto</span>commit to <span class="literal">false</span> on JDBC Connection [com.mysql.cj.jdbc.<span class="symbol">ConnectionImpl@</span><span class="number">49070868</span>]</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG query:<span class="number">143</span> - ==&gt;  Preparing: select * <span class="keyword">from</span> sys_user_role where user_id = ? </span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG query:<span class="number">143</span> - ==&gt; Parameters: <span class="number">1</span>(Integer)</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">16</span>:<span class="number">53</span>:<span class="number">43</span> DEBUG query:<span class="number">143</span> - &lt;==      Total: <span class="number">1</span></span><br><span class="line">&#123;user_id=<span class="number">1</span>, role_id=<span class="number">1</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>sql只打印了2次，说明只查询了2次数据库，说明不同的SqlSession之间的缓存是相互隔离的；</p>
+<h3 id="缓存失效"><a href="#缓存失效" class="headerlink" title="缓存失效"></a>缓存失效</h3><figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">package com.morris.mybatis.cache.one;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.morris.mybatis.cache.SqlSessionFactoryUtil;</span><br><span class="line"><span class="keyword">import</span> com.morris.mybatis.cache.UserMapper;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.session.SqlSession;</span><br><span class="line"><span class="keyword">import</span> org.apache.ibatis.session.SqlSessionFactory;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="symbol">MybatisCache3Test</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> static <span class="built_in">void</span> main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        SqlSessionFactory sqlSessionFactory = SqlSessionFactoryUtil.createSqlSessionFactory();</span><br><span class="line"></span><br><span class="line">        SqlSession sqlSession = sqlSessionFactory.openSession();</span><br><span class="line">        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);</span><br><span class="line">        System.<span class="keyword">out</span>.println(userMapper.query(<span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">        userMapper.update(<span class="number">1</span>, <span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">        System.<span class="keyword">out</span>.println(userMapper.query(<span class="number">1</span>)); <span class="comment">// 不同session</span></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下:</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG LogFactory:<span class="number">105</span> - Logging initialized using <span class="string">'class org.apache.ibatis.logging.log4j.Log4jImpl'</span> adapter.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG PooledDataSource:<span class="number">353</span> - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG PooledDataSource:<span class="number">353</span> - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG PooledDataSource:<span class="number">353</span> - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG PooledDataSource:<span class="number">353</span> - PooledDataSource forcefully closed/removed all connections.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG JdbcTransaction:<span class="number">136</span> - Opening JDBC Connection</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG PooledDataSource:<span class="number">424</span> - Created connection <span class="number">22756955.</span></span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG JdbcTransaction:<span class="number">100</span> - Setting <span class="built_in">auto</span>commit to <span class="literal">false</span> on JDBC Connection [com.mysql.cj.jdbc.<span class="symbol">ConnectionImpl@</span><span class="number">15</span>b3e5b]</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG query:<span class="number">143</span> - ==&gt;  Preparing: select * <span class="keyword">from</span> sys_user_role where user_id = ? </span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG query:<span class="number">143</span> - ==&gt; Parameters: <span class="number">1</span>(Integer)</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG query:<span class="number">143</span> - &lt;==      Total: <span class="number">1</span></span><br><span class="line">&#123;user_id=<span class="number">1</span>, role_id=<span class="number">1</span>&#125;</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG update:<span class="number">143</span> - ==&gt;  Preparing: update sys_user_role <span class="keyword">set</span> role_id=? where user_id=? </span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG update:<span class="number">143</span> - ==&gt; Parameters: <span class="number">10</span>(Integer), <span class="number">1</span>(Integer)</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG update:<span class="number">143</span> - &lt;==    Updates: <span class="number">1</span></span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG query:<span class="number">143</span> - ==&gt;  Preparing: select * <span class="keyword">from</span> sys_user_role where user_id = ? </span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG query:<span class="number">143</span> - ==&gt; Parameters: <span class="number">1</span>(Integer)</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">37</span> DEBUG query:<span class="number">143</span> - &lt;==      Total: <span class="number">1</span></span><br><span class="line">&#123;user_id=<span class="number">1</span>, role_id=<span class="number">10</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>第一次查询后，执行了update语句，第二次查询缓存就失效了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>在同一个 SqlSession 中, Mybatis 会把执行的方法和参数通过算法生成缓存的键值， 将键值和结果存放在一个 Map 中， 如果后续的键值一样， 则直接从 Map 中获取数据；</li>
+<li>不同的SqlSession之间的缓存是相互隔离的；</li>
+<li>任何的 UPDATE, INSERT, DELETE 语句都会清空缓存。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/mybatis/" rel="tag"><i class="fa fa-tag"></i> mybatis</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/post/93db9116.html" rel="next" title="spring整合mybatis后一级缓存失效">
+                  <i class="fa fa-chevron-left"></i> spring整合mybatis后一级缓存失效
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/post/9fe7a112.html" rel="prev" title="mybatis的二级缓存">
+                  mybatis的二级缓存 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#mybatis的一级缓存"><span class="nav-number">1.</span> <span class="nav-text">mybatis的一级缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#建表sql和数据"><span class="nav-number">1.1.</span> <span class="nav-text">建表sql和数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#引入依赖"><span class="nav-number">1.2.</span> <span class="nav-text">引入依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一级缓存的使用"><span class="nav-number">1.3.</span> <span class="nav-text">一级缓存的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#同一个session"><span class="nav-number">1.3.1.</span> <span class="nav-text">同一个session</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不同session"><span class="nav-number">1.3.2.</span> <span class="nav-text">不同session</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存失效"><span class="nav-number">1.3.3.</span> <span class="nav-text">缓存失效</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">1.4.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="https://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Morris"
+    src="/images/morris.png">
+  <p class="site-author-name" itemprop="name">Morris</p>
+  <div class="site-description" itemprop="description">你现在所得到的安逸将来要双倍偿还</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">62</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Morris</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: 'Iv1.0719a89e9daaa171',
+      clientSecret: '1be0a26202610ddbd49d231a941981c6649c2aff',
+      repo: 'gitalk',
+      owner: 'morris131',
+      admin: ['morris131'],
+      id: 'fd4a741412c21eb0423719d3a421f9cb',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>
