@@ -165,7 +165,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">62</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">65</span></a>
 
   </li>
   </ul>
@@ -190,6 +190,246 @@
             
 
   <div class="posts-expand">
+        
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/5763c10f.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/post/5763c10f.html" class="post-title-link" itemprop="url">自定义Collector</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-10 00:00:00" itemprop="dateCreated datePublished" datetime="2019-11-10T00:00:00+08:00">2019-11-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java8/" itemprop="url" rel="index">
+                    <span itemprop="name">java8</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="自定义Collector"><a href="#自定义Collector" class="headerlink" title="自定义Collector"></a>自定义Collector</h1><p>Collector接口包含了一系列方法，为实现具体的归约操作（即收集器）提供了范本。我们已经看过了Collector接口中实现的许多收集器（由Collector接口的工具类Collector提供），例如toList或groupingBy。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/post/5763c10f.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/6b148d3e.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/post/6b148d3e.html" class="post-title-link" itemprop="url">Collector的使用</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-09 00:00:00" itemprop="dateCreated datePublished" datetime="2019-11-09T00:00:00+08:00">2019-11-09</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java8/" itemprop="url" rel="index">
+                    <span itemprop="name">java8</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Collector的使用"><a href="#Collector的使用" class="headerlink" title="Collector的使用"></a>Collector的使用</h1><p>先弄明白几个概念：</p><ul>
+<li><p>java.util.Collection是Java集合的祖先接口。</p>
+</li>
+<li><p>java.util.Collections是java.util包下的一个工具类，内涵各种处理集合的静态方法。</p>
+</li>
+<li><p>java.util.stream.Stream#collect(java.util.stream.Collector&lt;? super T,A,R&gt;)是Stream的一个函数，负责收集流。</p>
+</li>
+<li><p>java.util.stream.Collector 是一个收集函数的接口, 声明了一个收集器的功能。</p>
+</li>
+<li><p>java.util.stream.Collectors则是一个收集器的工具类，内置了一系列收集器实现。</p>
+<p>java.util.stream.Stream#collect(java.util.stream.Collector&lt;? super T,A,R&gt;)方法是一个终端操作，会消耗类，产生一个最终结果。</p>
+</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/post/6b148d3e.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/4a10e949.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/post/4a10e949.html" class="post-title-link" itemprop="url">lambda与集合</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-08 00:00:00" itemprop="dateCreated datePublished" datetime="2019-11-08T00:00:00+08:00">2019-11-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java8/" itemprop="url" rel="index">
+                    <span itemprop="name">java8</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="lambda与集合"><a href="#lambda与集合" class="headerlink" title="lambda与集合"></a>lambda与集合</h1><p>首先回顾一下Java集合框架的接口继承结构：<br><img src="https://gitee.com/morris131/morris-book/raw/master/back/java/java8/images/1574144689272.png" alt></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/post/4a10e949.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
         
   
   
@@ -722,234 +962,6 @@
   
   
 
-        
-  
-  
-  <article itemscope itemtype="https://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/ffae633b.html">
-
-    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
-      <meta itemprop="image" content="/images/morris.png">
-      <meta itemprop="name" content="Morris">
-      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
-      <meta itemprop="name" content="枪手的博客">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/post/ffae633b.html" class="post-title-link" itemprop="url">自定义git</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-11-04 00:00:00" itemprop="dateCreated datePublished" datetime="2019-11-04T00:00:00+08:00">2019-11-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/git/" itemprop="url" rel="index">
-                    <span itemprop="name">git</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="自定义git"><a href="#自定义git" class="headerlink" title="自定义git"></a>自定义git</h1><h2 id="忽略特殊文件"><a href="#忽略特殊文件" class="headerlink" title="忽略特殊文件"></a>忽略特殊文件</h2><p>例如在IDEA下进行Java开发，IDEA会自动生成.idea文件夹，maven打包会自动生成target文件夹，但是这些文件是不需要提交到git上的。那怎么忽略这些文件不提交到git呢？</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/post/ffae633b.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="https://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/9c3c3621.html">
-
-    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
-      <meta itemprop="image" content="/images/morris.png">
-      <meta itemprop="name" content="Morris">
-      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
-      <meta itemprop="name" content="枪手的博客">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/post/9c3c3621.html" class="post-title-link" itemprop="url">lambda与匿名内部类</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-11-04 00:00:00" itemprop="dateCreated datePublished" datetime="2019-11-04T00:00:00+08:00">2019-11-04</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java8/" itemprop="url" rel="index">
-                    <span itemprop="name">java8</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="lambda与匿名内部类"><a href="#lambda与匿名内部类" class="headerlink" title="lambda与匿名内部类"></a>lambda与匿名内部类</h1><p>从表面上看到Lambda表达式似乎只是为了简化匿名内部类书写，这看起来仅仅通过语法糖在编译阶段把所有的Lambda表达式替换成匿名内部类就可以了。但实时并非如此。在JVM层面，Lambda表达式和匿名内部类有着明显的差别。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/post/9c3c3621.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="https://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/ff904cea.html">
-
-    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
-      <meta itemprop="image" content="/images/morris.png">
-      <meta itemprop="name" content="Morris">
-      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
-      <meta itemprop="name" content="枪手的博客">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/post/ff904cea.html" class="post-title-link" itemprop="url">静态方法与默认方法</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-11-03 00:00:00" itemprop="dateCreated datePublished" datetime="2019-11-03T00:00:00+08:00">2019-11-03</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/java8/" itemprop="url" rel="index">
-                    <span itemprop="name">java8</span>
-                  </a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="静态方法与默认方法"><a href="#静态方法与默认方法" class="headerlink" title="静态方法与默认方法"></a>静态方法与默认方法</h1><p>静态方法和默认方法都必须有自己的实现，如果一个类既有静态方法，又有默认方法，还有一个抽象方法，那么它还是一个函数式接口。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/post/ff904cea.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1000,7 +1012,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">62</span>
+          <span class="site-state-item-count">65</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

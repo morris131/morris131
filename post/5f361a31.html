@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="R01DtrTblROr_C2SkIMI9BZFFw_1FH4bT5WNNVAkdm4">
+  <meta name="baidu-site-verification" content="ZORq9vnduv">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="JDK动态代理源码解读JDK动态代理的一般使用方法如下，可见源码的入口为Proxy.newProxyInstance">
+<meta name="keywords" content="spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JDK动态代理源码解读">
+<meta property="og:url" content="https:&#x2F;&#x2F;morris131.github.io&#x2F;post&#x2F;5f361a31.html">
+<meta property="og:site_name" content="枪手的博客">
+<meta property="og:description" content="JDK动态代理源码解读JDK动态代理的一般使用方法如下，可见源码的入口为Proxy.newProxyInstance">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-12-08T16:00:00.000Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://morris131.github.io/post/5f361a31.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>JDK动态代理源码解读 | 枪手的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?2c9b55a761d135ab6f0695a694c71065";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="https://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">枪手的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">知识改变命运，编程照亮人生</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">14</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">7</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">65</span></a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/5f361a31.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JDK动态代理源码解读
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-09 00:00:00" itemprop="dateCreated datePublished" datetime="2019-12-09T00:00:00+08:00">2019-12-09</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index">
+                    <span itemprop="name">spring</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="JDK动态代理源码解读"><a href="#JDK动态代理源码解读" class="headerlink" title="JDK动态代理源码解读"></a>JDK动态代理源码解读</h1><p>JDK动态代理的一般使用方法如下，可见源码的入口为<code>Proxy.newProxyInstance</code></p><a id="more"></a>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">IUserService userService = (IUserService) <span class="module-access"><span class="module"><span class="identifier">Proxy</span>.</span></span><span class="keyword">new</span><span class="constructor">ProxyInstance(JdkProxyDemo.<span class="params">class</span>.<span class="params">getClassLoader</span>()</span>, <span class="keyword">new</span> Class<span class="literal">[]</span>&#123;<span class="module-access"><span class="module"><span class="identifier">IUserService</span>.</span></span><span class="keyword">class</span>&#125;, <span class="keyword">new</span> <span class="constructor">UserServiceInvocationHandler(<span class="params">new</span> UserService()</span>));</span><br></pre></td></tr></table></figure>
+
+<h2 id="Proxy的数据结构"><a href="#Proxy的数据结构" class="headerlink" title="Proxy的数据结构"></a>Proxy的数据结构</h2><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">Class</span>&lt;?&gt;[] constructorParams = &#123; InvocationHandler.<span class="keyword">class</span> &#125;; <span class="comment">// Proxy的构造方法的参数类型</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> WeakCache&lt;ClassLoader, <span class="keyword">Class</span>&lt;?&gt;[], <span class="keyword">Class</span>&lt;?&gt;&gt; proxyClassCache = <span class="keyword">new</span> WeakCache&lt;&gt;(<span class="keyword">new</span> KeyFactory(), <span class="keyword">new</span> ProxyClassFactory()); <span class="comment">// 代理类的缓存</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span> InvocationHandler h; <span class="comment">// 存放传入的自定义的InvocationHandler，供其子类$Proxy0调用</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Proxy-newProxyInstance"><a href="#Proxy-newProxyInstance" class="headerlink" title="Proxy.newProxyInstance"></a>Proxy.newProxyInstance</h2><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> Object newProxyInstance(ClassLoader loader,</span><br><span class="line">                                         <span class="keyword">Class</span>&lt;?&gt;[] interfaces,</span><br><span class="line">                                         InvocationHandler h)</span><br><span class="line">       <span class="keyword">throws</span> IllegalArgumentException</span><br><span class="line">   &#123;</span><br><span class="line">       Objects.requireNonNull(h);</span><br><span class="line"></span><br><span class="line">       <span class="keyword">final</span> <span class="keyword">Class</span>&lt;?&gt;[] intfs = interfaces.clone();</span><br><span class="line">       <span class="keyword">final</span> SecurityManager sm = System.getSecurityManager();</span><br><span class="line">       <span class="keyword">if</span> (sm != <span class="keyword">null</span>) &#123;</span><br><span class="line">           checkProxyAccess(Reflection.getCallerClass(), loader, intfs);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">/*</span></span><br><span class="line"><span class="comment">        * Look up or generate the designated proxy class.</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line"><span class="comment">// 重点在这，获得代理对象</span></span><br><span class="line">       <span class="keyword">Class</span>&lt;?&gt; cl = getProxyClass0(loader, intfs);</span><br><span class="line"></span><br><span class="line">       <span class="comment">/*</span></span><br><span class="line"><span class="comment">        * Invoke its constructor with the designated invocation handler.</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           <span class="keyword">if</span> (sm != <span class="keyword">null</span>) &#123;</span><br><span class="line">               checkNewProxyPermission(Reflection.getCallerClass(), cl);</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获得构造参数是InvocationHandler的构造方法</span></span><br><span class="line">           <span class="keyword">final</span> Constructor&lt;?&gt; cons = cl.getConstructor(constructorParams);</span><br><span class="line">           <span class="keyword">final</span> InvocationHandler ih = h;</span><br><span class="line">           <span class="keyword">if</span> (!Modifier.isPublic(cl.getModifiers())) &#123;</span><br><span class="line">               AccessController.doPrivileged(<span class="keyword">new</span> PrivilegedAction&lt;<span class="keyword">Void</span>&gt;() &#123;</span><br><span class="line">                   <span class="keyword">public</span> <span class="keyword">Void</span> run() &#123;</span><br><span class="line">                       cons.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">                       <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">                   &#125;</span><br><span class="line">               &#125;);</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="comment">// 调用构造方法$Proxy0(InvocationHandler h)生成代理对象实例 </span></span><br><span class="line">           <span class="keyword">return</span> cons.newInstance(<span class="keyword">new</span> Object[]&#123;h&#125;);</span><br><span class="line">       &#125; <span class="keyword">catch</span> (IllegalAccessException|InstantiationException e) &#123;</span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> InternalError(e.toString(), e);</span><br><span class="line">       &#125; <span class="keyword">catch</span> (InvocationTargetException e) &#123;</span><br><span class="line">           Throwable t = e.getCause();</span><br><span class="line">           <span class="keyword">if</span> (t <span class="keyword">instanceof</span> RuntimeException) &#123;</span><br><span class="line">               <span class="keyword">throw</span> (RuntimeException) t;</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               <span class="keyword">throw</span> <span class="keyword">new</span> InternalError(t.toString(), t);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125; <span class="keyword">catch</span> (NoSuchMethodException e) &#123;</span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> InternalError(e.toString(), e);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>而getProxyClass0()的代码如下</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">   <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">Class</span>&lt;?&gt; getProxyClass0(ClassLoader loader,</span><br><span class="line">                                          <span class="keyword">Class</span>&lt;?&gt;... interfaces) &#123;</span><br><span class="line">       <span class="keyword">if</span> (interfaces.length &gt; <span class="number">65535</span>) &#123;</span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"interface limit exceeded"</span>);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// If the proxy class defined by the given loader implementing</span></span><br><span class="line">       <span class="comment">// the given interfaces exists, this will simply return the cached copy;</span></span><br><span class="line">       <span class="comment">// otherwise, it will create the proxy class via the ProxyClassFactory</span></span><br><span class="line"><span class="comment">// 从静态属性proxyClassCache中获取，不存在则会调用ProxyClassFactory生成</span></span><br><span class="line">       <span class="keyword">return</span> proxyClassCache.get(loader, interfaces);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="ProxyClassFactory"><a href="#ProxyClassFactory" class="headerlink" title="ProxyClassFactory"></a>ProxyClassFactory</h2><p>ProxyClassFactory是一个BiFunction，用于生成代理类</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">class</span> ProxyClassFactory</span><br><span class="line">        <span class="keyword">implements</span> BiFunction&lt;ClassLoader, <span class="keyword">Class</span>&lt;?&gt;[], <span class="keyword">Class</span>&lt;?&gt;&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// prefix for all proxy class names</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String proxyClassNamePrefix = <span class="string">"$Proxy"</span>; <span class="comment">// 生成的代理类的名称前缀</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// next number to use for generation of unique proxy class names</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> AtomicLong nextUniqueNumber = <span class="keyword">new</span> AtomicLong(); <span class="comment">// 计数器</span></span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">Class</span>&lt;?&gt; apply(ClassLoader loader, <span class="keyword">Class</span>&lt;?&gt;[] interfaces) &#123;</span><br><span class="line"></span><br><span class="line">            Map&lt;<span class="keyword">Class</span>&lt;?&gt;, <span class="keyword">Boolean</span>&gt; interfaceSet = <span class="keyword">new</span> IdentityHashMap&lt;&gt;(interfaces.length);</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">Class</span>&lt;?&gt; intf : interfaces) &#123;</span><br><span class="line">                <span class="comment">/*</span></span><br><span class="line"><span class="comment">                 * Verify that the class loader resolves the name of this</span></span><br><span class="line"><span class="comment">                 * interface to the same Class object.</span></span><br><span class="line"><span class="comment">                 */</span></span><br><span class="line">                <span class="keyword">Class</span>&lt;?&gt; interfaceClass = <span class="keyword">null</span>;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    interfaceClass = <span class="keyword">Class</span>.forName(intf.getName(), <span class="keyword">false</span>, loader);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">                &#125;</span><br><span class="line">		<span class="comment">// 判断传入的接口是不是传入的classloader加载的</span></span><br><span class="line">		<span class="comment">// 对象的比较在同一个classloader下才有意义</span></span><br><span class="line">                <span class="keyword">if</span> (interfaceClass != intf) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(</span><br><span class="line">                        intf + <span class="string">" is not visible from class loader"</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">/*</span></span><br><span class="line"><span class="comment">                 * Verify that the Class object actually represents an</span></span><br><span class="line"><span class="comment">                 * interface.</span></span><br><span class="line"><span class="comment">                 */</span></span><br><span class="line">		<span class="comment">// 传入的是不是一个接口，只能代理接口</span></span><br><span class="line">                <span class="keyword">if</span> (!interfaceClass.isInterface()) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(</span><br><span class="line">                        interfaceClass.getName() + <span class="string">" is not an interface"</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">/*</span></span><br><span class="line"><span class="comment">                 * Verify that this interface is not a duplicate.</span></span><br><span class="line"><span class="comment">                 */</span></span><br><span class="line">                <span class="keyword">if</span> (interfaceSet.put(interfaceClass, <span class="keyword">Boolean</span>.<span class="keyword">TRUE</span>) != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(</span><br><span class="line">                        <span class="string">"repeated interface: "</span> + interfaceClass.getName());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            String proxyPkg = <span class="keyword">null</span>;     <span class="comment">// package to define proxy class in</span></span><br><span class="line">            <span class="keyword">int</span> accessFlags = Modifier.<span class="keyword">PUBLIC</span> | Modifier.<span class="keyword">FINAL</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">             * Record the package of a non-public proxy interface so that the</span></span><br><span class="line"><span class="comment">             * proxy class will be defined in the same package.  Verify that</span></span><br><span class="line"><span class="comment">             * all non-public proxy interfaces are in the same package.</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">	    <span class="comment">// 判断接口的访问修饰符，public的接口，生成的类的包名可以随意，但是package的接口生成的代理类的包名需与接口一致</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">Class</span>&lt;?&gt; intf : interfaces) &#123;</span><br><span class="line">                <span class="keyword">int</span> flags = intf.getModifiers();</span><br><span class="line">                <span class="keyword">if</span> (!Modifier.isPublic(flags)) &#123;</span><br><span class="line">                    accessFlags = Modifier.<span class="keyword">FINAL</span>;</span><br><span class="line">                    String name = intf.getName();</span><br><span class="line">                    <span class="keyword">int</span> n = name.lastIndexOf(<span class="string">'.'</span>);</span><br><span class="line">                    String pkg = ((n == -<span class="number">1</span>) ? <span class="string">""</span> : name.substring(<span class="number">0</span>, n + <span class="number">1</span>));</span><br><span class="line">                    <span class="keyword">if</span> (proxyPkg == <span class="keyword">null</span>) &#123;</span><br><span class="line">                        proxyPkg = pkg;</span><br><span class="line">                    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!pkg.equals(proxyPkg)) &#123;</span><br><span class="line">                        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(</span><br><span class="line">                            <span class="string">"non-public interfaces from different packages"</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (proxyPkg == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// if no non-public proxy interfaces, use com.sun.proxy package</span></span><br><span class="line">                proxyPkg = ReflectUtil.PROXY_PACKAGE + <span class="string">"."</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">             * Choose a name for the proxy class to generate.</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            <span class="keyword">long</span> num = nextUniqueNumber.getAndIncrement();</span><br><span class="line">            String proxyName = proxyPkg + proxyClassNamePrefix + num;</span><br><span class="line"></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">             * Generate the specified proxy class.</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">	    <span class="comment">// 生成代理类.class数组 此处是直接生成字节码</span></span><br><span class="line">            <span class="keyword">byte</span>[] proxyClassFile = ProxyGenerator.generateProxyClass(</span><br><span class="line">                proxyName, interfaces, accessFlags);</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">// 加载代理类，次此处调用的是一个本地方法</span></span><br><span class="line">                <span class="keyword">return</span> defineClass0(loader, proxyName,</span><br><span class="line">                                    proxyClassFile, <span class="number">0</span>, proxyClassFile.length);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (ClassFormatError e) &#123;</span><br><span class="line">                <span class="comment">/*</span></span><br><span class="line"><span class="comment">                 * A ClassFormatError here means that (barring bugs in the</span></span><br><span class="line"><span class="comment">                 * proxy class generation code) there was some other</span></span><br><span class="line"><span class="comment">                 * invalid aspect of the arguments supplied to the proxy</span></span><br><span class="line"><span class="comment">                 * class creation (such as virtual machine limitations</span></span><br><span class="line"><span class="comment">                 * exceeded).</span></span><br><span class="line"><span class="comment">                 */</span></span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(e.toString());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>jdk动态代理生成的代理类继承了Proxy类</li>
+<li>底层是直接生成.class字节码数组，内存操作，速度快</li>
+<li>底层使用了WeakCache做缓存</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/spring/" rel="tag"><i class="fa fa-tag"></i> spring</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/post/7b3179a.html" rel="next" title="JDK动态代理的使用">
+                  <i class="fa fa-chevron-left"></i> JDK动态代理的使用
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#JDK动态代理源码解读"><span class="nav-number">1.</span> <span class="nav-text">JDK动态代理源码解读</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Proxy的数据结构"><span class="nav-number">1.1.</span> <span class="nav-text">Proxy的数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Proxy-newProxyInstance"><span class="nav-number">1.2.</span> <span class="nav-text">Proxy.newProxyInstance</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ProxyClassFactory"><span class="nav-number">1.3.</span> <span class="nav-text">ProxyClassFactory</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">1.4.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="https://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Morris"
+    src="/images/morris.png">
+  <p class="site-author-name" itemprop="name">Morris</p>
+  <div class="site-description" itemprop="description">你现在所得到的安逸将来要双倍偿还</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Morris</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: 'Iv1.0719a89e9daaa171',
+      clientSecret: '1be0a26202610ddbd49d231a941981c6649c2aff',
+      repo: 'gitalk',
+      owner: 'morris131',
+      admin: ['morris131'],
+      id: '84ad8b4a8bd2780942cf5518b72df62a',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>
