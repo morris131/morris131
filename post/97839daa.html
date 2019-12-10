@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="R01DtrTblROr_C2SkIMI9BZFFw_1FH4bT5WNNVAkdm4">
+  <meta name="baidu-site-verification" content="ZORq9vnduv">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="mybatis mapper详解Mapper XML文件中支持如下配置：">
+<meta name="keywords" content="mybatis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mybatis mapper详解">
+<meta property="og:url" content="https:&#x2F;&#x2F;morris131.github.io&#x2F;post&#x2F;97839daa.html">
+<meta property="og:site_name" content="枪手的博客">
+<meta property="og:description" content="mybatis mapper详解Mapper XML文件中支持如下配置：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;mybatis&#x2F;images&#x2F;1575968053323.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;mybatis&#x2F;images&#x2F;1575968934711.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;mybatis&#x2F;images&#x2F;1575968961120.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;mybatis&#x2F;images&#x2F;1575969034393.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;mybatis&#x2F;images&#x2F;1575974391668.png">
+<meta property="og:updated_time" content="2019-12-09T16:00:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;gitee.com&#x2F;morris131&#x2F;morris-book&#x2F;raw&#x2F;master&#x2F;back&#x2F;java&#x2F;mybatis&#x2F;images&#x2F;1575968053323.png">
+
+<link rel="canonical" href="https://morris131.github.io/post/97839daa.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>mybatis mapper详解 | 枪手的博客</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?2c9b55a761d135ab6f0695a694c71065";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="https://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="https://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">枪手的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">知识改变命运，编程照亮人生</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">14</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">7</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">71</span></a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="https://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://morris131.github.io/post/97839daa.html">
+
+    <span hidden itemprop="author" itemscope itemtype="https://schema.org/Person">
+      <meta itemprop="image" content="/images/morris.png">
+      <meta itemprop="name" content="Morris">
+      <meta itemprop="description" content="你现在所得到的安逸将来要双倍偿还">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+      <meta itemprop="name" content="枪手的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mybatis mapper详解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-10 00:00:00" itemprop="dateCreated datePublished" datetime="2019-12-10T00:00:00+08:00">2019-12-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/mybatis/" itemprop="url" rel="index">
+                    <span itemprop="name">mybatis</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="mybatis-mapper详解"><a href="#mybatis-mapper详解" class="headerlink" title="mybatis mapper详解"></a>mybatis mapper详解</h1><p>Mapper XML文件中支持如下配置：</p><a id="more"></a>
+<ul>
+<li>cache：给定命名空间的缓存配置</li>
+<li>cache-ref：其他命名空间缓存配置的引用</li>
+<li>resultMap：是最复杂也是最强大的元素，用来描述如何将数据库结果集映射为java对象</li>
+<li>sql：可被其他语句引用的可重用语句块</li>
+<li>insert：插入</li>
+<li>update：更新</li>
+<li>delete：删除</li>
+<li>select：查询</li>
+</ul>
+<p>mapper配置最核心的两个要素是：SQL语句和映射规则。</p>
+<ul>
+<li>sql insert update delete select是写SQL语句</li>
+<li>resultMap是写映射规则的</li>
+</ul>
+<h2 id="select"><a href="#select" class="headerlink" title="select"></a>select</h2><p><img src="https://gitee.com/morris131/morris-book/raw/master/back/java/mybatis/images/1575968053323.png" alt></p>
+<h3 id="resultType自动映射"><a href="#resultType自动映射" class="headerlink" title="resultType自动映射"></a>resultType自动映射</h3><p>resultType指定实体类的全限定名，mubatis会自动将查询出的字段设置到实体类的属性中</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;select <span class="built_in">id</span>=<span class="string">"findById"</span> resultType=<span class="string">"com.morris.mybatis.quickstart.entity.User"</span>&gt;</span><br><span class="line">    select <span class="built_in">id</span>,</span><br><span class="line">    login_name loginName,</span><br><span class="line">    user_name userName,</span><br><span class="line">    email,</span><br><span class="line">    phone_number phoneNumber,</span><br><span class="line">    remark</span><br><span class="line">    <span class="keyword">from</span> sys_user <span class="keyword">where</span> <span class="built_in">id</span> = <span class="comment">#&#123;id&#125;</span></span><br><span class="line">&lt;/select&gt;</span><br></pre></td></tr></table></figure>
+<p>自动映射的前提是：SQL列名和JavaBean的属性是一致的</p>
+<p>如果数据库表的列名与实体类的属性名不一致有两种解决办法：</p>
+<ul>
+<li>sql中用as取一个与属性名一致的别名</li>
+<li>如果数据库采用的是下划线，实体类采用的是驼峰，这种情况可以设置mapUnderscoreToCamelCase为true</li>
+</ul>
+<h3 id="resultMap手动映射"><a href="#resultMap手动映射" class="headerlink" title="resultMap手动映射"></a>resultMap手动映射</h3><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;resultMap <span class="built_in">id</span>=<span class="string">"BaseResultMap"</span> type=<span class="string">"com.morris.mybatis.quickstart.entity.User"</span>&gt;</span><br><span class="line">    &lt;<span class="built_in">id</span> column=<span class="string">"id"</span> <span class="keyword">property</span>=<span class="string">"id"</span>&gt;&lt;/<span class="built_in">id</span>&gt;</span><br><span class="line">    &lt;<span class="literal">result</span> column=<span class="string">"login_name"</span> <span class="keyword">property</span>=<span class="string">"loginName"</span>&gt;&lt;/<span class="literal">result</span>&gt;</span><br><span class="line">    &lt;<span class="literal">result</span> column=<span class="string">"user_name"</span> <span class="keyword">property</span>=<span class="string">"userName"</span>&gt;&lt;/<span class="literal">result</span>&gt;</span><br><span class="line">    &lt;<span class="literal">result</span> column=<span class="string">"email"</span> <span class="keyword">property</span>=<span class="string">"email"</span>&gt;&lt;/<span class="literal">result</span>&gt;</span><br><span class="line">    &lt;<span class="literal">result</span> column=<span class="string">"phone_number"</span> <span class="keyword">property</span>=<span class="string">"phoneNumber"</span>&gt;&lt;/<span class="literal">result</span>&gt;</span><br><span class="line">    &lt;<span class="literal">result</span> column=<span class="string">"remark"</span> <span class="keyword">property</span>=<span class="string">"remark"</span>&gt;&lt;/<span class="literal">result</span>&gt;</span><br><span class="line">&lt;/resultMap&gt;</span><br><span class="line"></span><br><span class="line">&lt;select <span class="built_in">id</span>=<span class="string">"findById3"</span> resultMap=<span class="string">"BaseResultMap"</span>&gt;</span><br><span class="line">    select <span class="built_in">id</span>,</span><br><span class="line">    login_name,</span><br><span class="line">    user_name,</span><br><span class="line">    email,</span><br><span class="line">    phone_number,</span><br><span class="line">    remark</span><br><span class="line">    <span class="keyword">from</span> sys_user <span class="keyword">where</span> <span class="built_in">id</span> = <span class="comment">#&#123;id&#125;</span></span><br><span class="line">&lt;/select&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h4><p><img src="https://gitee.com/morris131/morris-book/raw/master/back/java/mybatis/images/1575968934711.png" alt></p>
+<h4 id="子元素"><a href="#子元素" class="headerlink" title="子元素"></a>子元素</h4><p><img src="https://gitee.com/morris131/morris-book/raw/master/back/java/mybatis/images/1575968961120.png" alt></p>
+<h4 id="id-amp-result"><a href="#id-amp-result" class="headerlink" title="id&amp;result"></a>id&amp;result</h4><p>id和result都将一个列的值映射到一个简单数据类型的属性或字段；</p>
+<p>id表示的结果将是对象的标识属性（key主键一样），在比较对象实例时用到。可以提高整体的性能，尤其是缓存和嵌套结果映射（也就是联合映射）的时候。<br><img src="https://gitee.com/morris131/morris-book/raw/master/back/java/mybatis/images/1575969034393.png" alt></p>
+<h4 id="constructor-NaN"><a href="#constructor-NaN" class="headerlink" title="constructor"></a>constructor</h4><p>一个pojo不存在没有参数的构造方法，就需要使用construtor</p>
+<p>为了通过名称来引用构造方法参数，可以添加@Param注解，指定参数名称的前提下，以任意顺序编写arg元素。</p>
+<figure class="highlight delphi"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;<span class="function"><span class="keyword">constructor</span>&gt;</span></span><br><span class="line"><span class="function">  &lt;<span class="title">idArg</span> <span class="title">column</span>="<span class="title">id</span>" <span class="title">javaType</span>="<span class="title">int</span>"/&gt;</span></span><br><span class="line"><span class="function">  &lt;<span class="title">arg</span> <span class="title">column</span>="<span class="title">user_name</span>" <span class="title">javaType</span>="<span class="title">String</span>"/&gt;</span></span><br><span class="line"><span class="function">&lt;/<span class="title">constructor</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="传递多个请求参数"><a href="#传递多个请求参数" class="headerlink" title="传递多个请求参数"></a>传递多个请求参数</h2><ul>
+<li>map传递参数：可读性差，导致可维护性和可扩展性差，杜绝使用</li>
+<li>注解传递参数：直观明了，当参数小于5个时，建议使用</li>
+<li>Java Bean的方式传递参数：当参数大于5个时，建议使用</li>
+</ul>
+<p>不管怎么传参，xml的配置都是一样，但是xml中select元素的id必须唯一，所以UserMapper类中不能出现重载的方法</p>
+<h3 id="注解传参"><a href="#注解传参" class="headerlink" title="注解传参"></a>注解传参</h3><p>UserMapper.xml配置如下:</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;<span class="keyword">select</span> id="findByUserNameAndEmail" resultMap="BaseResultMap"&gt;</span><br><span class="line">    <span class="keyword">select</span> id,</span><br><span class="line">    login_name,</span><br><span class="line">    user_name,</span><br><span class="line">    email,</span><br><span class="line">    phone_number,</span><br><span class="line">    remark</span><br><span class="line">    <span class="keyword">from</span> sys_user</span><br><span class="line">    <span class="keyword">where</span> user_name = #&#123;userName&#125; <span class="keyword">and</span></span><br><span class="line">    email <span class="keyword">like</span> CONCAT(<span class="string">'%'</span>, #&#123;email&#125;, <span class="string">'%'</span>)</span><br><span class="line">&lt;/<span class="keyword">select</span>&gt;</span><br></pre></td></tr></table></figure>
+<p>UserMapper.java配置如下：</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">User</span> <span class="selector-tag">findByUserNameAndEmail</span>(<span class="variable">@Param</span>(<span class="string">"userName"</span>) String userName, <span class="variable">@Param</span>(<span class="string">"email"</span>) String email);</span><br></pre></td></tr></table></figure>
+<h3 id="map传参"><a href="#map传参" class="headerlink" title="map传参"></a>map传参</h3><p>UserMapper.xml配置如下:</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;<span class="keyword">select</span> id="findByUserNameAndEmail2" resultMap="BaseResultMap"&gt;</span><br><span class="line">    <span class="keyword">select</span> id,</span><br><span class="line">    login_name,</span><br><span class="line">    user_name,</span><br><span class="line">    email,</span><br><span class="line">    phone_number,</span><br><span class="line">    remark</span><br><span class="line">    <span class="keyword">from</span> sys_user</span><br><span class="line">    <span class="keyword">where</span> user_name = #&#123;userName&#125; <span class="keyword">and</span></span><br><span class="line">    email <span class="keyword">like</span> CONCAT(<span class="string">'%'</span>, #&#123;email&#125;, <span class="string">'%'</span>)</span><br><span class="line">&lt;/<span class="keyword">select</span>&gt;</span><br></pre></td></tr></table></figure>
+<p>UserMapper.java配置如下：</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">User</span> findByUserNameAndEmail2(<span class="meta">Map</span>&lt;<span class="keyword">String, </span><span class="keyword">String&gt; </span><span class="meta">map</span>)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<h3 id="java-bean传参"><a href="#java-bean传参" class="headerlink" title="java bean传参"></a>java bean传参</h3><p>UserMapper.xml配置如下:</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;<span class="keyword">select</span> id="findByUserNameAndEmail3" resultMap="BaseResultMap"&gt;</span><br><span class="line">    <span class="keyword">select</span> id,</span><br><span class="line">    login_name,</span><br><span class="line">    user_name,</span><br><span class="line">    email,</span><br><span class="line">    phone_number,</span><br><span class="line">    remark</span><br><span class="line">    <span class="keyword">from</span> sys_user</span><br><span class="line">    <span class="keyword">where</span> user_name = #&#123;userName&#125; <span class="keyword">and</span></span><br><span class="line">    email <span class="keyword">like</span> CONCAT(<span class="string">'%'</span>, #&#123;email&#125;, <span class="string">'%'</span>)</span><br><span class="line">&lt;/<span class="keyword">select</span>&gt;</span><br></pre></td></tr></table></figure>
+<p>UserMapper.java配置如下：</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">User</span> <span class="title">findByUserNameAndEmail3</span>(UserVo userVo);</span><br></pre></td></tr></table></figure>
+
+<h2 id="与"><a href="#与" class="headerlink" title="$与#"></a>$与#</h2><p>传值${}：传入的数据直接显式生成在sql中，无法防止sql注入，直接插入到sql语句中。</p>
+<p>预编译#{}：将传入的数据当成一个字符串，会对自动传入的数据加一个单引号，能够很大程序防止sql注入，使用占位符?表示。</p>
+<p>表名、选取的列是动态的，order by和in操作，只能使用$，其他情况使用尽量使用#</p>
+<p>UserMapper.xml配置如下:</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;<span class="keyword">select</span> id=<span class="string">"selectBySymbol"</span> resultMap=<span class="string">"BaseResultMap"</span>&gt;</span><br><span class="line">    <span class="keyword">select</span></span><br><span class="line">    $&#123;inCol&#125;</span><br><span class="line">    <span class="keyword">from</span> $&#123;tableName&#125;</span><br><span class="line">    <span class="keyword">where</span> user_name = <span class="meta">#&#123;userName&#125;</span></span><br><span class="line">    order <span class="keyword">by</span> $&#123;orderStr&#125;</span><br><span class="line">&lt;/<span class="keyword">select</span>&gt;</span><br></pre></td></tr></table></figure>
+<p>UserMapper.java配置如下：</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">User</span> <span class="selector-tag">selectBySymbol</span>(<span class="variable">@Param</span>(<span class="string">"tableName"</span>) String tableName, <span class="variable">@Param</span>(<span class="string">"inCol"</span>) String inCol, <span class="variable">@Param</span>(<span class="string">"userName"</span>) String userName, <span class="variable">@Param</span>(<span class="string">"orderStr"</span>) String orderStr);</span><br></pre></td></tr></table></figure>
+<p>测试代码：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">@Test</span><br><span class="line">public void select<span class="constructor">BySymbol()</span> &#123;</span><br><span class="line">    SqlSession sqlSession = sqlSessionFactory.<span class="keyword">open</span><span class="constructor">Session()</span>;</span><br><span class="line"></span><br><span class="line">    UserMapper userDao = sqlSession.get<span class="constructor">Mapper(UserMapper.<span class="params">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    String inCol = <span class="string">"id,login_name,user_name,email,phone_number,remark"</span>;</span><br><span class="line">    String tableName = <span class="string">"sys_user"</span>;</span><br><span class="line">    String userName = <span class="string">"morris"</span>;</span><br><span class="line">    String orderStr = <span class="string">"user_name"</span>;</span><br><span class="line">    User user = userDao.select<span class="constructor">BySymbol(<span class="params">tableName</span>, <span class="params">inCol</span>, <span class="params">userName</span>, <span class="params">orderStr</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="module-access"><span class="module"><span class="identifier">System</span>.</span></span>out.println(user.<span class="keyword">to</span><span class="constructor">String()</span>);</span><br><span class="line"></span><br><span class="line">    sqlSession.close<span class="literal">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果如下：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-10</span> <span class="number">18</span>:<span class="number">12</span>:<span class="number">57</span> DEBUG LogFactory:<span class="number">105</span> - Logging initialized using <span class="string">'class org.apache.ibatis.logging.log4j.Log4jImpl'</span> adapter.</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-10</span> <span class="number">18</span>:<span class="number">12</span>:<span class="number">57</span> DEBUG JdbcTransaction:<span class="number">136</span> - Opening JDBC Connection</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-10</span> <span class="number">18</span>:<span class="number">12</span>:<span class="number">57</span> DEBUG JdbcTransaction:<span class="number">100</span> - Setting <span class="built_in">auto</span>commit to <span class="literal">false</span> on JDBC Connection [com.mysql.cj.jdbc.<span class="symbol">ConnectionImpl@</span><span class="number">2</span>b6faea6]</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-10</span> <span class="number">18</span>:<span class="number">12</span>:<span class="number">57</span> DEBUG selectBySymbol:<span class="number">143</span> - ==&gt;  Preparing: select id,login_name,user_name,email,phone_number,remark <span class="keyword">from</span> sys_user where user_name = ? order by user_name </span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-10</span> <span class="number">18</span>:<span class="number">12</span>:<span class="number">57</span> DEBUG selectBySymbol:<span class="number">143</span> - ==&gt; Parameters: morris(String)</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-10</span> <span class="number">18</span>:<span class="number">12</span>:<span class="number">57</span> DEBUG selectBySymbol:<span class="number">143</span> - &lt;==      Total: <span class="number">1</span></span><br><span class="line">User&#123;id=<span class="number">0</span>, loginName=<span class="string">'morris'</span>, userName=<span class="string">'morris'</span>, email=<span class="string">'morris@qq.com'</span>, phoneNumber=<span class="string">'13800000000'</span>, remark=<span class="string">'test'</span>&#125;</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-10</span> <span class="number">18</span>:<span class="number">12</span>:<span class="number">57</span> DEBUG JdbcTransaction:<span class="number">122</span> - Resetting <span class="built_in">auto</span>commit to <span class="literal">true</span> on JDBC Connection [com.mysql.cj.jdbc.<span class="symbol">ConnectionImpl@</span><span class="number">2</span>b6faea6]</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-10</span> <span class="number">18</span>:<span class="number">12</span>:<span class="number">57</span> DEBUG JdbcTransaction:<span class="number">90</span> - Closing JDBC Connection [com.mysql.cj.jdbc.<span class="symbol">ConnectionImpl@</span><span class="number">2</span>b6faea6]</span><br></pre></td></tr></table></figure>
+
+<h2 id="insert、update和delete"><a href="#insert、update和delete" class="headerlink" title="insert、update和delete"></a>insert、update和delete</h2><p><img src="https://gitee.com/morris131/morris-book/raw/master/back/java/mybatis/images/1575974391668.png" alt></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/mybatis/" rel="tag"><i class="fa fa-tag"></i> mybatis</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/post/222a6d6b.html" rel="next" title="mybatis入门示例">
+                  <i class="fa fa-chevron-left"></i> mybatis入门示例
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/post/ed3339dd.html" rel="prev" title="mybatis configuration详解">
+                  mybatis configuration详解 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#mybatis-mapper详解"><span class="nav-number">1.</span> <span class="nav-text">mybatis mapper详解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#select"><span class="nav-number">1.1.</span> <span class="nav-text">select</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#resultType自动映射"><span class="nav-number">1.1.1.</span> <span class="nav-text">resultType自动映射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#resultMap手动映射"><span class="nav-number">1.1.2.</span> <span class="nav-text">resultMap手动映射</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#属性"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#子元素"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">子元素</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#id-amp-result"><span class="nav-number">1.1.2.3.</span> <span class="nav-text">id&amp;result</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#constructor-NaN"><span class="nav-number">1.1.2.4.</span> <span class="nav-text">constructor</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#传递多个请求参数"><span class="nav-number">1.2.</span> <span class="nav-text">传递多个请求参数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#注解传参"><span class="nav-number">1.2.1.</span> <span class="nav-text">注解传参</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map传参"><span class="nav-number">1.2.2.</span> <span class="nav-text">map传参</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#java-bean传参"><span class="nav-number">1.2.3.</span> <span class="nav-text">java bean传参</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#与"><span class="nav-number">1.3.</span> <span class="nav-text">$与#</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#insert、update和delete"><span class="nav-number">1.4.</span> <span class="nav-text">insert、update和delete</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="https://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Morris"
+    src="/images/morris.png">
+  <p class="site-author-name" itemprop="name">Morris</p>
+  <div class="site-description" itemprop="description">你现在所得到的安逸将来要双倍偿还</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Morris</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: 'Iv1.0719a89e9daaa171',
+      clientSecret: '1be0a26202610ddbd49d231a941981c6649c2aff',
+      repo: 'gitalk',
+      owner: 'morris131',
+      admin: ['morris131'],
+      id: '51e557085cc44d2dfcbd6941fcb2ce32',
+        language: 'zh-CN',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>
